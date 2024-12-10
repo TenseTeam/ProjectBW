@@ -28,7 +28,6 @@ void UStateBase::OnHandleInput_Implementation(AActor* Context, const EInputActio
 
 void UStateBase::Enter(AActor* Context)
 {
-	FGvDebug::Log("Enter " + GetName());
 	OnEnter(Context);
 }
 

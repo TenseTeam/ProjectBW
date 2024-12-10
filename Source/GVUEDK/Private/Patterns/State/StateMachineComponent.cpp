@@ -16,11 +16,11 @@ UStateMachineComponent::UStateMachineComponent()
 void UStateMachineComponent::Initialize()
 {
 	//Context initialization
-	if (IsValid(ContextClass))
+	if (bUseExternalContext && IsValid(ContextClass))
 	{
 		Context = NewObject<AActor>(this, ContextClass);
 	}
-	else if (IsValid(GetOwner()))
+	else if (!bUseExternalContext && IsValid(GetOwner()))
 	{
 		Context = GetOwner();
 	}
@@ -28,6 +28,8 @@ void UStateMachineComponent::Initialize()
 	{
 		FGvDebug::Error("Invalid Context");
 		Context = nullptr;
+		bInitialized = false;
+		return;
 	}
 
 	//States initialization
@@ -42,7 +44,7 @@ void UStateMachineComponent::Initialize()
 				UStateBase* State = NewObject<UStateBase>(this, StateClass);
 				State->Initialize(Context);
 				States.Emplace(State);
-				FGvDebug::Log("State " + State->GetName() + " Initialized");
+				FGvDebug::Log("State " + State->GetName() + " created");
 				continue;
 			}
 			FGvDebug::Warning("Invalid State Class");
@@ -114,6 +116,14 @@ void UStateMachineComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	if (bInitialized)
 	{
 		CurrentState->Update(Context, DeltaTime);
+	}
+}
+
+void UStateMachineComponent::HandleInput(const EInputActionType InputAction, const FInputActionValue& Value)
+{
+	if (bInitialized)
+	{
+		CurrentState->HandleInput(Context, InputAction, Value);
 	}
 }
 

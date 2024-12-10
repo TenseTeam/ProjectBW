@@ -18,7 +18,9 @@ private:
 	
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
 	TArray<TSubclassOf<UStateBase>> StateClasses;
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true", ToolTip = "If false, the owner of this component will be used as the context"))
+	bool bUseExternalContext;
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true", EditCondition = "bUseExternalContext"))
 	TSubclassOf<AActor> ContextClass;
 	
 	UPROPERTY()
@@ -45,6 +47,8 @@ public:
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 							   FActorComponentTickFunction* ThisTickFunction) override;
+
+	virtual void HandleInput(const EInputActionType InputAction, const FInputActionValue& Value);
 
 protected:
 	virtual void BeginPlay() override;
