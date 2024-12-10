@@ -3,6 +3,8 @@
 
 #include "Features/Player/States/Idle.h"
 
+#include "ShaderCompiler.h"
+
 void UIdle::Enter(AActor* Context)
 {
 	if (!bInitialized)
@@ -10,7 +12,7 @@ void UIdle::Enter(AActor* Context)
 		return;
 	}
 	Super::Enter(Context);
-	//Character->CharacterState = ECharacterState::Idle;
+	Character->CharacterState = ECharacterState::Standing;
 }
 
 void UIdle::Update(AActor* Context, float deltaTime)
@@ -35,14 +37,17 @@ void UIdle::HandleInput(AActor* Context, const EInputActionType InputAction, con
 	}
 	Super::HandleInput(Context, InputAction, Value);
 
-	// if (InputAction == EInputActionType::Walk)
-	// {
-	// 	if (UActorStateBase* moveState = Controller->GetState(1))
-	// 	{
-	// 		Controller->ChangeControllerState(moveState);
-	// 	}
-	// 	return;
-	// }
+	if (InputAction == EInputActionType::Walk)
+	{
+		Character->ChangeState(1);
+		return;
+	}
+
+	if (InputAction == EInputActionType::Run)
+	{
+		Character->ChangeState(2);
+		return;
+	}
 	//
 	// if (InputAction == EInputActionType::Run)
 	// {

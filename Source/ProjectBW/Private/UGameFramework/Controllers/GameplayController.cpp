@@ -27,6 +27,8 @@ void AGameplayController::SetupInputComponent()
 		enhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AGameplayController::Walk);
 		enhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AGameplayController::StopWalk);
 		enhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AGameplayController::Look);
+		enhancedInputComponent->BindAction(RunAction, ETriggerEvent::Triggered, this, &AGameplayController::Run);
+		enhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this, &AGameplayController::StopRun);
 		EnhancedInputComponent = enhancedInputComponent;
 	}
 }
@@ -68,8 +70,11 @@ void AGameplayController::Look(const FInputActionValue& Value)
 
 void AGameplayController::Run(const FInputActionValue& Value)
 {
+	if (!BWCharacter->CanRun()) return;
+	BWCharacter->HandleInput(EInputActionType::Run, Value);
 }
 
 void AGameplayController::StopRun(const FInputActionValue& Value)
 {
+	BWCharacter->SetIsRunning(false);
 }

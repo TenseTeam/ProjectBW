@@ -11,6 +11,21 @@
 #include "Patterns/State/StateMachineComponent.h"
 #include "BWCharacter.generated.h"
 
+class AGameplayController;
+
+UENUM(BlueprintType)
+enum class ECharacterState : uint8
+{
+	Standing UMETA(DisplayName = "Standing"),
+	Walking UMETA(DisplayName = "Walking"),
+	Running UMETA(DisplayName = "Running"),
+	Jumping UMETA(DisplayName = "Jumping"),
+	Dodging UMETA(DisplayName = "Dodging"),
+	Shooting UMETA(DisplayName = "Shooting"),
+	Hooking UMETA(DisplayName = "Hooking"),
+	Climbing UMETA(DisplayName = "Climbing")
+};
+
 UCLASS()
 class PROJECTBW_API ABWCharacter : public ABWCharacterBase
 {
@@ -20,6 +35,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UCharacterData* Data;
 
+	UPROPERTY(BlueprintReadOnly)
+	ECharacterState CharacterState;
+
+	
+
 private:
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
 	UStateMachineComponent* StateMachineComponent;
@@ -27,9 +47,17 @@ private:
 	UGvSpringArmComponent* SpringArm;
 	UPROPERTY()
 	UCameraComponent* Camera;
+	UPROPERTY()
+	AGameplayController* BWController;
 
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	bool bIsRunning;
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bCanMove;
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bCanLook;
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	bool bCanRun;
 	
 
 public:
@@ -40,10 +68,19 @@ public:
 	void ChangeState(const int Index) const;
 	const UCharacterStatsBase* GetState(const int Index) const;
 
+	void Move(const FVector& MoveVector);
+
 	UFUNCTION(BlueprintCallable)
-	bool CanMove();
+	bool IsRunning() const;
 	UFUNCTION(BlueprintCallable)
-	bool CanLook();
+	void SetIsRunning(bool Value);
+	
+	UFUNCTION(BlueprintCallable)
+	bool CanMove() const;
+	UFUNCTION(BlueprintCallable)
+	bool CanLook() const;
+	UFUNCTION(BlueprintCallable)
+	bool CanRun() const;
 
 protected:
 	virtual void BeginPlay() override;

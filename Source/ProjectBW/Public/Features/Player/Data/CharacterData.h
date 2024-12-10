@@ -16,5 +16,8 @@ class PROJECTBW_API UCharacterData : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Running")
+	float RunSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Running")
+	float RunAcceleration;
 };
