@@ -20,4 +20,9 @@ public:
 	float RunSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Running")
 	float RunAcceleration;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Jumping")
+	UCurveFloat* AscentGravityCurve;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Jumping")
+	UCurveFloat* DescentGravityCurve;
 };

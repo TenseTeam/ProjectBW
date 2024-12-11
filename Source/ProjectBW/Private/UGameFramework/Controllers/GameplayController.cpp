@@ -29,6 +29,7 @@ void AGameplayController::SetupInputComponent()
 		enhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AGameplayController::Look);
 		enhancedInputComponent->BindAction(RunAction, ETriggerEvent::Triggered, this, &AGameplayController::Run);
 		enhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this, &AGameplayController::StopRun);
+		enhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AGameplayController::Jump);
 		EnhancedInputComponent = enhancedInputComponent;
 	}
 }
@@ -66,6 +67,12 @@ void AGameplayController::Look(const FInputActionValue& Value)
 	const FVector LookVector = Value.Get<FVector>();
 	AddYawInput(LookVector.X);
 	AddPitchInput(-LookVector.Y);
+}
+
+void AGameplayController::Jump(const FInputActionValue& Value)
+{
+	if (!BWCharacter->CanJump()) return;
+	BWCharacter->HandleInput(EInputActionType::Jump, Value);
 }
 
 void AGameplayController::Run(const FInputActionValue& Value)

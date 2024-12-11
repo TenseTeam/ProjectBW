@@ -25,6 +25,9 @@ private:
 	UInputAction* LookAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UInputAction* RunAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UInputAction* JumpAction;
+	
 	UPROPERTY()
 	UEnhancedInputComponent* EnhancedInputComponent;
 	UPROPERTY()
@@ -46,7 +49,7 @@ private:
 	void StopWalk(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	//void Dodge(const FInputActionValue& Value);
-	//void Jump(const FInputActionValue& Value);
+	void Jump(const FInputActionValue& Value);
 	void Run(const FInputActionValue& Value);
 	void StopRun(const FInputActionValue& Value);
 	//void Shoot(const FInputActionValue& Value);

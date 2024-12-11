@@ -54,4 +54,10 @@ void UWalk::HandleInput(AActor* Context, const EInputActionType InputAction, con
 		Character->ChangeState(2);
 		return;
 	}
+
+	if (InputAction == EInputActionType::Jump)
+	{
+		Character->ChangeState(3);
+		return;
+	}
 }

@@ -78,4 +78,10 @@ void URun::HandleInput(AActor* Context, const EInputActionType InputAction, cons
 		Character->Move(Value.Get<FVector>());
 		return;
 	}
+
+	if (InputAction == EInputActionType::Jump)
+	{
+		Character->ChangeState(3);
+		return;
+	}
 }

@@ -19,6 +19,6 @@ float UGroundCheckComponent::CheckGroundDistance() const
 	{
 		return (Start - HitResult.ImpactPoint).Size();
 	}
-	return MaxGroundDistance;
+	return -1.0f;
 }
 

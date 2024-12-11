@@ -24,6 +24,7 @@ private:
 
 public:
 	UGroundCheckComponent();
+	FORCEINLINE float GetMaxGroundDistance() const { return MaxGroundDistance; }
 	
 	UFUNCTION(BlueprintCallable)
 	float CheckGroundDistance() const;
