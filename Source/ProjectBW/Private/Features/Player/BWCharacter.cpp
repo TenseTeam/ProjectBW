@@ -32,6 +32,7 @@ ABWCharacter::ABWCharacter()
 	bCanMove = true;
 	bCanLook = true;
 	bCanRun = true;
+	bCanDodge = true;
 }
 
 void ABWCharacter::BeginPlay()
@@ -124,6 +125,16 @@ bool ABWCharacter::CanLook() const
 bool ABWCharacter::CanRun() const
 {
 	return bCanRun;
+}
+
+void ABWCharacter::SetCanDodge(bool Value)
+{
+	bCanDodge = Value;
+}
+
+bool ABWCharacter::CanDodge() const
+{
+	return bCanDodge;
 }
 
 void ABWCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)

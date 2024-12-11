@@ -83,6 +83,8 @@ private:
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bCanRun;
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	bool bCanDodge;
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bCanShoot;
 	
 
@@ -121,6 +123,11 @@ public:
 	bool CanLook() const;
 	UFUNCTION(BlueprintCallable)
 	bool CanRun() const;
+
+	UFUNCTION(BlueprintCallable)
+	void SetCanDodge(bool Value);
+	UFUNCTION(BlueprintCallable)
+	bool CanDodge() const;
 
 private:
 	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode) override;

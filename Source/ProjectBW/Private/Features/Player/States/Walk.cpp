@@ -60,4 +60,10 @@ void UWalk::HandleInput(AActor* Context, const EInputActionType InputAction, con
 		Character->ChangeState(3);
 		return;
 	}
+
+	if (InputAction == EInputActionType::Dodge /*&& !Character->GetCharacterMovement()->IsFalling() */)
+	{
+		Character->ChangeState(4);
+		return;
+	}
 }

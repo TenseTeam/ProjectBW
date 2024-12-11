@@ -27,6 +27,8 @@ private:
 	UInputAction* RunAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UInputAction* JumpAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UInputAction* DodgeAction;
 	
 	UPROPERTY()
 	UEnhancedInputComponent* EnhancedInputComponent;
@@ -45,13 +47,13 @@ private:
 
 	void AddMappingContext() const;
 	
+	void Look(const FInputActionValue& Value);
 	void Walk(const FInputActionValue& Value);
 	void StopWalk(const FInputActionValue& Value);
-	void Look(const FInputActionValue& Value);
-	//void Dodge(const FInputActionValue& Value);
-	void Jump(const FInputActionValue& Value);
 	void Run(const FInputActionValue& Value);
 	void StopRun(const FInputActionValue& Value);
+	void Jump(const FInputActionValue& Value);
+	void Dodge(const FInputActionValue& Value);
 	//void Shoot(const FInputActionValue& Value);
 	//void StopShoot(const FInputActionValue& Value);
 	//void Aim(const FInputActionValue& Value);

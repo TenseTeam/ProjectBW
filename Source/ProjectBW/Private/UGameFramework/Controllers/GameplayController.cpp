@@ -30,6 +30,7 @@ void AGameplayController::SetupInputComponent()
 		enhancedInputComponent->BindAction(RunAction, ETriggerEvent::Triggered, this, &AGameplayController::Run);
 		enhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this, &AGameplayController::StopRun);
 		enhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AGameplayController::Jump);
+		enhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &AGameplayController::Dodge);
 		EnhancedInputComponent = enhancedInputComponent;
 	}
 }
@@ -49,6 +50,14 @@ void AGameplayController::AddMappingContext() const
 	}
 }
 
+void AGameplayController::Look(const FInputActionValue& Value)
+{
+	if (!BWCharacter->CanLook()) return;
+	const FVector LookVector = Value.Get<FVector>();
+	AddYawInput(LookVector.X);
+	AddPitchInput(-LookVector.Y);
+}
+
 void AGameplayController::Walk(const FInputActionValue& Value)
 {
 	MoveInputValue = Value.Get<FVector>();
@@ -61,20 +70,6 @@ void AGameplayController::StopWalk(const FInputActionValue& Value)
 	MoveInputValue = FVector::ZeroVector;
 }
 
-void AGameplayController::Look(const FInputActionValue& Value)
-{
-	if (!BWCharacter->CanLook()) return;
-	const FVector LookVector = Value.Get<FVector>();
-	AddYawInput(LookVector.X);
-	AddPitchInput(-LookVector.Y);
-}
-
-void AGameplayController::Jump(const FInputActionValue& Value)
-{
-	if (!BWCharacter->CanJump()) return;
-	BWCharacter->HandleInput(EInputActionType::Jump, Value);
-}
-
 void AGameplayController::Run(const FInputActionValue& Value)
 {
 	if (!BWCharacter->CanRun()) return;
@@ -85,3 +80,16 @@ void AGameplayController::StopRun(const FInputActionValue& Value)
 {
 	BWCharacter->SetIsRunning(false);
 }
+
+void AGameplayController::Jump(const FInputActionValue& Value)
+{
+	if (!BWCharacter->CanJump()) return;
+	BWCharacter->HandleInput(EInputActionType::Jump, Value);
+}
+
+void AGameplayController::Dodge(const FInputActionValue& Value)
+{
+	if (!BWCharacter->CanDodge()) return;
+	BWCharacter->HandleInput(EInputActionType::Dodge, Value);
+}
+
