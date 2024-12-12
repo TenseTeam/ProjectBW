@@ -17,5 +17,11 @@ public class ProjectBWEditorTarget : TargetRules
 			"VUNDK",
 			"GVUEDK"
 		} );
+		RegisterModulesCreatedByRider();
+	}
+
+	private void RegisterModulesCreatedByRider()
+	{
+		ExtraModuleNames.AddRange(new string[] { "LGUEDK" });
 	}
 }
