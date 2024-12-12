@@ -30,10 +30,10 @@ enum class ECharacterState : uint8
 UENUM(BlueprintType) 
 enum class EJumpState : uint8
 {
-	None UMETA(DisplayName = "None"),
-	JumpStart UMETA(DisplayName = "JumpStart"),
-	JumpLoop UMETA(DisplayName = "JumpLoop"),
-	JumpEnd UMETA(DisplayName = "JumpEnd")
+	None = 0 UMETA(DisplayName = "None"),
+	JumpStart = 1 UMETA(DisplayName = "JumpStart"),
+	JumpLoop = 2 UMETA(DisplayName = "JumpLoop"),
+	JumpEnd = 3 UMETA(DisplayName = "JumpEnd")
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMovementModeChanged);
@@ -54,7 +54,7 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	ECharacterState CharacterState = ECharacterState::Standing;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	EJumpState JumpState = EJumpState::None;
 
 private:
@@ -101,6 +101,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	float GetGroundDistance() const;
+	UFUNCTION(BlueprintCallable)
+	bool MoveInputActive() const;
 
 	UFUNCTION(BlueprintCallable)
 	bool IsRunning() const;

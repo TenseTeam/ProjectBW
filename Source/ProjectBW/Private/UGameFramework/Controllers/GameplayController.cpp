@@ -15,6 +15,11 @@ void AGameplayController::BeginPlay()
 {
 	Super::BeginPlay();
 	BWCharacter = Cast<ABWCharacter>(GetCharacter());
+	if (!BWCharacter)
+	{
+		FGvDebug::Warning(GetName() + " Has Invalid Character, input will not work", true);
+		return;
+	}
 	AddMappingContext();
 	
 }
@@ -83,7 +88,7 @@ void AGameplayController::StopRun(const FInputActionValue& Value)
 
 void AGameplayController::Jump(const FInputActionValue& Value)
 {
-	if (!BWCharacter->CanJump()) return;
+	//if (BWCharacter->JumpState != EJumpState::None) return;
 	BWCharacter->HandleInput(EInputActionType::Jump, Value);
 }
 

@@ -20,9 +20,9 @@ void UDodge::Initialize(AActor* Context)
 	DefaultBrakingDecelerationWalking = Character->GetCharacterMovement()->BrakingDecelerationWalking;
 	DodgeAnimMontage = Character->Data->DodgeAnimMontage;
 	DodgeAnimLenght = DodgeAnimMontage->GetPlayLength() / Character->Data->DodgeAnimPlayRate;
-	FGvDebug::Log("Lenght: " + FString::SanitizeFloat(DodgeAnimMontage->GetPlayLength()), true);
-	FGvDebug::Log("Rate: " + FString::SanitizeFloat(Character->Data->DodgeAnimPlayRate), true);
-	FGvDebug::Log("DodgeAnimLenght: " + FString::SanitizeFloat(DodgeAnimLenght), true);
+	//FGvDebug::Log("Lenght: " + FString::SanitizeFloat(DodgeAnimMontage->GetPlayLength()), true);
+	//FGvDebug::Log("Rate: " + FString::SanitizeFloat(Character->Data->DodgeAnimPlayRate), true);
+	//FGvDebug::Log("DodgeAnimLenght: " + FString::SanitizeFloat(DodgeAnimLenght), true);
 	ExitNormalizedTime = Character->Data->ExitNormalizedTime;
 	RotationSpeed = Character->Data->RotationSpeed;
 }

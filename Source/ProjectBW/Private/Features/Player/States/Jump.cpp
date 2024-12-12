@@ -10,13 +10,14 @@
 void UJump::Initialize(AActor* Context)
 {
 	Super::Initialize(Context);
-	if (!IsValid(Character->Data) || !IsValid(Character->Data->AscentGravityCurve) || !IsValid(Character->Data->DescentGravityCurve))
+	if (!IsValid(Character->Data) || !IsValid(Character->Data->AscentGravityCurve) || !IsValid(
+		Character->Data->DescentGravityCurve))
 	{
 		FGvDebug::Warning("Jump state has missing required data", true);
 		bInitialized = false;
 		return;
 	}
-	
+
 	// register to the apex reached event
 	ABWCharacter::OnNotifyApexEvent.AddDynamic(this, &UJump::OnJumpApexReached);
 }
@@ -53,7 +54,7 @@ void UJump::Update(AActor* Context, float DeltaTime)
 		return;
 	}
 	Super::Update(Context, DeltaTime);
-	
+
 	const float DistanceFromJumpStart = FMath::Abs(Character->GetActorLocation().Z - JumpStartZPos);
 	UpdateGravity(DistanceFromJumpStart * 0.01 /*convert from cm/s to m/s */);
 
@@ -111,7 +112,7 @@ void UJump::HandleInput(AActor* Context, const EInputActionType InputAction, con
 	//TO DO: add shoot and aim
 }
 
-void UJump::UpdateGravity(const float GroundDistance) const 
+void UJump::UpdateGravity(const float GroundDistance) const
 {
 	if (Character->GetVelocity().Z >= 0)
 	{
@@ -129,7 +130,8 @@ void UJump::OnJumpApexReached()
 	{
 		Character->JumpState = EJumpState::JumpLoop;
 	}
-	else if (Character->CharacterState != ECharacterState::Dodging && Character->CharacterState != ECharacterState::Hooking)
+	else if (Character->CharacterState != ECharacterState::Dodging && Character->CharacterState !=
+		ECharacterState::Hooking)
 	{
 		Character->ChangeState(3); // Jump
 	}

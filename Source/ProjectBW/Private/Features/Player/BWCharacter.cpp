@@ -21,7 +21,7 @@ ABWCharacter::ABWCharacter()
 
 	SpringArm = CreateDefaultSubobject<UGvSpringArmComponent>("SpringArm");
 	SpringArm->SetupAttachment(RootComponent);
-	
+
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 	Camera->SetupAttachment(SpringArm);
 
@@ -33,12 +33,18 @@ ABWCharacter::ABWCharacter()
 	bCanLook = true;
 	bCanRun = true;
 	bCanDodge = true;
+
+	//JumpState = EJumpState::None;
 }
 
 void ABWCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	BWController = Cast<AGameplayController>(GetController());
+	if (!BWController)
+	{
+		FGvDebug::Warning(GetName() + " Has Invalid Controller, input will not work", true);
+	}
 }
 
 void ABWCharacter::Tick(float DeltaTime)
@@ -66,7 +72,6 @@ const UCharacterState* ABWCharacter::GetState(const int Index) const
 //End State Machine Stuff
 
 
-
 //Character Movement Stuff...
 
 void ABWCharacter::Move(const FVector& MoveVector)
@@ -80,6 +85,11 @@ float ABWCharacter::GetGroundDistance() const
 {
 	const float Distance = GroundCheckComponent->CheckGroundDistance();
 	return Distance == -1 ? GroundCheckComponent->GetMaxGroundDistance() : Distance;
+}
+
+bool ABWCharacter::MoveInputActive() const
+{
+	return !AGameplayController::GetMoveInputValue().IsNearlyZero();
 }
 
 bool ABWCharacter::IsRunning() const
@@ -121,7 +131,7 @@ bool ABWCharacter::CanLook() const
 {
 	return bCanLook;
 }
- 
+
 bool ABWCharacter::CanRun() const
 {
 	return bCanRun;
@@ -140,7 +150,7 @@ bool ABWCharacter::CanDodge() const
 void ABWCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)
 {
 	Super::OnMovementModeChanged(PrevMovementMode, PreviousCustomMode);
-	
+
 	GetCharacterMovement()->bNotifyApex = GetCharacterMovement()->MovementMode == MOVE_Falling;
 
 	if (OnMovementModeChangedEvent.IsBound())
@@ -157,7 +167,3 @@ void ABWCharacter::NotifyJumpApex()
 		OnNotifyApexEvent.Broadcast();
 	}
 }
-
-
-
-
