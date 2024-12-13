@@ -15,7 +15,8 @@ public class ProjectBW : ModuleRules
 			"Engine",
 			"InputCore",
 			"EnhancedInput",
-			"VUNDK"
+			"VUNDK",
+			"GVUEDK"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[]
