@@ -8,6 +8,7 @@
 #include "Components/EnvironmentTracing/GroundCheckComponent.h"
 #include "Data/CharacterData.h"
 #include "Features/Gameplay/DynamicCameraSystem/GvSpringArmComponent.h"
+#include "Features/Gameplay/GrapplingHookSystem/GrapplingHookComponent.h"
 #include "Patterns/State/StateMachineComponent.h"
 #include "BWCharacter.generated.h"
 
@@ -62,10 +63,12 @@ private:
 	UStateMachineComponent* StateMachineComponent;
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
 	UGvSpringArmComponent* SpringArm;
-	UPROPERTY()
-	UCameraComponent* Camera;
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
 	UGroundCheckComponent* GroundCheckComponent;
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	UGrapplingHookComponent* GrapplingHook;
+	UPROPERTY()
+	UCameraComponent* Camera;
 	UPROPERTY()
 	AGameplayController* BWController;
 
@@ -98,6 +101,9 @@ public:
 	const UCharacterState* GetState(const int Index) const;
 
 	void Move(const FVector& MoveVector);
+
+	UFUNCTION(BlueprintCallable)
+	UGrapplingHookComponent* GetGrapplingHook() const;
 
 	UFUNCTION(BlueprintCallable)
 	float GetGroundDistance() const;

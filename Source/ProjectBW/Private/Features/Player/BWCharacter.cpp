@@ -28,13 +28,14 @@ ABWCharacter::ABWCharacter()
 	StateMachineComponent = CreateDefaultSubobject<UStateMachineComponent>("StateMachineComponent");
 
 	GroundCheckComponent = CreateDefaultSubobject<UGroundCheckComponent>("GroundCheckComponent");
+	
+	GrapplingHook = CreateDefaultSubobject<UGrapplingHookComponent>("Grappling Hook");
 
 	bCanMove = true;
 	bCanLook = true;
 	bCanRun = true;
 	bCanDodge = true;
 
-	//JumpState = EJumpState::None;
 }
 
 void ABWCharacter::BeginPlay()
@@ -79,6 +80,11 @@ void ABWCharacter::Move(const FVector& MoveVector)
 	FRotator CameraCurrentRotation = BWController->PlayerCameraManager->GetCameraCacheView().Rotation;
 	FRotator MoveVectorRotationOffset(0, CameraCurrentRotation.Yaw, 0);
 	AddMovementInput(MoveVectorRotationOffset.Quaternion() * MoveVector);
+}
+
+UGrapplingHookComponent* ABWCharacter::GetGrapplingHook() const
+{
+	return GrapplingHook;
 }
 
 float ABWCharacter::GetGroundDistance() const
