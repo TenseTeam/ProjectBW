@@ -66,7 +66,12 @@ void UStateMachineComponent::ChangeState(const int Index)
 {
 	if (bInitialized)
 	{
-		if (CurrentState == States[Index])
+		UStateBase* NewState = GetState(Index);
+		if (!IsValid(NewState))
+		{
+			return;
+		}
+		if (CurrentState == NewState)
 		{
 			FGvDebug::Warning("State already running");
 			return;
@@ -75,7 +80,7 @@ void UStateMachineComponent::ChangeState(const int Index)
 		{
 			PreviousState = CurrentState;
 			CurrentState->Exit(Context);
-			CurrentState = States[Index];
+			CurrentState = NewState;
 			CurrentState->Enter(Context);
 		}
 	}
