@@ -35,6 +35,7 @@ ABWCharacter::ABWCharacter()
 	bCanLook = true;
 	bCanRun = true;
 	bCanDodge = true;
+	bCanHook = true;
 
 }
 
@@ -87,6 +88,11 @@ UGrapplingHookComponent* ABWCharacter::GetGrapplingHook() const
 	return GrapplingHook;
 }
 
+UGvSpringArmComponent* ABWCharacter::GetSpringArm() const
+{
+    return SpringArm;
+}
+
 float ABWCharacter::GetGroundDistance() const
 {
 	const float Distance = GroundCheckComponent->CheckGroundDistance();
@@ -128,6 +134,16 @@ void ABWCharacter::SetIsAiming(bool Value)
 	bIsAiming = Value;
 }
 
+bool ABWCharacter::IsHooking() const
+{
+	return bIsHooking;
+}
+
+void ABWCharacter::SetIsHooking(bool Value)
+{
+	bIsHooking = Value;
+}
+
 bool ABWCharacter::CanMove() const
 {
 	return bCanMove;
@@ -151,6 +167,16 @@ void ABWCharacter::SetCanDodge(bool Value)
 bool ABWCharacter::CanDodge() const
 {
 	return bCanDodge;
+}
+
+void ABWCharacter::SetCanHook(bool Value)
+{ 
+	bCanHook = Value;
+}
+
+bool ABWCharacter::CanHook() const
+{
+	return bCanHook && GrapplingHook->IsTargetAcquired();
 }
 
 void ABWCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)

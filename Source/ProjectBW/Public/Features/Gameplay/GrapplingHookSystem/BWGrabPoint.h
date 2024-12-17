@@ -23,6 +23,7 @@ private:
 	UPROPERTY()
 	UGrapplingHookComponent* PlayerGrapplingHook;
 
+	FCollisionQueryParams TraceParams;
 	bool bInitialized;
 
 public:
@@ -34,5 +35,6 @@ public:
 
 private:
 	FVector GetPlayerCameraLocation() const;
+	bool ObstacleInBetween(const ACharacter* Character, TArray<FHitResult>& HitResults) const;
 	void Initialize();
 };

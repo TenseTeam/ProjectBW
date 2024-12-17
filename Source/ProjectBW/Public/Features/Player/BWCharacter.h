@@ -37,6 +37,15 @@ enum class EJumpState : uint8
 	JumpEnd = 3 UMETA(DisplayName = "JumpEnd")
 };
 
+UENUM(BlueprintType) 
+enum class EHookState : uint8
+{
+	None UMETA(DisplayName = "None"),
+	HookStart UMETA(DisplayName = "HookStart"),
+	HookLoop UMETA(DisplayName = "HookLoop"),
+	HookEnd UMETA(DisplayName = "HookEnd")
+};
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMovementModeChanged);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FNotifyApex);
 
@@ -55,8 +64,11 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	ECharacterState CharacterState = ECharacterState::Standing;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadOnly)
 	EJumpState JumpState = EJumpState::None;
+
+	UPROPERTY(BlueprintReadOnly)
+	EHookState HookState = EHookState::None;
 
 private:
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
@@ -65,7 +77,7 @@ private:
 	UGvSpringArmComponent* SpringArm;
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
 	UGroundCheckComponent* GroundCheckComponent;
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UGrapplingHookComponent* GrapplingHook;
 	UPROPERTY()
 	UCameraComponent* Camera;
@@ -78,6 +90,8 @@ private:
     bool bIsShooting;
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bIsAiming;
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	bool bIsHooking;
 	
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bCanMove;
@@ -89,6 +103,8 @@ private:
 	bool bCanDodge;
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bCanShoot;
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	bool bCanHook;
 	
 
 public:
@@ -104,6 +120,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	UGrapplingHookComponent* GetGrapplingHook() const;
+	UFUNCTION(BlueprintCallable)
+	UGvSpringArmComponent* GetSpringArm() const;
 
 	UFUNCTION(BlueprintCallable)
 	float GetGroundDistance() const;
@@ -124,6 +142,11 @@ public:
 	bool IsAiming() const;
 	UFUNCTION(BlueprintCallable)
 	void SetIsAiming(bool Value);
+
+	UFUNCTION(BlueprintCallable)
+	bool IsHooking() const;
+	UFUNCTION(BlueprintCallable)
+	void SetIsHooking(bool Value);
 	
 	UFUNCTION(BlueprintCallable)
 	bool CanMove() const;
@@ -136,6 +159,11 @@ public:
 	void SetCanDodge(bool Value);
 	UFUNCTION(BlueprintCallable)
 	bool CanDodge() const;
+
+	UFUNCTION(BlueprintCallable)
+	void SetCanHook(bool Value);
+	UFUNCTION(BlueprintCallable)
+	bool CanHook() const;
 
 private:
 	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode) override;

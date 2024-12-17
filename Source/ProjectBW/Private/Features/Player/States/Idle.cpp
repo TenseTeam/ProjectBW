@@ -60,4 +60,10 @@ void UIdle::HandleInput(AActor* Context, const EInputActionType InputAction, con
 		Character->ChangeState(4);
 		return;
 	}
+
+	if (InputAction == EInputActionType::Hook)
+	{
+		Character->ChangeState(5);
+		return;
+	}
 }

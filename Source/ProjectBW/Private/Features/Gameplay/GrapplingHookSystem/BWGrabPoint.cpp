@@ -3,6 +3,8 @@
 
 #include "Features/Gameplay/GrapplingHookSystem/BWGrabPoint.h"
 
+#include <string>
+
 #include "Features/Player/BWCharacter.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
@@ -45,46 +47,72 @@ bool ABWGrabPoint::CanBeGrabbed(const ACharacter* Character) const
 	}
 
 	// Check if the distance is not too close to the player
-	const float SquaredDistance = FVector::DistSquared(GetActorLocation(), GetPlayerCameraLocation());
+	const float SquaredDistance = FVector::DistSquared(GetActorLocation(), Character->GetActorLocation());
 	if (SquaredDistance < PlayerGrapplingHook->GetMinDistance() * PlayerGrapplingHook->GetMinDistance())
 	{
 		return false;
 	}
 
 	// Check if there are any obstacles between the player and the grab point
-	FHitResult HitResult;
-	FCollisionQueryParams TraceParams(FName(TEXT("Trace")), true, this);
-	TraceParams.bTraceComplex = false;
-	TraceParams.AddIgnoredActor(Character);
-	if (GetWorld()->LineTraceSingleByProfile(HitResult, GetLandingPoint(), Character->GetActorLocation(), "BlockAll",
-	                                         TraceParams))
+	TArray<FHitResult> HitResults;
+	if (ObstacleInBetween(Character, HitResults))
 	{
-		if (HitResult.GetActor() != Character)
-		{
-			//FGvDebug::Warning("Obstacle between " + GetName() + " and player", true);
-			return false;
-		}
+		return false;
 	}
-	
+	// FCollisionQueryParams TraceParams(FName(TEXT("Trace")), true, this);
+	// TraceParams.bTraceComplex = false;
+	// TraceParams.AddIgnoredActor(Character);
+	// if (GetWorld()->LineTraceSingleByProfile(HitResult, GetLandingPoint(), Character->GetActorLocation(), "BlockAll",
+	//                                          TraceParams))
+	// {
+	// 	if (HitResult.GetActor() != Character)
+	// 	{
+	// 		//FGvDebug::Warning("Obstacle between " + GetName() + " and player", true);
+	// 		return false;
+	// 	}
+	// }
+
 	// Check how close the grab point is to the camera's forward vector
 	const FVector Direction = (GetActorLocation() - GetPlayerCameraLocation()).GetSafeNormal();
 	const FVector CameraForward = Character->GetControlRotation().Vector();
-	const float ToleranceMultiplier = SquaredDistance / (PlayerGrapplingHook->GetMaxDistance() * PlayerGrapplingHook->GetMaxDistance());
+	const float ToleranceMultiplier = SquaredDistance / (PlayerGrapplingHook->GetMaxDistance() * PlayerGrapplingHook->
+		GetMaxDistance());
 	const float Tolerance = FMath::Lerp(0.999f, 0.8f, ToleranceMultiplier);
 	const bool bCoincident = FVector::Coincident(Direction.GetSafeNormal(), CameraForward, Tolerance);
 
 #if WITH_EDITOR
 	if (bShowDebug)
-	DrawDebugSphere(GetWorld(), GetActorLocation(), 100, 12, bCoincident ? FColor::Green : FColor::Red, false, -1, 0,
-	                1);
+		DrawDebugSphere(GetWorld(), GetActorLocation(), 100, 12, bCoincident ? FColor::Green : FColor::Red, false, -1,
+		                0,
+		                1);
 #endif
-	
+
 	return bCoincident;
 }
 
 FVector ABWGrabPoint::GetPlayerCameraLocation() const
 {
 	return UGameplayStatics::GetPlayerCameraManager(this, 0)->GetCameraCacheView().Location;
+}
+
+bool ABWGrabPoint::ObstacleInBetween(const ACharacter* Character, TArray<FHitResult>& HitResults) const
+{
+	// between landing point and player
+	GetWorld()->LineTraceMultiByProfile(HitResults, GetLandingPoint(), Character->GetActorLocation(), "BlockAll",
+	                                    TraceParams);
+	if (HitResults.Num() > 0)
+	{
+		return true;
+	}
+	// between grab point and player
+	GetWorld()->LineTraceMultiByProfile(HitResults, GetActorLocation(), Character->GetActorLocation(), "BlockAll",
+	                                    TraceParams);
+	if (HitResults.Num() > 0)
+	{
+		return true;
+	}
+	return false;
+	
 }
 
 void ABWGrabPoint::Initialize()
@@ -106,6 +134,11 @@ void ABWGrabPoint::Initialize()
 	Mesh->SetCollisionProfileName("BlockAllDynamic");
 	constexpr ECollisionChannel GrabPointsChannel = ECC_GameTraceChannel1;
 	Mesh->SetCollisionResponseToChannel(GrabPointsChannel, ECR_Block);
+
+	TraceParams = FCollisionQueryParams(FName(TEXT("Trace")), true, this);
+	TraceParams.bTraceComplex = false;
+	TraceParams.AddIgnoredActor(PlayerCharacter);
+	TraceParams.AddIgnoredActor(this);
 
 	bInitialized = true;
 }

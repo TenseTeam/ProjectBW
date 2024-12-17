@@ -36,6 +36,7 @@ void AGameplayController::SetupInputComponent()
 		enhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this, &AGameplayController::StopRun);
 		enhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AGameplayController::Jump);
 		enhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &AGameplayController::Dodge);
+		enhancedInputComponent->BindAction(ThrowHookAction, ETriggerEvent::Triggered, this, &AGameplayController::ThrowHook);
 		EnhancedInputComponent = enhancedInputComponent;
 	}
 }
@@ -96,5 +97,11 @@ void AGameplayController::Dodge(const FInputActionValue& Value)
 {
 	if (!BWCharacter->CanDodge()) return;
 	BWCharacter->HandleInput(EInputActionType::Dodge, Value);
+}
+
+void AGameplayController::ThrowHook(const FInputActionValue& Value)
+{
+	if (!BWCharacter->CanHook()) return;
+	BWCharacter->HandleInput(EInputActionType::Hook, Value);
 }
 

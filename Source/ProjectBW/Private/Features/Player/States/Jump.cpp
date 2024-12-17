@@ -92,6 +92,7 @@ void UJump::Exit(AActor* Context)
 		return;
 	}
 	Super::Exit(Context);
+	Character->StopJumping();
 	Character->JumpState = EJumpState::None;
 }
 
@@ -106,6 +107,12 @@ void UJump::HandleInput(AActor* Context, const EInputActionType InputAction, con
 	if (InputAction == EInputActionType::Walk)
 	{
 		Character->Move(Value.Get<FVector>());
+		return;
+	}
+
+	if (InputAction == EInputActionType::Hook)
+	{
+		Character->ChangeState(5);
 		return;
 	}
 
