@@ -1,7 +1,6 @@
 // Copyright VUNDK, Inc. All Rights Reserved.
 
 #include "Features/Gameplay/EquipmentSystem/Equipment.h"
-#include "Features/Gameplay/EquipmentSystem/EquipmentManager.h"
 #include "Features/Gameplay/InventorySystem/Base/Data/ItemDataBase.h"
 
 UEquipment::UEquipment()
@@ -9,15 +8,8 @@ UEquipment::UEquipment()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UEquipment::LoadEquippedItems(TArray<UItemBase*> InEquippedItems)
-{
-	for (UItemBase* Item : InEquippedItems)
-		EquipItem(Item, Item->GetItemData()->EquipSlotKey, Item->GetEquipSlotIndex());
-}
-
 void UEquipment::BeginPlay()
 {
-	UEquipmentManager::Init(this);
 	Super::BeginPlay();
 
 	EquippedItems = TMap<FName, TMap<int32, UItemBase*>>();
@@ -79,6 +71,17 @@ TSet<UItemBase*> UEquipment::GetEquippedItems()
 	}
 	
 	return Items;
+}
+
+void UEquipment::ClearEquipment()
+{
+	for (auto& SlotItems : EquippedItems)
+	{
+		for (auto& Item : SlotItems.Value)
+			Item.Value = nullptr;
+	}
+
+	OnEquipmentCleared.Broadcast();
 }
 
 bool UEquipment::CanEquipItem(const UItemBase* Item, const UEquipSlotKey* TargetSlotKey, const int32 SlotIndex) const

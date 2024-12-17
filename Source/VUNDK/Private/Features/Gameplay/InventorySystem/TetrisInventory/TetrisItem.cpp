@@ -5,12 +5,11 @@
 #include "Features/Gameplay/InventorySystem/TetrisInventory/Data/TetrisItemData.h"
 #include "Features/Gameplay/InventorySystem/TetrisInventory/Data/SaveData/TetrisItemSaveData.h"
 
-UTetrisItem::UTetrisItem()
+UTetrisItem::UTetrisItem(): TopLeftCornerPosition(),
+                            bIsRotated(false),
+                            CachedSize(),
+                            bCachedRotation(false)
 {
-	TopLeftCornerPosition = FIntPoint();
-	CachedSize = FIntPoint();
-	bIsRotated = false;
-	bCachedRotation = false;
 }
 
 void UTetrisItem::Init(UItemDataBase* Data)
@@ -30,13 +29,11 @@ FTetrisItemSaveData UTetrisItem::CreateTetrisSaveData() const
 
 void UTetrisItem::LoadTetrisSaveData(const FTetrisItemSaveData& TetrisSaveData, UTetrisInventory* Inventory)
 {
+	LoadItemBaseSaveData(TetrisSaveData.ItemSaveData);
 	UTetrisInventory* TetrisInventory = Cast<UTetrisInventory>(Inventory);
 	
 	if (TetrisSaveData.bIsRotated)
 		Rotate();
-	
-	TetrisInventory->TryAddItemAtSlots(this, TetrisSaveData.SlotPosition);
-	LoadItemBaseSaveData(TetrisSaveData.ItemSaveData);
 }
 
 void UTetrisItem::SetRotation(const bool bNewRotation)

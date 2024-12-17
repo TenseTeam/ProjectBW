@@ -6,6 +6,7 @@
 #include "Engine/DataAsset.h"
 #include "Features/Gameplay/EquipmentSystem/Data/EquipSlotKey.h"
 #include "Features/Gameplay/InventorySystem/Base/ItemBase.h"
+#include "Features/Gameplay/InventorySystem/Base/ItemDropActor.h"
 #include "ItemDataBase.generated.h"
 
 UCLASS(Abstract, Blueprintable, BlueprintType)
@@ -18,6 +19,8 @@ public:
 	FString ItemTypeID;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UItemBase> ItemClass;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<AItemDropActor> ItemDropClass;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UEquipSlotKey* EquipSlotKey;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -26,19 +29,25 @@ public:
 	FText ItemDescription;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FSlateBrush ItemIcon;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "1", UIMin = "1"))
+	int32 MaxStackSize;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip = "Indicates whether the inventory is limited to a single instance of this item type id."))
 	bool bIsUnique;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip = "Indicates whether the item will be consumed upon use."))	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip = "Indicates whether the item can be consumed."))
 	bool bIsConsumable;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition = "bIsConsumable", EditConditionHides, ToolTip = "Indicates whether the item will be consumed upon use."))
+	bool bConsumeUponUse;
 
 public:
-	UItemDataBase()
+	UItemDataBase(): ItemTypeID(FGuid::NewGuid().ToString()),
+	                 ItemClass(UItemBase::StaticClass()),
+	                 ItemDropClass(nullptr),
+	                 EquipSlotKey(nullptr),
+	                 MaxStackSize(1),
+	                 bIsUnique(false),
+	                 bIsConsumable(false),
+	                 bConsumeUponUse(false)
 	{
-		ItemClass = UItemBase::StaticClass();
-		EquipSlotKey = nullptr;
-		ItemTypeID = FGuid::NewGuid().ToString();
-		bIsUnique = false;
-		bIsConsumable = false;
 	}
 
 	FORCEINLINE FName GetItemDataID() const

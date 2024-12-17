@@ -26,9 +26,13 @@ public:
 	
 protected:
 	// Current position of the item's top-left corner in the inventory grid
+	UPROPERTY()
 	FIntPoint TopLeftCornerPosition;
+	UPROPERTY()
 	bool bIsRotated;
+	UPROPERTY()
 	FIntPoint CachedSize;
+	UPROPERTY()
 	bool bCachedRotation;
 
 public:

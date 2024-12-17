@@ -18,10 +18,8 @@ struct FTetrisItemSaveData
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsRotated;
 
-	FTetrisItemSaveData()
+	FTetrisItemSaveData(): SlotPosition(),
+	                       bIsRotated(false)
 	{
-		ItemSaveData = FItemSaveData();
-		SlotPosition = FIntPoint();
-		bIsRotated = false;
 	}
 };

@@ -4,11 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Data/RPGGearItemGenerationData.h"
-#include "Data/RPGItemsRaritiesData.h"
+#include "Data/Rarities/RPGItemsRaritiesData.h"
 #include "Features/Gameplay/RPGSystem/RPGInventory/Items/RPGGearItem.h"
-#include "Features/Gameplay/RPGSystem/RPGInventory/Items/RPGItemBase.h"
-#include "Features/Gameplay/RPGSystem/RPGInventory/Items/RPGWeaponItem.h"
-#include "Features/Gameplay/RPGSystem/RPGItemsGeneration/Data/RPGMainStatsData.h"
+#include "Features/Gameplay/RPGSystem/RPGInventory/Items/RPGItem.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "RPGItemsGenerator.generated.h"
 
@@ -18,22 +16,16 @@ class VUNDK_API URPGItemsGenerator : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-	static bool TryGenerateRPGItemBase(URPGItemBase* Item, const URPGItemBaseGenerationData* GenerationData);
-
-	UFUNCTION(BlueprintCallable, Category = "RPG Inventory Factory")
-	static bool TryGenerateRPGWeaponItem(URPGWeaponItem* WeaponItem, const URPGItemBaseGenerationData* GenerationData);
+	UFUNCTION(BlueprintCallable, Category = "VUNDK|Gameplay|RPGSystem")
+	static bool TryGenerateRPGItem(URPGItem* Item, const URPGItemBaseGenerationData* GenerationData);
 	
-	UFUNCTION(BlueprintCallable, Category = "RPG Inventory Factory")
+	UFUNCTION(BlueprintCallable, Category = "VUNDK|Gameplay|RPGSystem")
 	static bool TryGenerateRPGGearItem(URPGGearItem* GearItem, const URPGGearItemGenerationData* GenerationData);
 
-	static UStatOperation* CreateWeaponDamageOperation(URPGWeaponItem* WeaponItem);
-	
 private:
 	static FRPGItemVisualDetails GenerateVisualDetails(const URPGItemVisualSetData* Set);
 	
 	static URPGRarityLevelData* GenerateRarityLevel(const URPGItemsRaritiesData* Set);
 	
-	static TMap<UCharacterBaseStatData*, int32> GenerateStatsModifiers(URPGGearItem* Item, const URPGGearItemGenerationData* GenerationData);
-	
-	static UCharacterBaseStatData* GetRandomMainStat(const URPGMainStatsData* MainStatsPool);
+	static void GenerateItemStatsModifiers(URPGGearItem* Item, const URPGGearItemGenerationData* GenerationData);
 };

@@ -12,16 +12,16 @@ struct FSaveManagerData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "VUNDK|Generic|Save System")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UDefaultSaveGame> SaveGameClass = UDefaultSaveGame::StaticClass();
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "VUNDK|Generic|Save System")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UDefaultSaveGame> SharedSaveGameClass = UDefaultSaveGame::StaticClass();
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "VUNDK|Generic|Save System")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<USlotInfoItem> SlotInfoItemClass = USlotInfoItem::StaticClass();
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "VUNDK|Generic|Save System")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<USlotInfoItem> SharedSlotInfoItemClass = USlotInfoItem::StaticClass();
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "VUNDK|Generic|Save System")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FAutoSaveData AutoSaveData;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "VUNDK|Generic|Save System")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bIsAutoSaveEnabled;
 };

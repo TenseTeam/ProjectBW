@@ -4,10 +4,9 @@
 #include "Features/Gameplay/InventorySystem/Base/InventoryBase.h"
 #include "Features/Gameplay/InventorySystem/Utility/ISInventoriesUtility.h"
 
-UInventoriesManager::UInventoriesManager()
+UInventoriesManager::UInventoriesManager(): Registry(nullptr)
 {
 	PrimaryComponentTick.bCanEverTick = false;
-	Registry = nullptr;
 }
 
 bool UInventoriesManager::IsItemInRegistry(const UItemDataBase* ItemData) const
@@ -20,10 +19,13 @@ bool UInventoriesManager::IsItemInRegistry(const UItemDataBase* ItemData) const
 UItemDataBase* UInventoriesManager::GetItemDataFromRegistry(const FName& ItemDataID) const
 {
 	if (!Check()) return nullptr;
+
+	if (Registry->RegisteredItems.Num() == 0)
+		return nullptr;
 	
 	for (UItemDataBase* ItemData : Registry->RegisteredItems)
 	{
-		if (ItemData == nullptr)
+		if (!IsValid(ItemData))
 		{
 			UE_LOG(LogInventorySystem, Warning, TEXT("An ItemData in the inventory registry %s is null."), *GetName());
 			continue;
