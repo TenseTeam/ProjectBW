@@ -35,7 +35,8 @@ void UDodge::Enter(AActor* Context)
 	}
 	Super::Enter(Context);
 
-	Character->CharacterState = ECharacterState::Dodging;
+	Character->MotionState = ECharacterState::Dodging;
+	Character->SetIsDodging(true);
 	
 	Character->GetCharacterMovement()->BrakingDecelerationWalking = 0;
 	ElapsedTime = 0.f;
@@ -50,6 +51,7 @@ void UDodge::Enter(AActor* Context)
 	CurrentRotation = Character->GetActorRotation();
 	
 	Character->PlayAnimMontage(DodgeAnimMontage, Character->Data->DodgeAnimPlayRate);
+	Character->OnStartDodging.Broadcast();
 
 	StartCooldown();
 }
@@ -68,17 +70,17 @@ void UDodge::Update(AActor* Context, float DeltaTime)
 	{
 		if (Character->GetCharacterMovement()->IsFalling())
 		{
-			Character->ChangeState(3); //jump
+			Character->ChangeMotionState(3); //jump
 			return;
 		}
 
 		if (Controller->GetMoveInputValue().IsNearlyZero())
 		{
-			Character->ChangeState(0); //idle
+			Character->ChangeMotionState(0); //idle
 			return;
 		}
 		
-		Character->ChangeState(1); //walk
+		Character->ChangeMotionState(1); //walk
 		return;
 	}
 
@@ -104,6 +106,8 @@ void UDodge::Exit(AActor* Context)
 	}
 	Super::Exit(Context);
 	Character->GetCharacterMovement()->BrakingDecelerationWalking = DefaultBrakingDecelerationWalking;
+	Character->SetIsDodging(false);
+	Character->OnStopDodging.Broadcast();
 }
 
 void UDodge::HandleInput(AActor* Context, const EInputActionType InputAction, const FInputActionValue& Value)

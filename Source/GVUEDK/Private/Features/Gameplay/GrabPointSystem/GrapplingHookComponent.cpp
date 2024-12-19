@@ -79,7 +79,7 @@ void UGrapplingHookComponent::StartHooking()
 	EndHookLocation = TargetGrabPoint->GetLandingPoint();
 	TotalHookDistance = FVector::Dist(StartHookLocation, EndHookLocation);
 	StartHookDirection = (EndHookLocation - StartHookLocation).GetSafeNormal();
-	OnStartHooking.Broadcast(StartHookLocation, EndHookLocation, StartHookDirection, TotalHookDistance);
+	OnStartHooking.Broadcast();
 	if (bOrientRotationToMovement)
 		GetOwner()->SetActorRotation(FRotator(StartHookDirection.Rotation().Roll, StartHookDirection.Rotation().Yaw, 0.f));
 	bIsHooking = true;
@@ -132,7 +132,7 @@ bool UGrapplingHookComponent::LookForGrabPoints(TSet<IGrabPoint*>& OutGrabPoints
 				FGvDebug::Error(HitResult.GetActor()->GetName() + " is not a grab point, FIX: set ignore collision response", true);
 				continue;
 			}
-			// check if the grab point is in range and can be grabbed
+			// check if the grab point is in range and can be grabbed (TO DO: Check if DistSquared can be moved in CanBeGrabbed)
 			if (FVector::DistSquared(GetOwner()->GetActorLocation(), GrabPoint->GetLocation()) <= MaxDistance * MaxDistance
 				&& GrabPoint->CanBeGrabbed(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)))
 			{

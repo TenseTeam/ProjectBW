@@ -59,18 +59,6 @@ bool ABWGrabPoint::CanBeGrabbed(const ACharacter* Character) const
 	{
 		return false;
 	}
-	// FCollisionQueryParams TraceParams(FName(TEXT("Trace")), true, this);
-	// TraceParams.bTraceComplex = false;
-	// TraceParams.AddIgnoredActor(Character);
-	// if (GetWorld()->LineTraceSingleByProfile(HitResult, GetLandingPoint(), Character->GetActorLocation(), "BlockAll",
-	//                                          TraceParams))
-	// {
-	// 	if (HitResult.GetActor() != Character)
-	// 	{
-	// 		//FGvDebug::Warning("Obstacle between " + GetName() + " and player", true);
-	// 		return false;
-	// 	}
-	// }
 
 	// Check how close the grab point is to the camera's forward vector
 	const FVector Direction = (GetActorLocation() - GetPlayerCameraLocation()).GetSafeNormal();

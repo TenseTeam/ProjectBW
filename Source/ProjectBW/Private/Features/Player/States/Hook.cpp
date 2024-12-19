@@ -37,7 +37,7 @@ void UHook::Enter(AActor* Context)
 	StartDelay = PlayerGrapplingHook->GetStartDelay();
 	ElapsedTime = 0;
 	
-	Character->CharacterState = ECharacterState::Hooking;
+	Character->MotionState = ECharacterState::Hooking;
 	Character->HookState = EHookState::HookStart;
 	Character->SetIsHooking(true);
 	Character->GetCharacterMovement()->bNotifyApex = true;
@@ -105,10 +105,10 @@ void UHook::OnHookFinished()
 {
 	if (Controller->GetMoveInputValue().IsNearlyZero())
 	{
-		Character->ChangeState(0); //idle
+		Character->ChangeMotionState(0); //idle
 	}
 	else
 	{
-		Character->ChangeState(1); //walk
+		Character->ChangeMotionState(1); //walk
 	}
 }

@@ -3,18 +3,21 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Base/CharacterState.h"
-#include "Idle.generated.h"
+#include "Base/ActionState.h"
+#include "ActionIdle.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTBW_API UIdle : public UCharacterState
+class PROJECTBW_API UActionIdle : public UActionState
 {
 	GENERATED_BODY()
 
 	virtual void Enter(AActor* Context) override;
-	virtual void Update(AActor* Context, float deltaTime) override;
+	virtual void Exit(AActor* Context) override;
 	virtual void HandleInput(AActor* Context, const EInputActionType InputAction, const FInputActionValue& Value) override;
+
+	UFUNCTION()
+	void CheckWantShootOrAim();
 };

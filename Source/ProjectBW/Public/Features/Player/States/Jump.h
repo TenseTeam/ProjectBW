@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Base/CharacterState.h"
+#include "Base/MotionState.h"
 #include "Jump.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTBW_API UJump : public UCharacterState
+class PROJECTBW_API UJump : public UMotionState
 {
 	GENERATED_BODY()
 

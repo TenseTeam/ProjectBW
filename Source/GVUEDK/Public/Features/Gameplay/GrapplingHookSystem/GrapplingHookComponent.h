@@ -6,7 +6,7 @@
 #include "GrabPoint.h"
 #include "GrapplingHookComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FStartHooking, FVector, StartLocation, FVector, EndLocation, FVector, Direction, float, TotalDistance);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartHooking);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FHooking);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopHooking);
 
