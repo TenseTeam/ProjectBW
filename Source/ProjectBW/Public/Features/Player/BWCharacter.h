@@ -138,8 +138,8 @@ private:
 	UGroundCheckComponent* GroundCheckComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UGrapplingHookComponent* GrapplingHook;
-	UPROPERTY()
-	UCameraComponent* Camera;
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* FollowCamera;
 	UPROPERTY()
 	AGameplayController* BWController;
 

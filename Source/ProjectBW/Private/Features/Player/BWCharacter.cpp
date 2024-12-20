@@ -22,8 +22,8 @@ ABWCharacter::ABWCharacter()
 	SpringArm = CreateDefaultSubobject<UGvSpringArmComponent>("SpringArm");
 	SpringArm->SetupAttachment(RootComponent);
 
-	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
-	Camera->SetupAttachment(SpringArm);
+	FollowCamera = CreateDefaultSubobject<UCameraComponent>("FollowCamera");
+	FollowCamera->SetupAttachment(SpringArm);
 
 	MotionStateMachineComponent = CreateDefaultSubobject<UStateMachineComponent>("MotionStateMachineComponent");
 	ActionStateMachineComponent = CreateDefaultSubobject<UStateMachineComponent>("ActionStateMachineComponent");
