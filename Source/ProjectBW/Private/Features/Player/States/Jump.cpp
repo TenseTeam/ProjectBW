@@ -44,7 +44,7 @@ void UJump::Enter(AActor* Context)
 	AscentGravityCurve = Character->Data->AscentGravityCurve;
 	DescentGravityCurve = Character->Data->DescentGravityCurve;
 	JumpStartZPos = Character->GetActorLocation().Z;
-	Character->CharacterState = ECharacterState::Jumping;
+	Character->MotionState = ECharacterState::Jumping;
 }
 
 void UJump::Update(AActor* Context, float DeltaTime)
@@ -76,11 +76,11 @@ void UJump::Update(AActor* Context, float DeltaTime)
 	{
 		if (Controller->GetMoveInputValue().IsNearlyZero())
 		{
-			Character->ChangeState(0); //idle
+			Character->ChangeMotionState(0); //idle
 		}
 		else
 		{
-			Character->ChangeState(1); //walk
+			Character->ChangeMotionState(1); //walk
 		}
 	}
 }
@@ -92,6 +92,7 @@ void UJump::Exit(AActor* Context)
 		return;
 	}
 	Super::Exit(Context);
+	Character->StopJumping();
 	Character->JumpState = EJumpState::None;
 }
 
@@ -106,6 +107,12 @@ void UJump::HandleInput(AActor* Context, const EInputActionType InputAction, con
 	if (InputAction == EInputActionType::Walk)
 	{
 		Character->Move(Value.Get<FVector>());
+		return;
+	}
+
+	if (InputAction == EInputActionType::Hook)
+	{
+		Character->ChangeMotionState(5);
 		return;
 	}
 
@@ -126,13 +133,13 @@ void UJump::UpdateGravity(const float GroundDistance) const
 
 void UJump::OnJumpApexReached()
 {
-	if (Character->CharacterState == ECharacterState::Jumping)
+	if (Character->MotionState == ECharacterState::Jumping)
 	{
 		Character->JumpState = EJumpState::JumpLoop;
 	}
-	else if (Character->CharacterState != ECharacterState::Dodging && Character->CharacterState !=
+	else if (Character->MotionState != ECharacterState::Dodging && Character->MotionState !=
 		ECharacterState::Hooking)
 	{
-		Character->ChangeState(3); // Jump
+		Character->ChangeMotionState(3); // Jump
 	}
 }

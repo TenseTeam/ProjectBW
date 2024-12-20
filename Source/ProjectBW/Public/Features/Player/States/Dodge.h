@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Base/CharacterState.h"
+#include "Base/MotionState.h"
 #include "Dodge.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTBW_API UDodge : public UCharacterState
+class PROJECTBW_API UDodge : public UMotionState
 {
 	GENERATED_BODY()
 
