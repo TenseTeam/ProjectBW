@@ -13,7 +13,10 @@ public class LGUEDK : ModuleRules
                 "CoreUObject",
                 "Engine",
                 "Slate",
-                "SlateCore"
+                "SlateCore",
+                "AIModule",
+                "NavigationSystem",
+                "GameplayTasks"
             }
         );
 
