@@ -3,13 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+// #include "EnemyBase.h"
 #include "Runtime/AIModule/Classes/AIController.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
-#include "Perception/AISenseConfig_Hearing.h"
-#include "Perception/AISenseConfig_Damage.h"
 #include "EnemyControllerBase.generated.h"
 
+class AEnemyBase;
 
 
 UCLASS()
@@ -27,6 +27,12 @@ protected:
 	UFUNCTION()
 	void OnPossess(APawn* InPawn) override;
 
+	UFUNCTION()
+	void SetStateAsPatrolling();
+	
+	UFUNCTION()
+	void SetStateAsPassive();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Sight", meta = (ClampMin = "0.0", UIMin = "0.0"))
 	float SightRadius = 2000.0f;
 
@@ -43,7 +49,11 @@ protected:
 	float SightMaxAge = 5.0f;
 	
 private:
-	class UAISenseConfig_Sight* SightConfig;
+
+	UPROPERTY()
+	AEnemyBase* ControlledPawn;
+	UPROPERTY()
+	UAISenseConfig_Sight* SightConfig;
 	
 	void SetUpPercveptionSystem();
 

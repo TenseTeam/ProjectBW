@@ -7,6 +7,7 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "EnemyControllerBase.h" 
 #include "AI/Enumerators/EMovementSpeed.h"
+#include "AI/Enumerators/EnemyState.h"
 #include "EnemyBase.generated.h"
 
 UCLASS()
@@ -26,6 +27,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Movement")
 	float SprintSpeed = 1000.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|State")
+	EEnemyState CurrentState = EEnemyState::Patrolling;
 	
 public:
 	// Sets default values for this character's properties
@@ -34,6 +38,9 @@ public:
 	UBehaviorTree* GetBehaviorTree() const;
 
 	void SetMovementSpeed(EMovementSpeed MovementSpeed);
+
+	EEnemyState GetEnemyState() const { return CurrentState; }
+	void SetEnemyState(EEnemyState NewState) { CurrentState = NewState; }
 	
 protected:
 	// Called when the game starts or when spawned

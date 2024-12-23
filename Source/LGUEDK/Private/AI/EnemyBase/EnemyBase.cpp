@@ -58,7 +58,6 @@ void AEnemyBase::SetMovementSpeed(EMovementSpeed MovementSpeed)
 void AEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 

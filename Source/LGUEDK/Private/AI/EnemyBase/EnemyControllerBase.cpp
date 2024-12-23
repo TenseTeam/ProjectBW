@@ -17,23 +17,50 @@ AEnemyControllerBase::AEnemyControllerBase(FObjectInitializer const& ObjectIniti
 void AEnemyControllerBase::BeginPlay()
 {
 	Super::BeginPlay();
+	SetStateAsPatrolling();
 
 }
 
 void AEnemyControllerBase::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-	if (AEnemyBase* const enemyBase = Cast<AEnemyBase>(InPawn))
+	if (AEnemyBase* const EnemyBase = Cast<AEnemyBase>(InPawn))
 	{
-		if (UBehaviorTree* const tree = enemyBase->GetBehaviorTree())
+		ControlledPawn = EnemyBase;
+		if (UBehaviorTree* const tree = EnemyBase->GetBehaviorTree())
 		{
 			UBlackboardComponent* BlackboardComponent;
 			UseBlackboard(tree->BlackboardAsset,BlackboardComponent);
 			Blackboard = BlackboardComponent;
 			RunBehaviorTree(tree);
-
 			UE_LOG(LogTemp, Warning, TEXT("Aic controller: %s"), *InPawn->GetName());
 		}
+	}
+}
+
+void AEnemyControllerBase::SetStateAsPatrolling()
+{
+	if (UBlackboardComponent* BlackboardComp = GetBlackboardComponent())
+	{
+		BlackboardComp->SetValueAsEnum(TEXT("EnemyState"), uint8 (EEnemyState::Patrolling));
+	}
+
+	if (ControlledPawn)
+	{
+		ControlledPawn->SetEnemyState(EEnemyState::Patrolling);
+	}
+}
+
+void AEnemyControllerBase::SetStateAsPassive()
+{
+	if (UBlackboardComponent* BlackboardComp = GetBlackboardComponent())
+	{
+		BlackboardComp->SetValueAsEnum(TEXT("EnemyState"), uint8(EEnemyState::Passive));
+	}
+
+	if (ControlledPawn)
+	{
+		ControlledPawn->SetEnemyState(EEnemyState::Passive);
 	}
 }
 
