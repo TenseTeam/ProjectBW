@@ -3,7 +3,9 @@
 
 #include "AI/EnemyBase/EnemyControllerBase.h"
 #include "AI/EnemyBase/EnemyBase.h"
+#include "AI/Interfaces/AITargetInterface.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Components/HealtComponent/HealthBaseComponent.h"
 
 
 AEnemyControllerBase::AEnemyControllerBase(FObjectInitializer const& ObjectInitializer)
@@ -59,7 +61,12 @@ void AEnemyControllerBase::SetUpPercveptionSystem()
 
 void AEnemyControllerBase::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
 {
-	if (AActor* const player = Cast<AActor>(Actor))
+	// if (IAITargetInterface* MyInterface = Cast<IAITargetInterface>(Actor))
+	// {
+	// 	GetBlackboardComponent()->SetValueAsBool("CanSeePlayer",Stimulus.WasSuccessfullySensed());
+	// 	UE_LOG(LogTemp, Warning, TEXT("Vedo il player"),Stimulus.WasSuccessfullySensed());
+	// }
+	if (AActor* const player = Actor)
 	{
 		GetBlackboardComponent()->SetValueAsBool("CanSeePlayer",Stimulus.WasSuccessfullySensed());
 		UE_LOG(LogTemp, Warning, TEXT("Vedo il player"),Stimulus.WasSuccessfullySensed());

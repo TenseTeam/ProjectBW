@@ -7,6 +7,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
+#include "Utility/LGDebug.h"
 
 UBTTask_FindPlayerLocation::UBTTask_FindPlayerLocation(FObjectInitializer const& ObjectInitializer)
 {
@@ -20,9 +21,13 @@ EBTNodeResult::Type UBTTask_FindPlayerLocation::ExecuteTask(UBehaviorTreeCompone
 	{
 		// get player location to use as origin
 		FVector const playerLocation = playerCharacter->GetActorLocation();
+
+		// LGDebug::Log(SearchRandom?"true":"false" ,true);
 		
 		if (SearchRandom)
 		{
+			//LGDebug::Log(SearchRandom?"true":"false" ,true);
+			
 			FNavLocation location;
 
 			//get the navigation system and generate a random location near the player
