@@ -140,9 +140,9 @@ private:
 	UGrapplingHookComponent* GrapplingHook;
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
+	
 	UPROPERTY()
 	AGameplayController* BWController;
-
 	
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bWantRunning;

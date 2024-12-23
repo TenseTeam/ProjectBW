@@ -22,22 +22,6 @@ class PROJECTBW_API URun : public UMotionState
 
 	UFUNCTION()
 	void InterruptRun();
-
-	// void PauseRun();
-	// void UnpauseRun();
-	//
-	// UFUNCTION()
-	// void OnStartShooting();
-	// UFUNCTION()
-	// void OnStartAiming();
-	// UFUNCTION()
-	// void OnStopShooting();
-	// UFUNCTION()
-	// void OnStopAiming();
-
-	// bool bIsAiming = false;
-	// bool bIsShooting = false;
-	// bool bPaused = false;
 	
 	float DefaultAcceleration;
 	float DefaultSpeed;

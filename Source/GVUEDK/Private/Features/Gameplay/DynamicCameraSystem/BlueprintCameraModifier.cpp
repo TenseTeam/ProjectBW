@@ -49,7 +49,7 @@ bool UBlueprintCameraModifier::ModifyCamera(float DeltaTime, struct FMinimalView
 	{
 		ApplyCameraTransition(CustomPOV->POV, CustomPOVTransitionTime, InOutPOV, DeltaTime);
 		bExitTransitionCompleted = false;
-		return true;
+		return bHasPriority;
 	}
 	if (!bExitTransitionCompleted)
 	{

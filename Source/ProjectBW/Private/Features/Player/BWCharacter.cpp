@@ -67,8 +67,6 @@ void ABWCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-//State Machine Stuff...
-
 void ABWCharacter::HandleMotionInput(const EInputActionType InputAction, const FInputActionValue& Value) const
 {
 	MotionStateMachineComponent->HandleInput(InputAction, Value);
@@ -99,15 +97,10 @@ const UCharacterState* ABWCharacter::GetActionState(const int Index) const
 	return Cast<UCharacterState>(ActionStateMachineComponent->GetState(Index));
 }
 
-//End State Machine Stuff
-
-
-//Character Movement Stuff...
-
 void ABWCharacter::Move(const FVector& MoveVector)
 {
-	FRotator CameraCurrentRotation = BWController->PlayerCameraManager->GetCameraCacheView().Rotation;
-	FRotator MoveVectorRotationOffset(0, CameraCurrentRotation.Yaw, 0);
+	const FRotator CameraCurrentRotation = BWController->PlayerCameraManager->GetCameraCacheView().Rotation;
+	const FRotator MoveVectorRotationOffset(0, CameraCurrentRotation.Yaw, 0);
 	AddMovementInput(MoveVectorRotationOffset.Quaternion() * MoveVector);
 }
 
@@ -134,8 +127,7 @@ bool ABWCharacter::MoveInputActive() const
 
 bool ABWCharacter::IsRunning() const
 {
-	return bWantRunning && !AGameplayController::GetMoveInputValue().IsNearlyZero();
-	//&& GetCharacterMovement()->MaxWalkSpeed == Data->RunSpeed;
+	return bWantRunning && MoveInputActive();
 }
 
 bool ABWCharacter::WantRunning() const
@@ -253,11 +245,11 @@ bool ABWCharacter::CanShoot() const
 	return bCanShoot && !IsDodging() && !IsHooking();
 }
 
-
 void ABWCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)
 {
 	Super::OnMovementModeChanged(PrevMovementMode, PreviousCustomMode);
 
+	//Needed to notify the apex of the jump/fall
 	GetCharacterMovement()->bNotifyApex = GetCharacterMovement()->MovementMode == MOVE_Falling;
 
 	if (OnMovementModeChangedEvent.IsBound())

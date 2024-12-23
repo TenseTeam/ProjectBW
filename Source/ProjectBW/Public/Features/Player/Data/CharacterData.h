@@ -42,4 +42,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Hooking",
 		meta = (ClampMin = 0, ClampMax = 1, ToolTip = "Normalized distance at wich the hooking end phase starts"))
 	float HookEndNormalizedDistance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Shooting")
+	float RotationSpeedAiming;
 };
