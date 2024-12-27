@@ -95,7 +95,7 @@ void UGrapplingHookComponent::StopHooking()
 
 void UGrapplingHookComponent::PerformHooking(float DeltaTime)
 {
-	GetOwner()->SetActorLocation(GetOwner()->GetActorLocation() + StartHookDirection * GetSpeed() * DeltaTime/*, false, nullptr, ETeleportType::TeleportPhysics*/);
+	GetOwner()->SetActorLocation(GetOwner()->GetActorLocation() + StartHookDirection * GetSpeed() * DeltaTime);
 	OnHooking.Broadcast();
 	if (GetElapsedNormalizedDistance() >= 1)
 	{

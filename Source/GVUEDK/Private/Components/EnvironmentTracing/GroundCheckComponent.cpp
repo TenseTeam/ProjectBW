@@ -7,11 +7,12 @@
 UGroundCheckComponent::UGroundCheckComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	StartTraceLocation = FVector::ZeroVector;
 }
 
 float UGroundCheckComponent::CheckGroundDistance() const
 {
-	const FVector Start = GetOwner()->GetActorLocation();
+	const FVector Start = GetOwner()->GetActorTransform().TransformPosition(StartTraceLocation);
 	const FVector End = Start + FVector::DownVector * MaxGroundDistance;
 
 	FHitResult HitResult;

@@ -3,8 +3,6 @@
 
 #include "Features/Player/States/MotionIdle.h"
 
-#include "ShaderCompiler.h"
-
 void UMotionIdle::Enter(AActor* Context)
 {
 	if (!bInitialized)
@@ -23,11 +21,6 @@ void UMotionIdle::Update(AActor* Context, float deltaTime)
 		return;
 	}
 	Super::Update(Context, deltaTime);
-
-	//if(Character->GetCharacterMovement()->IsFalling())
-	//{
-	//	Character->ChangeState(jump);
-	//{
 }
 
 void UMotionIdle::HandleInput(AActor* Context, const EInputActionType InputAction, const FInputActionValue& Value)

@@ -4,6 +4,7 @@
 #include "Features/Player/States/Jump.h"
 
 #include "Chaos/Deformable/MuscleActivationConstraints.h"
+#include "Features/Player/States/Hook.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Utility/FGvDebug.h"
 
@@ -29,9 +30,8 @@ void UJump::Enter(AActor* Context)
 		return;
 	}
 	Super::Enter(Context);
-
-	// Check if character is going up or down and set the correct jump state
-	if (Character->GetVelocity().Z < 0)
+	// Check if character is going up or down or if the previous motion state was hook state, and set the correct jump state
+	if (Character->GetVelocity().Z < 0 || IsValid(Cast<UHook>(Character->GetPreviousMotionState())))
 	{
 		Character->JumpState = EJumpState::JumpLoop;
 	}

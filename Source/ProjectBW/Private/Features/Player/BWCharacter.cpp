@@ -82,6 +82,16 @@ const UCharacterState* ABWCharacter::GetMotionState(const int Index) const
 	return Cast<UCharacterState>(MotionStateMachineComponent->GetState(Index));
 }
 
+const UCharacterState* ABWCharacter::GetCurrentMotionState() const
+{
+	return Cast<UCharacterState>(MotionStateMachineComponent->GetCurrentState());
+}
+
+const UCharacterState* ABWCharacter::GetPreviousMotionState() const
+{
+	return Cast<UCharacterState>(MotionStateMachineComponent->GetPreviousState());
+}
+
 void ABWCharacter::HandleActionInput(const EInputActionType InputAction, const FInputActionValue& Value) const
 {
 	ActionStateMachineComponent->HandleInput(InputAction, Value);

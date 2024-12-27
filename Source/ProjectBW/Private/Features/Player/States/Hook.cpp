@@ -33,18 +33,10 @@ void UHook::Enter(AActor* Context)
 	}
 	Super::Enter(Context);
 	
-	HookEndNormalizedDistance = Character->Data->HookEndNormalizedDistance;
-	StartDelay = PlayerGrapplingHook->GetStartDelay();
-	ElapsedTime = 0;
-	
 	Character->MotionState = ECharacterState::Hooking;
 	Character->HookState = EHookState::HookStart;
-	Character->SetIsHooking(true);
-	Character->GetCharacterMovement()->bNotifyApex = true;
-	Character->GetCharacterMovement()->GravityScale = 0;
-	Character->GetCharacterMovement()->StopMovementImmediately();
-	Character->SetActorEnableCollision(false);
 	
+	PlayerGrapplingHook->OnStartHooking.AddDynamic(this, &UHook::OnHookStarted);
 	PlayerGrapplingHook->OnStopHooking.AddDynamic(this, &UHook::OnHookFinished);
 	PlayerGrapplingHook->StartHooking();
 }
@@ -84,12 +76,9 @@ void UHook::Exit(AActor* Context)
 		return;
 	}
 	Super::Exit(Context);
+	PlayerGrapplingHook->OnStartHooking.RemoveDynamic(this, &UHook::OnHookStarted);
 	PlayerGrapplingHook->OnStopHooking.RemoveDynamic(this, &UHook::OnHookFinished);
 	Character->HookState = EHookState::None;
-	Character->GetSpringArm()->bDoCollisionTest = true;
-	Character->SetIsHooking(false);
-	Character->GetCharacterMovement()->GravityScale = 1;
-	Character->SetActorEnableCollision(true);
 }
 
 void UHook::HandleInput(AActor* Context, const EInputActionType InputAction, const FInputActionValue& Value)
@@ -103,12 +92,34 @@ void UHook::HandleInput(AActor* Context, const EInputActionType InputAction, con
 
 void UHook::OnHookFinished() 
 {
+	Character->GetSpringArm()->bDoCollisionTest = true;
+	Character->SetIsHooking(false);
+	Character->GetCharacterMovement()->GravityScale = 1;
+	Character->SetActorEnableCollision(true);
+	
+	if (Character->GetGroundDistance() > 100)
+	{
+		Character->ChangeMotionState(3); //jump
+		return;
+	}
 	if (Controller->GetMoveInputValue().IsNearlyZero())
 	{
 		Character->ChangeMotionState(0); //idle
+		return;
 	}
-	else
-	{
-		Character->ChangeMotionState(1); //walk
-	}
+	
+	Character->ChangeMotionState(1); //walk
+}
+
+void UHook::OnHookStarted()
+{
+	HookEndNormalizedDistance = Character->Data->HookEndNormalizedDistance;
+	StartDelay = PlayerGrapplingHook->GetStartDelay();
+	ElapsedTime = 0;
+
+	Character->SetIsHooking(true);
+	Character->GetCharacterMovement()->bNotifyApex = true;
+	Character->GetCharacterMovement()->GravityScale = 0;
+	Character->GetCharacterMovement()->StopMovementImmediately();
+	Character->SetActorEnableCollision(false);
 }

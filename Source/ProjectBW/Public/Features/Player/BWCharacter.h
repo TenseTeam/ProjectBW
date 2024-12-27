@@ -182,6 +182,8 @@ public:
 	void HandleMotionInput(const EInputActionType InputAction, const FInputActionValue& Value) const;
 	void ChangeMotionState(const int Index) const;
 	const UCharacterState* GetMotionState(const int Index) const;
+	const UCharacterState* GetCurrentMotionState() const;
+	const UCharacterState* GetPreviousMotionState() const;
 
 	void HandleActionInput(const EInputActionType InputAction, const FInputActionValue& Value) const;
 	void ChangeActionState(const int Index) const;
