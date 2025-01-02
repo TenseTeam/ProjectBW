@@ -55,6 +55,10 @@ void ABWCharacter::BeginPlay()
 
 	GrapplingHook->OnStartHooking.AddDynamic(this, &ABWCharacter::StartHooking);
 	GrapplingHook->OnStopHooking.AddDynamic(this, &ABWCharacter::StopHooking);
+
+	DodgerComponent->OnStartDodge.AddDynamic(this, &ABWCharacter::StartDodging);
+	DodgerComponent->OnDodge.AddDynamic(this, &ABWCharacter::Dodging);
+	DodgerComponent->OnStopDodge.AddDynamic(this, &ABWCharacter::StopDodging);
 }
 
 void ABWCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -124,6 +128,11 @@ UGrapplingHookComponent* ABWCharacter::GetGrapplingHook() const
 UGvSpringArmComponent* ABWCharacter::GetSpringArm() const
 {
     return SpringArm;
+}
+
+UDodgerComponent* ABWCharacter::GetDodgerComponent() const
+{
+	return DodgerComponent;
 }
 
 float ABWCharacter::GetGroundDistance() const
@@ -287,4 +296,19 @@ void ABWCharacter::StartHooking()
 void ABWCharacter::StopHooking()
 {
 	OnStopHook.Broadcast();
+}
+
+void ABWCharacter::StartDodging()
+{
+	OnStartDodging.Broadcast();
+}
+
+void ABWCharacter::Dodging()
+{
+	OnDodging.Broadcast();
+}
+
+void ABWCharacter::StopDodging()
+{
+	OnStopDodging.Broadcast();
 }

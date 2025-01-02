@@ -25,19 +25,6 @@ public:
 	UCurveFloat* AscentGravityCurve;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Jumping")
 	UCurveFloat* DescentGravityCurve;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dodging")
-	float DodgeSpeed;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dodging")
-	float DodgeCooldown;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dodging")
-	float RotationSpeed;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dodging")
-	UAnimMontage* DodgeAnimMontage;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dodging")
-	float DodgeAnimPlayRate = 1.f;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dodging", meta = (ClampMin = 0, ClampMax = 1))
-	float ExitNormalizedTime = 1.f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Hooking",
 		meta = (ClampMin = 0, ClampMax = 1, ToolTip = "Normalized distance at wich the hooking end phase starts"))

@@ -68,6 +68,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopRunning);
 
 //Dodge events
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartDodging);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDodging);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopDodging);
 
 //Dodge events
@@ -105,6 +106,8 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
 	FStartDodging OnStartDodging;
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FDodging OnDodging;
 	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
 	FStopDodging OnStopDodging;
 
@@ -198,6 +201,8 @@ public:
 	UGrapplingHookComponent* GetGrapplingHook() const;
 	UFUNCTION(BlueprintCallable)
 	UGvSpringArmComponent* GetSpringArm() const;
+	UFUNCTION(BlueprintCallable)
+	UDodgerComponent* GetDodgerComponent() const;
 
 	UFUNCTION(BlueprintCallable)
 	float GetGroundDistance() const;
@@ -264,8 +269,16 @@ public:
 private:
 	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode) override;
 	virtual void NotifyJumpApex() override;
+	
 	UFUNCTION()
 	void StartHooking();
 	UFUNCTION()
 	void StopHooking();
+
+	UFUNCTION()
+	void StartDodging();
+	UFUNCTION()
+	void Dodging();
+	UFUNCTION()
+	void StopDodging();
 };
