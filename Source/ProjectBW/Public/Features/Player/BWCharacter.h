@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Base/BWCharacterBase.h"
 #include "Camera/CameraComponent.h"
+#include "Components/Dodger/DodgerComponent.h"
 #include "Components/EnvironmentTracing/GroundCheckComponent.h"
 #include "Data/CharacterData.h"
 #include "Features/Gameplay/DynamicCameraSystem/GvSpringArmComponent.h"
@@ -140,6 +141,8 @@ private:
 	UGrapplingHookComponent* GrapplingHook;
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UDodgerComponent* DodgerComponent;
 	
 	UPROPERTY()
 	AGameplayController* BWController;

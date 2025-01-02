@@ -65,6 +65,7 @@ void UDodge::Update(AActor* Context, float DeltaTime)
 	ElapsedTime += DeltaTime;
 	if (ElapsedTime >= DodgeAnimLenght * ExitNormalizedTime)
 	{
+		//Character->StopAnimMontage(DodgeAnimMontage);
 		if (Character->GetCharacterMovement()->IsFalling())
 		{
 			Character->ChangeMotionState(3); //jump
@@ -82,14 +83,16 @@ void UDodge::Update(AActor* Context, float DeltaTime)
 	}
 
 	//if the character is falling we want to apply gravity
-	if (Character->GetCharacterMovement()->IsFalling())
-	{
-		Character->GetCharacterMovement()->Velocity = TargetVelocity + FVector::DownVector * 981;
-	}
-	else
-	{
-		Character->GetCharacterMovement()->Velocity = TargetVelocity;
-	}
+	 if (Character->GetCharacterMovement()->IsFalling())
+	 {
+	 	Character->GetCharacterMovement()->Velocity = TargetVelocity + FVector::DownVector * 981;
+	 }
+	 else
+	 {
+	 	Character->GetCharacterMovement()->Velocity = TargetVelocity;
+	 }
+	//Character->GetCharacterMovement()->Velocity = TargetVelocity;
+
 
 	CurrentRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, RotationSpeed);
 	Character->SetActorRotation(CurrentRotation);

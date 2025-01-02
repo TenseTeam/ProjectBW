@@ -32,6 +32,8 @@ ABWCharacter::ABWCharacter()
 	
 	GrapplingHook = CreateDefaultSubobject<UGrapplingHookComponent>("Grappling Hook");
 
+	DodgerComponent = CreateDefaultSubobject<UDodgerComponent>("DodgerComponent");
+
 	bCanMove = true;
 	bCanLook = true;
 	bCanRun = true;
