@@ -15,7 +15,7 @@ FRPGGearItemSaveData URPGGearItem::CreateRPGGearItemSaveData() const
 	FRPGGearItemSaveData GearSaveData;
 	GearSaveData.RPGItemSaveData = CreateRPGItemSaveData();
 
-	for (const auto& StatModifier : StatsModifiers)
+	for (const auto& StatModifier : GearStats)
 		GearSaveData.GearBonusStats.Add(StatModifier.Key->StatID, StatModifier.Value);
 
 	return GearSaveData;
@@ -29,16 +29,16 @@ void URPGGearItem::LoadRPGGearItemSaveData(FRPGGearItemSaveData& GearSaveData, U
 	for (TMap<FName, int32> BonusStats = GearSaveData.GearBonusStats; const auto& Stats : BonusStats)
 	{
 		if (UBaseStatData* StatData = URPGInventoriesUtility::GetStatByID(Stats.Key); IsValid(StatData))
-			StatsModifiers.Add(StatData, Stats.Value);
+			GearStats.Add(StatData, Stats.Value);
 	}
 }
 
 int32 URPGGearItem::GetItemStatValue(const UBaseStatData* Stat) const
 {
-	if (!StatsModifiers.Contains(Stat))
+	if (!GearStats.Contains(Stat))
 		return 0;
 
-	return StatsModifiers[Stat];
+	return GearStats[Stat];
 }
 
 void URPGGearItem::AddItemStat(UBaseStatData* Stat, const TSubclassOf<UStatOperation> OperationClass, const bool bOverrideIfExist)
@@ -49,13 +49,13 @@ void URPGGearItem::AddItemStat(UBaseStatData* Stat, const TSubclassOf<UStatOpera
 		return LocalStat->bIsUncapped ? Operation->GetResultOperation() : FMath::Clamp(Operation->GetResultOperation(), LocalStat->StatMinValue, LocalStat->StatMaxValue);
 	};
 	
-	if (StatsModifiers.Contains(Stat))
+	if (GearStats.Contains(Stat))
 	{
 		if (!bOverrideIfExist)
 			return;
 
 		if (const int32 Value = CalculateResult (Stat, OperationClass); Value != 0)
-			StatsModifiers[Stat] = Value;
+			GearStats[Stat] = Value;
 		else
 			RemoveItemStat(Stat);
 		
@@ -63,33 +63,33 @@ void URPGGearItem::AddItemStat(UBaseStatData* Stat, const TSubclassOf<UStatOpera
 	}
 
 	if (const int32 Value = CalculateResult (Stat, OperationClass); Value != 0)
-		StatsModifiers.Add(Stat, CalculateResult (Stat, OperationClass));
+		GearStats.Add(Stat, CalculateResult (Stat, OperationClass));
 	else
 		RemoveItemStat(Stat);
 }
 
 void URPGGearItem::RemoveItemStat(UBaseStatData* Stat)
 {
-	if (!StatsModifiers.Contains(Stat))
+	if (!GearStats.Contains(Stat))
 		return;
 
-	StatsModifiers.Remove(Stat);
+	GearStats.Remove(Stat);
 }
 
 void URPGGearItem::SetItemStat(UBaseStatData* Stat, const int32 Value)
 {
-	if (!StatsModifiers.Contains(Stat))
+	if (!GearStats.Contains(Stat))
 		return;
 	
-	StatsModifiers[Stat] = Value;
+	GearStats[Stat] = Value;
 }
 
 void URPGGearItem::ModifyItemStat(UBaseStatData* Stat, const int32 SumValue)
 {
-	if (!StatsModifiers.Contains(Stat))
+	if (!GearStats.Contains(Stat))
 		return;
 
-	SetItemStat(Stat, StatsModifiers[Stat] + SumValue);
+	SetItemStat(Stat, GearStats[Stat] + SumValue);
 }
 
 URPGGearItemData* URPGGearItem::GetRPGGearItemData() const
@@ -122,5 +122,5 @@ bool URPGGearItem::CanStackItem_Implementation(UItemBase* OtherItem) const
 		return true;
 	};
 
-	return AreStatsEqual(StatsModifiers, GearItem->StatsModifiers);
+	return AreStatsEqual(GearStats, GearItem->GearStats);
 }

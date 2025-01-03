@@ -18,7 +18,7 @@ class VUNDK_API URPGGearItem : public URPGItem
 
 protected:
 	UPROPERTY(BlueprintReadOnly)
-	TMap<UBaseStatData*, int32> StatsModifiers;
+	TMap<UBaseStatData*, int32> GearStats;
 
 public:
 	URPGGearItem();
