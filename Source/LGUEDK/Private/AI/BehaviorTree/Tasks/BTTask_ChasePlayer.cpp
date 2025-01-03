@@ -3,7 +3,7 @@
 
 #include "BTTask_ChasePlayer.h"
 
-#include "AI/EnemyBase/EnemyControllerBase.h"
+#include "LGUEDK/Public/AI/NPC/NPCBase/NPCBaseController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 
@@ -15,7 +15,7 @@ UBTTask_ChasePlayer::UBTTask_ChasePlayer(FObjectInitializer const& ObjectInitial
 EBTNodeResult::Type UBTTask_ChasePlayer::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	//get target location from blackboard via controller
-	if (AEnemyControllerBase* const AiController = Cast<AEnemyControllerBase>(OwnerComp.GetAIOwner()))
+	if (ANPCBaseController* const AiController = Cast<ANPCBaseController>(OwnerComp.GetAIOwner()))
 	{
 		FVector const PlayerLocation = OwnerComp.GetBlackboardComponent()->GetValueAsVector(GetSelectedBlackboardKey());
 

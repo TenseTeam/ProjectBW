@@ -3,30 +3,30 @@
 #pragma once
 
 #include "CoreMinimal.h"
-// #include "EnemyBase.h"
-#include "Runtime/AIModule/Classes/AIController.h"
-#include "Perception/AIPerceptionComponent.h"
+#include "NPCBaseEnemy.h"
+#include "AI/NPC/NPCBase/NPCBaseController.h"
 #include "Perception/AISenseConfig_Sight.h"
-#include "EnemyControllerBase.generated.h"
+#include "NPCBaseEnemyController.generated.h"
 
-class AEnemyBase;
+class ANPCBaseEnemy;
 
 
 UCLASS()
-class LGUEDK_API AEnemyControllerBase : public AAIController
+class LGUEDK_API ANPCBaseEnemyController : public ANPCBaseController
 {
 	GENERATED_BODY()
 
 public:
 
-	explicit AEnemyControllerBase(FObjectInitializer const& ObjectInitializer);
+	explicit ANPCBaseEnemyController(FObjectInitializer const& ObjectInitializer);
 
 protected:
+	
 	virtual void BeginPlay() override;
 	
 	UFUNCTION()
 	void OnPossess(APawn* InPawn) override;
-
+	
 	UFUNCTION()
 	void SetStateAsPatrolling();
 	
@@ -48,10 +48,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Sight", meta = (ClampMin = "0.0", UIMin = "0.0"))
 	float SightMaxAge = 5.0f;
 	
+	
 private:
-
+	
 	UPROPERTY()
-	AEnemyBase* ControlledPawn;
+	ANPCBaseEnemy* ControlledPawn;
+	
 	UPROPERTY()
 	UAISenseConfig_Sight* SightConfig;
 	

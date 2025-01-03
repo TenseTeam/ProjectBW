@@ -1,23 +1,24 @@
 // Copyright Villains, Inc. All Rights Reserved.
 
-
-#include "AI/EnemyBase/EnemyBase.h"
+#include "LGUEDK/Public/AI/NPC/NPCBaseEnemy/NPCBaseEnemy.h"
+#include "AI/Enumerators/EMovementSpeed.h"
+#include "AI/NPC/NPCBase/NPCBaseController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Utility/LGDebug.h"
 
 
 // Sets default values
-AEnemyBase::AEnemyBase()
+ANPCBaseEnemy::ANPCBaseEnemy()
 {
-	AIControllerClass = AEnemyControllerBase::StaticClass();
+	AIControllerClass = ANPCBaseController::StaticClass();
 }
 
-UBehaviorTree* AEnemyBase::GetBehaviorTree() const
+UBehaviorTree* ANPCBaseEnemy::GetBehaviorTree() const
 {
 	return BehaviorTree;
 }
 
-void AEnemyBase::SetMovementSpeed(EMovementSpeed MovementSpeed)
+void ANPCBaseEnemy::SetMovementSpeed(EMovementSpeed MovementSpeed) const
 {
 
 	UCharacterMovementComponent* MyCharacterMovement = GetCharacterMovement();
@@ -54,11 +55,9 @@ void AEnemyBase::SetMovementSpeed(EMovementSpeed MovementSpeed)
 	
 }
 
-// Called when the game starts or when spawned
-void AEnemyBase::BeginPlay()
+void ANPCBaseEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 }
-
 
 

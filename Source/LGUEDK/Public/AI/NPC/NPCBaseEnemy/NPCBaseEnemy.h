@@ -3,18 +3,28 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
-#include "BehaviorTree/BehaviorTree.h"
-#include "EnemyControllerBase.h" 
 #include "AI/Enumerators/EMovementSpeed.h"
 #include "AI/Enumerators/EnemyState.h"
-#include "EnemyBase.generated.h"
+#include "AI/NPC/NPCBase/NPCBase.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "NPCBaseEnemy.generated.h"
 
 UCLASS()
-class LGUEDK_API AEnemyBase : public ACharacter
+class LGUEDK_API ANPCBaseEnemy : public ANPCBase
 {
 	GENERATED_BODY()
 
+public:
+	
+	ANPCBaseEnemy();
+	
+	UBehaviorTree* GetBehaviorTree() const;
+
+	void SetMovementSpeed(EMovementSpeed MovementSpeed) const;
+
+	EEnemyState GetEnemyState() const { return CurrentState; }
+	void SetEnemyState(EEnemyState NewState) { CurrentState = NewState; }
+	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Movement")
 	float IdleSpeed = 0.0f;
@@ -30,23 +40,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|State")
 	EEnemyState CurrentState = EEnemyState::Patrolling;
-	
-public:
-	// Sets default values for this character's properties
-	AEnemyBase();
 
-	UBehaviorTree* GetBehaviorTree() const;
 
-	void SetMovementSpeed(EMovementSpeed MovementSpeed);
-
-	EEnemyState GetEnemyState() const { return CurrentState; }
-	void SetEnemyState(EEnemyState NewState) { CurrentState = NewState; }
-	
-protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "IA",meta=(AllowPrivateAccess="true"))
+public:
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "AI",meta=(AllowPrivateAccess="true"))
 	UBehaviorTree* BehaviorTree;
-	
 };

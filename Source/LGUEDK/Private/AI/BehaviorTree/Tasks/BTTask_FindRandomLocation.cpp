@@ -3,7 +3,7 @@
 
 #include "BTTask_FindRandomLocation.h"
 #include "NavigationSystem.h"
-#include "AI/EnemyBase/EnemyControllerBase.h"
+#include "LGUEDK/Public/AI/NPC/NPCBase/NPCBaseController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 UBTTask_FindRandomLocation::UBTTask_FindRandomLocation(FObjectInitializer const& ObjectInitializer)
@@ -14,7 +14,7 @@ UBTTask_FindRandomLocation::UBTTask_FindRandomLocation(FObjectInitializer const&
 EBTNodeResult::Type UBTTask_FindRandomLocation::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 
-	if (AEnemyControllerBase* const controller = Cast<AEnemyControllerBase>(OwnerComp.GetAIOwner()))
+	if (ANPCBaseController* const controller = Cast<ANPCBaseController>(OwnerComp.GetAIOwner()))
 	{
 		if (APawn* const enemy = controller->GetPawn())
 		{

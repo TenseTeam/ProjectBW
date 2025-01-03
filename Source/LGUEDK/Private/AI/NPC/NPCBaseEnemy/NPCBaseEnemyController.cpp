@@ -1,30 +1,30 @@
 // Copyright Villains, Inc. All Rights Reserved.
 
 
-#include "AI/EnemyBase/EnemyControllerBase.h"
-#include "AI/EnemyBase/EnemyBase.h"
-#include "AI/Interfaces/AITargetInterface.h"
+#include "AI/NPC/NPCBaseEnemy/NPCBaseEnemyController.h"
+
+#include "AI/NPC/NPCBaseEnemy/NPCBaseEnemy.h"
+#include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "Components/HealtComponent/HealthBaseComponent.h"
+#include "Perception/AIPerceptionComponent.h"
+#include "Perception/AIPerceptionTypes.h"
 
 
-AEnemyControllerBase::AEnemyControllerBase(FObjectInitializer const& ObjectInitializer)
+ANPCBaseEnemyController::ANPCBaseEnemyController(FObjectInitializer const& ObjectInitializer)
 {
 	SetUpPercveptionSystem();
 }
 
-// Called when the game starts or when spawned
-void AEnemyControllerBase::BeginPlay()
+void ANPCBaseEnemyController::BeginPlay()
 {
 	Super::BeginPlay();
 	SetStateAsPatrolling();
-
 }
 
-void AEnemyControllerBase::OnPossess(APawn* InPawn)
+void ANPCBaseEnemyController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-	if (AEnemyBase* const EnemyBase = Cast<AEnemyBase>(InPawn))
+	if (ANPCBaseEnemy* const EnemyBase = Cast<ANPCBaseEnemy>(InPawn))
 	{
 		ControlledPawn = EnemyBase;
 		if (UBehaviorTree* const tree = EnemyBase->GetBehaviorTree())
@@ -38,7 +38,7 @@ void AEnemyControllerBase::OnPossess(APawn* InPawn)
 	}
 }
 
-void AEnemyControllerBase::SetStateAsPatrolling()
+void ANPCBaseEnemyController::SetStateAsPatrolling()
 {
 	if (UBlackboardComponent* BlackboardComp = GetBlackboardComponent())
 	{
@@ -51,7 +51,7 @@ void AEnemyControllerBase::SetStateAsPatrolling()
 	}
 }
 
-void AEnemyControllerBase::SetStateAsPassive()
+void ANPCBaseEnemyController::SetStateAsPassive()
 {
 	if (UBlackboardComponent* BlackboardComp = GetBlackboardComponent())
 	{
@@ -64,7 +64,7 @@ void AEnemyControllerBase::SetStateAsPassive()
 	}
 }
 
-void AEnemyControllerBase::SetUpPercveptionSystem()
+void ANPCBaseEnemyController::SetUpPercveptionSystem()
 {
 	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
 	if (SightConfig)
@@ -80,13 +80,12 @@ void AEnemyControllerBase::SetUpPercveptionSystem()
 		SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
 
 		GetPerceptionComponent()->SetDominantSense(*SightConfig->GetSenseImplementation());
-		GetPerceptionComponent()->OnTargetPerceptionUpdated.AddDynamic(this,&AEnemyControllerBase::OnTargetDetected);
+		GetPerceptionComponent()->OnTargetPerceptionUpdated.AddDynamic(this,&ANPCBaseEnemyController::OnTargetDetected);
 		GetPerceptionComponent()->ConfigureSense(*SightConfig);
 	}
-	
 }
 
-void AEnemyControllerBase::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
+void ANPCBaseEnemyController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
 {
 	// if (IAITargetInterface* MyInterface = Cast<IAITargetInterface>(Actor))
 	// {
@@ -99,5 +98,3 @@ void AEnemyControllerBase::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
 		UE_LOG(LogTemp, Warning, TEXT("Vedo il player"),Stimulus.WasSuccessfullySensed());
 	}
 }
-
-

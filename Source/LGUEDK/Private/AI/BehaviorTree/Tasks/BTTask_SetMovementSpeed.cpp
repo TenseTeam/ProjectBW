@@ -3,8 +3,9 @@
 
 #include "BTTask_SetMovementSpeed.h"
 
-#include "AI/EnemyBase/EnemyBase.h"
-#include "AI/EnemyBase/EnemyControllerBase.h"
+#include "AI/NPC/NPCBaseEnemy/NPCBaseEnemy.h"
+#include "LGUEDK/Public/AI/NPC/NPCBase/NPCBase.h"
+#include "LGUEDK/Public/AI/NPC/NPCBase/NPCBaseController.h"
 
 UBTTask_SetMovementSpeed::UBTTask_SetMovementSpeed(FObjectInitializer const& ObjectInitializer)
 {
@@ -20,7 +21,7 @@ EBTNodeResult::Type UBTTask_SetMovementSpeed::ExecuteTask(UBehaviorTreeComponent
 		return EBTNodeResult::Failed;
 	}
 	
-	AEnemyBase* Enemy = Cast<AEnemyBase>(AIController->GetPawn());
+	ANPCBaseEnemy* Enemy = Cast<ANPCBaseEnemy>(AIController->GetPawn());
 	if (!Enemy)
 	{
 		return EBTNodeResult::Failed;

@@ -2,8 +2,9 @@
 
 
 #include "BTDecoratorEnemyState.h"
-
-#include "AI/EnemyBase/EnemyBase.h"
+#include "AIController.h"
+#include "AI/NPC/NPCBaseEnemy/NPCBaseEnemy.h"
+#include "LGUEDK/Public/AI/NPC/NPCBase/NPCBase.h"
 
 UBTDecoratorEnemyState::UBTDecoratorEnemyState(FObjectInitializer const& ObjectInitializer)
 {
@@ -18,7 +19,7 @@ bool UBTDecoratorEnemyState::CalculateRawConditionValue(UBehaviorTreeComponent& 
 		return false;
 	}
 
-	const AEnemyBase* Enemy = Cast<AEnemyBase>(AIController->GetPawn());
+	const ANPCBaseEnemy* Enemy = Cast<ANPCBaseEnemy>(AIController->GetPawn());
 	if (!Enemy)
 	{
 		return false;
