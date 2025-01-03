@@ -22,6 +22,7 @@ void UMenuWidget::Open()
 	SetVisibility(OpenVisibility);
 	UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(PlayerController, this, EMouseLockMode::DoNotLock, false, true);
 	PlayerController->bShowMouseCursor = true;
+	bIsOpen = true;
 	OnOpen();
 }
 
@@ -34,8 +35,9 @@ void UMenuWidget::Close()
 		return;
 	
 	SetVisibility(CloseVisibility);
-	UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerController, true);
+	UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerController, false);
 	PlayerController->bShowMouseCursor = false;
+	bIsOpen = false;
 	OnClose();
 }
 

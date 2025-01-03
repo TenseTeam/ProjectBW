@@ -24,9 +24,9 @@ public:
 	FString MeasurementSymbol;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bIsUncapped;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition = "bIsUncapped", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int32 StatMinValue;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition = "bIsUncapped", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition = "!bIsUncapped", EditConditionHides))
 	int32 StatMaxValue;
 
 public:

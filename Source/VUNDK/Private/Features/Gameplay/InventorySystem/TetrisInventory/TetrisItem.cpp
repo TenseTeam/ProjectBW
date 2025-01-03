@@ -38,7 +38,7 @@ void UTetrisItem::LoadTetrisSaveData(const FTetrisItemSaveData& TetrisSaveData, 
 
 void UTetrisItem::SetRotation(const bool bNewRotation)
 {
-	if (!GetTetrisItemData()->bCanBeRotated)
+	if (!GetTetrisItemData()->bCanBeRotated && GetTetrisItemData()->Size.X != GetTetrisItemData()->Size.Y)
 		return;
 
 	bIsRotated = bNewRotation;
@@ -95,4 +95,10 @@ void UTetrisItem::CacheCurrentRotation()
 {
 	bCachedRotation = bIsRotated;
 	CachedSize = GetRelativeSize();
+}
+
+void UTetrisItem::OnEquip_Implementation()
+{
+	Super::OnEquip_Implementation();
+	SetRotation(false);
 }

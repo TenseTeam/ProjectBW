@@ -9,19 +9,19 @@ void UMenuManager::OpenMenu(UMenuWidget* Menu)
 		return;
 	
 	if (IsValid(CurrentOpenMenu))
-		CloseMenu(CurrentOpenMenu);
+		CloseMenu();
 
 	Menu->Open();
 	CurrentOpenMenu = Menu;
 	SetMenuMappingContext();
 }
 
-void UMenuManager::CloseMenu(UMenuWidget* Menu)
+void UMenuManager::CloseMenu()
 {
 	if (!Check())
 		return;
-	
-	Menu->Close();
+
+	CurrentOpenMenu->Close();
 	CurrentOpenMenu = nullptr;
 	SetGameplayMappingContext();
 }
@@ -30,9 +30,15 @@ void UMenuManager::ToggleMenu(UMenuWidget* Menu)
 {
 	if (!Check())
 		return;
+
+	if (CurrentOpenMenu == Menu)
+	{
+		CloseMenu();
+		return;
+	}
 	
 	if (IsValid(CurrentOpenMenu))
-		CloseMenu(CurrentOpenMenu);
+		CloseMenu();
 	else
 		OpenMenu(Menu);
 }

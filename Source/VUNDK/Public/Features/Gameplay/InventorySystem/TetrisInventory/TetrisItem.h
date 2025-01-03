@@ -74,4 +74,7 @@ public:
 	void SetCurrentPosition(const FIntPoint NewPosition);
 
 	void CacheCurrentRotation();
+
+protected:
+	virtual void OnEquip_Implementation() override;
 };

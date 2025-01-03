@@ -11,12 +11,12 @@ class VUNDK_API UMenuWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
-protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	ESlateVisibility OpenVisibility = ESlateVisibility::Visible;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	ESlateVisibility CloseVisibility = ESlateVisibility::Collapsed;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int32 ZOrder = 0;
 	
 private:

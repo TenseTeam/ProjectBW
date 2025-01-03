@@ -16,7 +16,22 @@ URPGItem::URPGItem()
 void URPGItem::Init(UItemDataBase* Data)
 {
 	Super::Init(Data);
-	RarityLevel = URPGInventoriesUtility::GetRPGInventoriesManager()->ItemsRarities->RarityLevels.Array()[0]; // Default rarity level
+
+	const URPGItemsRaritiesData* RaritiesData = URPGInventoriesUtility::GetRPGInventoriesManager()->ItemsRarities;
+
+	if (RaritiesData == nullptr)
+	{
+		UE_LOG(LogInventorySystem, Error, TEXT("Init(), Rarities data is not set for item %s"), *GetItemFullName().ToString());
+		return;
+	}
+
+	if (RaritiesData->RarityLevels.IsEmpty())
+	{
+		UE_LOG(LogInventorySystem, Error, TEXT("Init(), Rarity levels are not set for item %s"), *GetItemFullName().ToString());
+		return;
+	}
+	
+	RarityLevel = RaritiesData->RarityLevels.Array()[0]; // Default rarity level
 }
 
 FRPGItemSaveData URPGItem::CreateRPGItemSaveData() const

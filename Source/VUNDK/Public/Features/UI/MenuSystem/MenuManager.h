@@ -9,7 +9,7 @@
 #include "Widgets/MenuWidget.h"
 #include "MenuManager.generated.h"
 
-UCLASS()
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class VUNDK_API UMenuManager : public UActorComponent
 {
 	GENERATED_BODY()
@@ -33,7 +33,7 @@ public:
 	void OpenMenu(UMenuWidget* Menu);
 
 	UFUNCTION(BlueprintCallable)
-	void CloseMenu(UMenuWidget* Menu);
+	void CloseMenu();
 
 	UFUNCTION(BlueprintCallable)
 	void ToggleMenu(UMenuWidget* Menu);

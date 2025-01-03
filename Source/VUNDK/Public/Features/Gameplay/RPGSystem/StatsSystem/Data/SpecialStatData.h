@@ -30,6 +30,7 @@ public:
 public:
 	USpecialStatData(): StatID(FGuid::NewGuid().ToString()),
 	                    StatCodeName("AAA"),
+	                    StatColor(),
 	                    StatIcon(nullptr),
 	                    StatDefaultValue(10)
 	{
