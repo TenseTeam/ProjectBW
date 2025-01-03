@@ -3,6 +3,8 @@
 
 #include "Features/Player/States/Jump.h"
 
+#include <ThirdParty/ShaderConductor/ShaderConductor/External/DirectXShaderCompiler/include/dxc/DXIL/DxilConstants.h>
+
 #include "Chaos/Deformable/MuscleActivationConstraints.h"
 #include "Features/Player/States/Hook.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -107,6 +109,12 @@ void UJump::HandleInput(AActor* Context, const EInputActionType InputAction, con
 	if (InputAction == EInputActionType::Walk)
 	{
 		Character->Move(Value.Get<FVector>());
+		return;
+	}
+
+	if (InputAction == EInputActionType::Dodge)
+	{
+		Character->ChangeMotionState(4);
 		return;
 	}
 
