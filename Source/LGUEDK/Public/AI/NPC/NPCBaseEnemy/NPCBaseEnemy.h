@@ -41,6 +41,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|State")
 	EEnemyState CurrentState = EEnemyState::Patrolling;
 
+	
+	// Range ottimale
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Range")
+	float OptimalRangeMin = 300.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Range")
+	float OptimalRangeMax = 600.0f;
+
+	// Altezza massima di salto
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Jump")
+	float MaxJumpHeight = 500.0f;
 
 	virtual void BeginPlay() override;
 

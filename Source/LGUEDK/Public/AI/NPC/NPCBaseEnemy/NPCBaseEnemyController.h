@@ -5,6 +5,9 @@
 #include "CoreMinimal.h"
 #include "NPCBaseEnemy.h"
 #include "AI/NPC/NPCBase/NPCBaseController.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "Perception/AISenseConfig_Damage.h"
+#include "Perception/AISenseConfig_Hearing.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "NPCBaseEnemyController.generated.h"
 
@@ -33,6 +36,17 @@ protected:
 	UFUNCTION()
 	void SetStateAsPassive();
 
+	UFUNCTION()
+	void SetStateAsAttacking(AActor* Actor);
+
+	UFUNCTION()
+	void SetStateAsInvestigating();
+
+	UFUNCTION()
+	void SetStateAsJumping(AActor* Actor);
+
+
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Sight", meta = (ClampMin = "0.0", UIMin = "0.0"))
 	float SightRadius = 2000.0f;
 
@@ -48,17 +62,47 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Sight", meta = (ClampMin = "0.0", UIMin = "0.0"))
 	float SightMaxAge = 5.0f;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Hearing", meta = (ClampMin = "0.0", UIMin = "0.0"))
+	float HearingRange = 3000.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Hearing", meta = (ClampMin = "0.0", UIMin = "0.0"))
+	float HearingMaxAge = 5.0f;
+
 	
 private:
 	
 	UPROPERTY()
 	ANPCBaseEnemy* ControlledPawn;
+
+	UPROPERTY()
+	UAIPerceptionComponent* AIPerceptionComponent;
 	
 	UPROPERTY()
 	UAISenseConfig_Sight* SightConfig;
 	
-	void SetUpPercveptionSystem();
+	UPROPERTY()
+	UAISenseConfig_Hearing* HearingConfig;
+	
+	void SetUpPerceptionSystem();
+	void SetUpSightConfig();
+	void SetUpHearingConfig();
+	
 
 	UFUNCTION()
-	void OnTargetDetected(AActor* Actor,FAIStimulus Stimulus);
+	void HandleSight(AActor* Actor, FAIStimulus Stimulus);
+	UFUNCTION()
+	void HandleHear(AActor* Actor, FAIStimulus Stimulus);
+	
+	
+	UFUNCTION()
+	void OnLostSight();
+	UFUNCTION()
+	void OnLostHear();
+
+	
+	FTimerHandle LostSightTimerHandle;
+	
+	FTimerHandle LostHearTimerHandle;
+	
+	
 };

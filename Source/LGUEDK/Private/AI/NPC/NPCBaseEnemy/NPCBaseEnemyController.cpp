@@ -3,21 +3,27 @@
 
 #include "AI/NPC/NPCBaseEnemy/NPCBaseEnemyController.h"
 
+#include "AI/Interfaces/AITargetInterface.h"
 #include "AI/NPC/NPCBaseEnemy/NPCBaseEnemy.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Perception/AIPerceptionComponent.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Perception/AIPerceptionTypes.h"
+#include "Perception/AISenseConfig_Hearing.h"
+#include "Perception/AISense_Hearing.h"
+#include "Utility/LGDebug.h"
 
 
 ANPCBaseEnemyController::ANPCBaseEnemyController(FObjectInitializer const& ObjectInitializer)
 {
-	SetUpPercveptionSystem();
+	SetUpPerceptionSystem();
 }
 
 void ANPCBaseEnemyController::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	SetStateAsPatrolling();
 }
 
@@ -43,6 +49,8 @@ void ANPCBaseEnemyController::SetStateAsPatrolling()
 	if (UBlackboardComponent* BlackboardComp = GetBlackboardComponent())
 	{
 		BlackboardComp->SetValueAsEnum(TEXT("EnemyState"), uint8 (EEnemyState::Patrolling));
+
+		LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)EEnemyState::Patrolling).ToString(),true);
 	}
 
 	if (ControlledPawn)
@@ -56,6 +64,8 @@ void ANPCBaseEnemyController::SetStateAsPassive()
 	if (UBlackboardComponent* BlackboardComp = GetBlackboardComponent())
 	{
 		BlackboardComp->SetValueAsEnum(TEXT("EnemyState"), uint8(EEnemyState::Passive));
+
+		LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)EEnemyState::Passive).ToString(),true);
 	}
 
 	if (ControlledPawn)
@@ -64,12 +74,54 @@ void ANPCBaseEnemyController::SetStateAsPassive()
 	}
 }
 
-void ANPCBaseEnemyController::SetUpPercveptionSystem()
+void ANPCBaseEnemyController::SetStateAsAttacking(AActor* Actor)
+{
+	if (UBlackboardComponent* BlackboardComp = GetBlackboardComponent())
+	{
+		BlackboardComp->SetValueAsEnum(TEXT("EnemyState"), uint8(EEnemyState::Attacking));
+		BlackboardComp->SetValueAsObject(TEXT("AttackTarget"),Actor);
+
+		LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)EEnemyState::Attacking).ToString(),true);
+	}
+
+	if (ControlledPawn)
+	{
+		ControlledPawn->SetEnemyState(EEnemyState::Attacking);
+	}
+}
+
+void ANPCBaseEnemyController::SetStateAsInvestigating()
+{
+	if (UBlackboardComponent* BlackboardComp = GetBlackboardComponent())
+	{
+		BlackboardComp->SetValueAsEnum(TEXT("EnemyState"), uint8(EEnemyState::Investigating));
+	}
+
+	if (ControlledPawn)
+	{
+		ControlledPawn->SetEnemyState(EEnemyState::Investigating);
+	}
+}
+
+void ANPCBaseEnemyController::SetStateAsJumping(AActor* Actor)
+{
+	
+}
+
+void ANPCBaseEnemyController::SetUpPerceptionSystem()
+{
+	AIPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
+	SetPerceptionComponent(*AIPerceptionComponent);
+
+	SetUpSightConfig();
+	SetUpHearingConfig();
+}
+
+void ANPCBaseEnemyController::SetUpSightConfig()
 {
 	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
 	if (SightConfig)
 	{
-		SetPerceptionComponent(*CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("Perception Component")));
 		SightConfig->SightRadius = SightRadius;
 		SightConfig->LoseSightRadius = LoseSightRadius;
 		SightConfig->PeripheralVisionAngleDegrees = PeripheralVisionAngleDegrees;
@@ -79,22 +131,93 @@ void ANPCBaseEnemyController::SetUpPercveptionSystem()
 		SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
 		SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
 
-		GetPerceptionComponent()->SetDominantSense(*SightConfig->GetSenseImplementation());
-		GetPerceptionComponent()->OnTargetPerceptionUpdated.AddDynamic(this,&ANPCBaseEnemyController::OnTargetDetected);
-		GetPerceptionComponent()->ConfigureSense(*SightConfig);
+		AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ANPCBaseEnemyController::HandleSight);
+		AIPerceptionComponent->ConfigureSense(*SightConfig);
+		AIPerceptionComponent->SetDominantSense(*SightConfig->GetSenseImplementation());
 	}
 }
 
-void ANPCBaseEnemyController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
+void ANPCBaseEnemyController::SetUpHearingConfig()
 {
-	// if (IAITargetInterface* MyInterface = Cast<IAITargetInterface>(Actor))
-	// {
-	// 	GetBlackboardComponent()->SetValueAsBool("CanSeePlayer",Stimulus.WasSuccessfullySensed());
-	// 	UE_LOG(LogTemp, Warning, TEXT("Vedo il player"),Stimulus.WasSuccessfullySensed());
-	// }
-	if (AActor* const player = Actor)
+	HearingConfig = CreateDefaultSubobject<UAISenseConfig_Hearing>(TEXT("Hearing Config"));
+	if (HearingConfig)
 	{
-		GetBlackboardComponent()->SetValueAsBool("CanSeePlayer",Stimulus.WasSuccessfullySensed());
-		UE_LOG(LogTemp, Warning, TEXT("Vedo il player"),Stimulus.WasSuccessfullySensed());
+		HearingConfig->HearingRange = HearingRange;
+		HearingConfig->SetMaxAge(HearingMaxAge);
+		HearingConfig->DetectionByAffiliation.bDetectEnemies = true;
+		HearingConfig->DetectionByAffiliation.bDetectFriendlies = true;
+		HearingConfig->DetectionByAffiliation.bDetectNeutrals = true;
+
+		AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ANPCBaseEnemyController::HandleHear);
+		AIPerceptionComponent->ConfigureSense(*HearingConfig);
 	}
+}
+
+void ANPCBaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
+{
+	if (Stimulus.Type == UAISense::GetSenseID<UAISense_Sight>())
+	{
+		if (Stimulus.WasSuccessfullySensed())
+		{
+			if (Actor->Implements<UAITargetInterface>())
+			{
+				SetStateAsAttacking(Actor);
+				LGDebug::Log("SEE PLAYER ",true);
+			}
+		}
+		else
+		{
+			GetWorld()->GetTimerManager().SetTimer(
+				LostSightTimerHandle,
+				this,
+				&ANPCBaseEnemyController::OnLostSight,
+				SightMaxAge,
+				false
+			);
+			LGDebug::Log("LOST SIGHT PLAYER", true);
+		}	
+	}
+	
+}
+
+void ANPCBaseEnemyController::HandleHear(AActor* Actor, FAIStimulus Stimulus)
+{
+	if (Stimulus.Type == UAISense::GetSenseID<UAISense_Hearing>())
+	{
+		if (Stimulus.WasSuccessfullySensed())
+		{
+		
+			// LastHeardLocation = Stimulus.StimulusLocation;
+			//
+			// // Aggiorna il Blackboard con la posizione
+			// GetBlackboardComponent()->SetValueAsVector("LastHeardLocation", LastHeardLocation);
+			SetStateAsInvestigating();
+			LGDebug::Log("HEAR PLAYER ",true);
+		}
+		else
+		{
+			GetWorld()->GetTimerManager().SetTimer(
+				LostHearTimerHandle,
+				this,
+				&ANPCBaseEnemyController::OnLostHear,
+				HearingMaxAge,
+				false
+			);
+			LGDebug::Log(" LOST HEAR PLAYER ",true);
+		}
+	}
+	
+}
+
+
+void ANPCBaseEnemyController::OnLostSight()
+{
+	SetStateAsPatrolling();
+	LGDebug::Log("LOST SIGHT PLAYER", true);
+}
+
+void ANPCBaseEnemyController::OnLostHear()
+{
+	SetStateAsPatrolling();
+	LGDebug::Log(" LOST HEAR PLAYER ",true);
 }
