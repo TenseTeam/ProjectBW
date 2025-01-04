@@ -18,7 +18,7 @@ class GVUEDK_API UBlueprintCameraModifier : public UGvCameraModifier
 private:
 	UPROPERTY()
 	ACharacter* Character;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UCameraPOV* CustomPOV;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", ToolTip = "If true, when the camera modifier is applied, no other camera modifier will be applied"))
 	bool bHasPriority = false;

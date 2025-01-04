@@ -62,8 +62,10 @@ public:
 	float GetMinDistance() const { return MinDistance; }
 	float GetTotalHookDistance() const { return bIsHooking ? TotalHookDistance : 0.f; }
 	float GetStartDelay() const { return StartDelay; }
+	UFUNCTION(BlueprintCallable)
 	FVector GetStartLocation() const { return bIsHooking ? StartHookLocation : FVector::ZeroVector; }
 	FVector GetLandingPointLocation() const { return bIsHooking ? EndHookLocation : FVector::ZeroVector; }
+	UFUNCTION(BlueprintCallable)
 	FVector GetStartDirection() const { return bIsHooking ? StartHookDirection : FVector::ZeroVector; }
 	UFUNCTION(BlueprintCallable)
 	FVector GetTargetGrabPointLocation() const { return bTargetAcquired ? TargetGrabPoint->GetLocation() : FVector::ZeroVector; }
