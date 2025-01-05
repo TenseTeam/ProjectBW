@@ -32,7 +32,7 @@ private:
 	UCurveFloat* SpeedCurve;
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true", ToolTip = "Used only if no SpeedCurve provided"))
 	float LinearSpeed;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0.0"))
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true", ClampMin = "0.0"))
 	float StartDelay;
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
 	bool bOrientRotationToMovement;
@@ -61,6 +61,9 @@ public:
 	float GetMaxDistance() const { return MaxDistance; }
 	float GetMinDistance() const { return MinDistance; }
 	float GetTotalHookDistance() const { return bIsHooking ? TotalHookDistance : 0.f; }
+	UFUNCTION(BlueprintCallable)
+	float GetElapsedTime() const { return ElapsedTime; }
+	UFUNCTION(BlueprintCallable)
 	float GetStartDelay() const { return StartDelay; }
 	UFUNCTION(BlueprintCallable)
 	FVector GetStartLocation() const { return bIsHooking ? StartHookLocation : FVector::ZeroVector; }
