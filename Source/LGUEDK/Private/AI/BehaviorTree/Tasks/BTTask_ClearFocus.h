@@ -10,7 +10,7 @@
  * 
  */
 UCLASS()
-class LGUEDK_API UBTTask_ClearFocus : public UBTTask_BlueprintBase
+class LGUEDK_API UBTTask_ClearFocus : public UBTTaskNode
 {
 	GENERATED_BODY()
 

@@ -25,5 +25,7 @@ bool UBTDecoratorEnemyState::CalculateRawConditionValue(UBehaviorTreeComponent& 
 		return false;
 	}
 	
-	return Enemy->GetEnemyState() == RequiredState;
+	return Enemy->GetState() == RequiredState;
 }
+
+

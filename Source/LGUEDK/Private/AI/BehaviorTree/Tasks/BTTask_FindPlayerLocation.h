@@ -10,7 +10,7 @@
  * 
  */
 UCLASS()
-class LGUEDK_API UBTTask_FindPlayerLocation : public UBTTask_BlackboardBase
+class LGUEDK_API UBTTask_FindPlayerLocation : public UBTTaskNode
 {
 	GENERATED_BODY()
 

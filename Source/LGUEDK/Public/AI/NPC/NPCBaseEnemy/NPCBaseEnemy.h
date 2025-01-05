@@ -22,7 +22,7 @@ public:
 
 	void SetMovementSpeed(EMovementSpeed MovementSpeed) const;
 
-	EEnemyState GetEnemyState() const { return CurrentState; }
+	EEnemyState GetState() const { return CurrentState; }
 	void SetEnemyState(EEnemyState NewState) { CurrentState = NewState; }
 	
 protected:

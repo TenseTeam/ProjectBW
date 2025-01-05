@@ -36,7 +36,7 @@ EBTNodeResult::Type UBTTask_FindPlayerLocation::ExecuteTask(UBehaviorTreeCompone
 				// try to get a random position near the player
 				if (navigationSystem->GetRandomPointInNavigableRadius(playerLocation,SearchRadius,location))
 				{
-					OwnerComp.GetBlackboardComponent()->SetValueAsVector(GetSelectedBlackboardKey(),location.Location);
+					OwnerComp.GetBlackboardComponent()->SetValueAsVector("TargetLocation",location.Location);
 					FinishLatentTask(OwnerComp,EBTNodeResult::Succeeded);
 					return EBTNodeResult::Succeeded;
 				}	
@@ -45,7 +45,7 @@ EBTNodeResult::Type UBTTask_FindPlayerLocation::ExecuteTask(UBehaviorTreeCompone
 		}
 		else
 		{
-			OwnerComp.GetBlackboardComponent()->SetValueAsVector(GetSelectedBlackboardKey(),playerLocation);
+			OwnerComp.GetBlackboardComponent()->SetValueAsVector("TargetLocation",playerLocation);
 			FinishLatentTask(OwnerComp,EBTNodeResult::Succeeded);
 			return EBTNodeResult::Succeeded;
 		}

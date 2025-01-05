@@ -10,7 +10,7 @@
  * 
  */
 UCLASS()
-class LGUEDK_API UBTTask_FindRandomLocation : public UBTTask_BlackboardBase
+class LGUEDK_API UBTTask_FindRandomLocation : public UBTTaskNode
 {
 	GENERATED_BODY()
 

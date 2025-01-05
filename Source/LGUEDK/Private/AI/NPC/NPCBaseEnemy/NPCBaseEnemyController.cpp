@@ -155,10 +155,12 @@ void ANPCBaseEnemyController::SetUpHearingConfig()
 
 void ANPCBaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 {
-	if (Stimulus.Type == UAISense::GetSenseID<UAISense_Sight>())
-	{
+	
 		if (Stimulus.WasSuccessfullySensed())
 		{
+			if (Stimulus.Type != UAISense::GetSenseID<UAISense_Sight>())return;
+			if (ControlledPawn->GetState() == EEnemyState::Attacking)return;
+
 			if (Actor->Implements<UAITargetInterface>())
 			{
 				SetStateAsAttacking(Actor);
@@ -167,6 +169,8 @@ void ANPCBaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 		}
 		else
 		{
+			if (ControlledPawn->GetState() == EEnemyState::Investigating)return;
+			
 			GetWorld()->GetTimerManager().SetTimer(
 				LostSightTimerHandle,
 				this,
@@ -176,37 +180,41 @@ void ANPCBaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 			);
 			LGDebug::Log("LOST SIGHT PLAYER", true);
 		}	
-	}
 	
 }
 
 void ANPCBaseEnemyController::HandleHear(AActor* Actor, FAIStimulus Stimulus)
 {
-	if (Stimulus.Type == UAISense::GetSenseID<UAISense_Hearing>())
-	{
+
 		if (Stimulus.WasSuccessfullySensed())
 		{
-		
-			// LastHeardLocation = Stimulus.StimulusLocation;
-			//
-			// // Aggiorna il Blackboard con la posizione
-			// GetBlackboardComponent()->SetValueAsVector("LastHeardLocation", LastHeardLocation);
+			if (Stimulus.Type != UAISense::GetSenseID<UAISense_Hearing>())return;
+			if (ControlledPawn->GetState() == EEnemyState::Attacking)return;
+
+			
+			
+			GetBlackboardComponent()->SetValueAsVector("TargetLocation",RandomPosition(Stimulus.StimulusLocation));
+			SetStateAsPassive();
 			SetStateAsInvestigating();
 			LGDebug::Log("HEAR PLAYER ",true);
 		}
-		else
-		{
-			GetWorld()->GetTimerManager().SetTimer(
-				LostHearTimerHandle,
-				this,
-				&ANPCBaseEnemyController::OnLostHear,
-				HearingMaxAge,
-				false
-			);
-			LGDebug::Log(" LOST HEAR PLAYER ",true);
-		}
-	}
+}
+
+FVector ANPCBaseEnemyController::RandomPosition(FVector Position)
+{
+	const float MinRadius = 200.0f;
+	const float MaxRadius = 600.0f;
 	
+	float RandomRadius = FMath::FRandRange(MinRadius, MaxRadius);
+	
+	float RandomAngle = FMath::FRandRange(0.0f, 2.0f * PI);
+	
+	float OffsetX = RandomRadius * FMath::Cos(RandomAngle);
+	float OffsetY = RandomRadius * FMath::Sin(RandomAngle);
+	
+	FVector RandomPoint = Position + FVector(OffsetX, OffsetY, 0.0f);
+
+	return RandomPoint;
 }
 
 

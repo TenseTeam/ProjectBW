@@ -3,22 +3,26 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AI/Enumerators/EMovementSpeed.h"
-#include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
-#include "BTTask_SetMovementSpeed.generated.h"
+#include "AI/Enumerators/EnemyState.h"
+#include "BehaviorTree/Tasks/BTTask_BlueprintBase.h"
+#include "BTTask_SetState.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class LGUEDK_API UBTTask_SetMovementSpeed : public UBTTaskNode
+class LGUEDK_API UBTTask_SetState : public UBTTaskNode
 {
 	GENERATED_BODY()
-public:
-	explicit UBTTask_SetMovementSpeed(FObjectInitializer const& ObjectInitializer);
-	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
+public:
+	
+	explicit UBTTask_SetState(FObjectInitializer const& ObjectInitializer);
+	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+	
 private:
+		
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="AI", meta=(AllowPrivateAccess = "true"))
-	EMovementSpeed MovementSpeed;
+	EEnemyState DesiredState;
+
 };

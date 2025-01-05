@@ -18,6 +18,7 @@ class LGUEDK_API UBTDecoratorEnemyState : public UBTDecorator_BlackboardBase
 protected:
 	explicit UBTDecoratorEnemyState(FObjectInitializer const& ObjectInitializer);
 	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
+	
 
 public:
 	

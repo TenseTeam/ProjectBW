@@ -26,7 +26,7 @@ EBTNodeResult::Type UBTTask_FindRandomLocation::ExecuteTask(UBehaviorTreeCompone
 				FNavLocation location;
 				if (navigationSystem->GetRandomReachablePointInRadius(initialPosition,SearchRadius,location))
 				{
-					OwnerComp.GetBlackboardComponent()->SetValueAsVector(GetSelectedBlackboardKey(), location.Location);
+					OwnerComp.GetBlackboardComponent()->SetValueAsVector("TargetLocation", location.Location);
 				}
 
 				//finish with success

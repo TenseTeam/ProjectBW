@@ -93,6 +93,8 @@ private:
 	UFUNCTION()
 	void HandleHear(AActor* Actor, FAIStimulus Stimulus);
 	
+	UFUNCTION()
+	FVector RandomPosition(FVector Position);
 	
 	UFUNCTION()
 	void OnLostSight();
