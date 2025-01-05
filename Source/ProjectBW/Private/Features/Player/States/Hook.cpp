@@ -38,6 +38,7 @@ void UHook::Enter(AActor* Context)
 	
 	PlayerGrapplingHook->OnStartHooking.AddDynamic(this, &UHook::OnHookStarted);
 	PlayerGrapplingHook->OnStopHooking.AddDynamic(this, &UHook::OnHookFinished);
+	PlayerGrapplingHook->OnHookMotionStarted.AddDynamic(this, &UHook::OnHookMotionStarted);
 	PlayerGrapplingHook->StartHooking();
 }
 
@@ -54,13 +55,12 @@ void UHook::Update(AActor* Context, float deltaTime)
 		ElapsedTime += deltaTime;
 		return;
 	}
-
+	
 	const float SquaredTotalDistance = PlayerGrapplingHook->GetTotalHookDistance() * PlayerGrapplingHook->GetTotalHookDistance();
 	const float SquaredElapsedDistance = FVector::DistSquared(Character->GetActorLocation(), PlayerGrapplingHook->GetStartLocation());
 	const float NormalizedElapsedDistance = SquaredElapsedDistance / SquaredTotalDistance;
 	if (NormalizedElapsedDistance < HookEndNormalizedDistance)
 	{
-		Character->GetSpringArm()->bDoCollisionTest = false;
 		Character->HookState = EHookState::HookLoop;
 	}
 	else
@@ -78,6 +78,7 @@ void UHook::Exit(AActor* Context)
 	Super::Exit(Context);
 	PlayerGrapplingHook->OnStartHooking.RemoveDynamic(this, &UHook::OnHookStarted);
 	PlayerGrapplingHook->OnStopHooking.RemoveDynamic(this, &UHook::OnHookFinished);
+	PlayerGrapplingHook->OnHookMotionStarted.RemoveDynamic(this, &UHook::OnHookMotionStarted);
 	Character->HookState = EHookState::None;
 }
 
@@ -94,7 +95,6 @@ void UHook::OnHookFinished()
 {
 	Character->GetSpringArm()->bDoCollisionTest = true;
 	Character->SetIsHooking(false);
-	Character->GetCharacterMovement()->GravityScale = 1;
 	Character->SetActorEnableCollision(true);
 	
 	if (Character->GetGroundDistance() > 100)
@@ -116,10 +116,12 @@ void UHook::OnHookStarted()
 	HookEndNormalizedDistance = Character->Data->HookEndNormalizedDistance;
 	StartDelay = PlayerGrapplingHook->GetStartDelay();
 	ElapsedTime = 0;
-
 	Character->SetIsHooking(true);
 	Character->GetCharacterMovement()->bNotifyApex = true;
-	Character->GetCharacterMovement()->GravityScale = 0;
-	Character->GetCharacterMovement()->StopMovementImmediately();
+}
+
+void UHook::OnHookMotionStarted()
+{
+	Character->GetSpringArm()->bDoCollisionTest = false;
 	Character->SetActorEnableCollision(false);
 }

@@ -7,8 +7,10 @@
 #include "GrapplingHookComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartHooking);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FHookMotionStarted);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FHooking);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopHooking);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInterruptHooking);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class GVUEDK_API UGrapplingHookComponent : public UActorComponent
@@ -19,9 +21,13 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FStartHooking OnStartHooking;
 	UPROPERTY(BlueprintAssignable)
+	FHookMotionStarted OnHookMotionStarted;
+	UPROPERTY(BlueprintAssignable)
 	FHooking OnHooking;
 	UPROPERTY(BlueprintAssignable)
 	FStopHooking OnStopHooking;
+	UPROPERTY(BlueprintAssignable)
+	FInterruptHooking OnInterruptHooking;
 
 private:
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true", ClampMin = "1.0"))
@@ -37,8 +43,13 @@ private:
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
 	bool bOrientRotationToMovement;
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	bool bApplyMomentumDuringHookThrow;
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
 	bool bShowDebug;
 
+	UPROPERTY()
+	ACharacter* OwnerCharacter;
+	
 	TSet<IGrabPoint*> InRangeGrabPoints;
 	IGrabPoint* TargetGrabPoint;
 
@@ -50,12 +61,15 @@ private:
 	
 	bool bTargetAcquired;
 	bool bIsHooking;
+	bool bMotionDataCalculated;
+	bool bInitialized;
 
 public:
 	UGrapplingHookComponent();
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
+	
 
 	bool IsTargetAcquired() const { return bTargetAcquired; }
 	float GetMaxDistance() const { return MaxDistance; }
@@ -85,9 +99,12 @@ protected:
 
 private:
 	bool LookForGrabPoints(TSet<IGrabPoint*>& OutGrabPoints) const;
-	bool PerformSphereTrace(TArray<FHitResult>& HitResults) const;
 	IGrabPoint* GetNearestGrabPoint(TSet<IGrabPoint*>& ValidGrabPoints) const;
 	float GetElapsedNormalizedDistance() const;
+	void OrientRotationToMovement(float DeltaTime) const;
+	// Returns true if the motion data is calculated successfully
+	bool CalculateMotionData();
+	bool PerformSphereTrace(TArray<FHitResult>& HitResults) const;
 	
 };
 
