@@ -191,7 +191,15 @@ void ANPCBaseEnemyController::HandleHear(AActor* Actor, FAIStimulus Stimulus)
 			if (Stimulus.Type != UAISense::GetSenseID<UAISense_Hearing>())return;
 			if (ControlledPawn->GetState() == EEnemyState::Attacking)return;
 
-			
+			///new restart behaviour i prefer use a jolly state -> SetStateAsPassive
+			// if (ControlledPawn->GetState() == EEnemyState::Investigating)
+			// {
+			// 	if (GetAIOwner())
+			// 	{
+			// 		GetAIOwner()->StopLogic("Restarting Behavior Tree");
+			// 		GetAIOwner()->RunBehaviorTree(BehaviorTreeAsset);  
+			// 	}
+			// }
 			
 			GetBlackboardComponent()->SetValueAsVector("TargetLocation",RandomPosition(Stimulus.StimulusLocation));
 			SetStateAsPassive();
