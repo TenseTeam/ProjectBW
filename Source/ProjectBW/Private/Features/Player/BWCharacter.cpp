@@ -32,6 +32,8 @@ ABWCharacter::ABWCharacter()
 	
 	GrapplingHook = CreateDefaultSubobject<UGrapplingHookComponent>("Grappling Hook");
 
+	DodgerComponent = CreateDefaultSubobject<UDodgerComponent>("DodgerComponent");
+
 	bCanMove = true;
 	bCanLook = true;
 	bCanRun = true;
@@ -53,6 +55,10 @@ void ABWCharacter::BeginPlay()
 
 	GrapplingHook->OnStartHooking.AddDynamic(this, &ABWCharacter::StartHooking);
 	GrapplingHook->OnStopHooking.AddDynamic(this, &ABWCharacter::StopHooking);
+
+	DodgerComponent->OnStartDodge.AddDynamic(this, &ABWCharacter::StartDodging);
+	DodgerComponent->OnDodge.AddDynamic(this, &ABWCharacter::Dodging);
+	DodgerComponent->OnStopDodge.AddDynamic(this, &ABWCharacter::StopDodging);
 }
 
 void ABWCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -67,8 +73,6 @@ void ABWCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-//State Machine Stuff...
-
 void ABWCharacter::HandleMotionInput(const EInputActionType InputAction, const FInputActionValue& Value) const
 {
 	MotionStateMachineComponent->HandleInput(InputAction, Value);
@@ -82,6 +86,16 @@ void ABWCharacter::ChangeMotionState(const int Index) const
 const UCharacterState* ABWCharacter::GetMotionState(const int Index) const
 {
 	return Cast<UCharacterState>(MotionStateMachineComponent->GetState(Index));
+}
+
+const UCharacterState* ABWCharacter::GetCurrentMotionState() const
+{
+	return Cast<UCharacterState>(MotionStateMachineComponent->GetCurrentState());
+}
+
+const UCharacterState* ABWCharacter::GetPreviousMotionState() const
+{
+	return Cast<UCharacterState>(MotionStateMachineComponent->GetPreviousState());
 }
 
 void ABWCharacter::HandleActionInput(const EInputActionType InputAction, const FInputActionValue& Value) const
@@ -99,15 +113,10 @@ const UCharacterState* ABWCharacter::GetActionState(const int Index) const
 	return Cast<UCharacterState>(ActionStateMachineComponent->GetState(Index));
 }
 
-//End State Machine Stuff
-
-
-//Character Movement Stuff...
-
 void ABWCharacter::Move(const FVector& MoveVector)
 {
-	FRotator CameraCurrentRotation = BWController->PlayerCameraManager->GetCameraCacheView().Rotation;
-	FRotator MoveVectorRotationOffset(0, CameraCurrentRotation.Yaw, 0);
+	const FRotator CameraCurrentRotation = BWController->PlayerCameraManager->GetCameraCacheView().Rotation;
+	const FRotator MoveVectorRotationOffset(0, CameraCurrentRotation.Yaw, 0);
 	AddMovementInput(MoveVectorRotationOffset.Quaternion() * MoveVector);
 }
 
@@ -119,6 +128,11 @@ UGrapplingHookComponent* ABWCharacter::GetGrapplingHook() const
 UGvSpringArmComponent* ABWCharacter::GetSpringArm() const
 {
     return SpringArm;
+}
+
+UDodgerComponent* ABWCharacter::GetDodgerComponent() const
+{
+	return DodgerComponent;
 }
 
 float ABWCharacter::GetGroundDistance() const
@@ -134,8 +148,7 @@ bool ABWCharacter::MoveInputActive() const
 
 bool ABWCharacter::IsRunning() const
 {
-	return bWantRunning && !AGameplayController::GetMoveInputValue().IsNearlyZero();
-	//&& GetCharacterMovement()->MaxWalkSpeed == Data->RunSpeed;
+	return bWantRunning && MoveInputActive();
 }
 
 bool ABWCharacter::WantRunning() const
@@ -253,11 +266,11 @@ bool ABWCharacter::CanShoot() const
 	return bCanShoot && !IsDodging() && !IsHooking();
 }
 
-
 void ABWCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)
 {
 	Super::OnMovementModeChanged(PrevMovementMode, PreviousCustomMode);
 
+	//Needed to notify the apex of the jump/fall
 	GetCharacterMovement()->bNotifyApex = GetCharacterMovement()->MovementMode == MOVE_Falling;
 
 	if (OnMovementModeChangedEvent.IsBound())
@@ -283,4 +296,19 @@ void ABWCharacter::StartHooking()
 void ABWCharacter::StopHooking()
 {
 	OnStopHook.Broadcast();
+}
+
+void ABWCharacter::StartDodging()
+{
+	OnStartDodging.Broadcast();
+}
+
+void ABWCharacter::Dodging()
+{
+	OnDodging.Broadcast();
+}
+
+void ABWCharacter::StopDodging()
+{
+	OnStopDodging.Broadcast();
 }

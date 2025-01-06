@@ -14,6 +14,7 @@ class PROJECTBW_API UShoot : public UActionState
 {
 	GENERATED_BODY()
 
+	virtual void Initialize(AActor* Context) override;
 	virtual void Enter(AActor* Context) override;
 	virtual void Update(AActor* Context, float DeltaTime) override;
 	virtual void Exit(AActor* Context) override;
@@ -24,8 +25,9 @@ class PROJECTBW_API UShoot : public UActionState
 	
 	bool bIsAiming = false;
 	bool bIsShooting = false;
-	// bool bPaused = false;
-	//
-	// void PauseState();
-	// void UnpauseState();
+
+	FRotator TargetRotation;
+	FRotator CurrentRotation;
+	float RotationSpeed = 0.f;
+	
 };

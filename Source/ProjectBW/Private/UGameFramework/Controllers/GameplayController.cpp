@@ -60,6 +60,8 @@ void AGameplayController::AddMappingContext() const
 	}
 }
 
+//Controller input functions
+
 void AGameplayController::Look(const FInputActionValue& Value)
 {
 	if (!BWCharacter->CanLook()) return;

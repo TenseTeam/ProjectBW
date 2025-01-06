@@ -9,22 +9,7 @@
 void UDodge::Initialize(AActor* Context)
 {
 	Super::Initialize(Context);
-
-	if (!IsValid(Character->Data) || !IsValid(Character->Data->DodgeAnimMontage))
-	{
-		FGvDebug::Warning("Dodge state has missing required data", true);
-		bInitialized = false;
-		return;
-	}
-
-	DefaultBrakingDecelerationWalking = Character->GetCharacterMovement()->BrakingDecelerationWalking;
-	DodgeAnimMontage = Character->Data->DodgeAnimMontage;
-	DodgeAnimLenght = DodgeAnimMontage->GetPlayLength() / Character->Data->DodgeAnimPlayRate;
-	//FGvDebug::Log("Lenght: " + FString::SanitizeFloat(DodgeAnimMontage->GetPlayLength()), true);
-	//FGvDebug::Log("Rate: " + FString::SanitizeFloat(Character->Data->DodgeAnimPlayRate), true);
-	//FGvDebug::Log("DodgeAnimLenght: " + FString::SanitizeFloat(DodgeAnimLenght), true);
-	ExitNormalizedTime = Character->Data->ExitNormalizedTime;
-	RotationSpeed = Character->Data->RotationSpeed;
+	PlayerDodgeComponent = Character->GetDodgerComponent();
 }
 
 void UDodge::Enter(AActor* Context)
@@ -35,25 +20,16 @@ void UDodge::Enter(AActor* Context)
 	}
 	Super::Enter(Context);
 
+
+	FRotator OffsetRotation = Character->GetControlRotation();
+	OffsetRotation.Pitch = 0;
+	OffsetRotation.Roll = 0;
+	PlayerDodgeComponent->StartDodge(OffsetRotation.Quaternion() * Controller->GetMoveInputValue());
+
 	Character->MotionState = ECharacterState::Dodging;
 	Character->SetIsDodging(true);
 	
-	Character->GetCharacterMovement()->BrakingDecelerationWalking = 0;
-	ElapsedTime = 0.f;
-	DodgeSpeed = Character->Data->DodgeSpeed;
-	DodgeCooldown = Character->Data->DodgeCooldown;
-	
-	TargetVelocity = GetRollVelocity();
-	TargetRotation = TargetVelocity.Rotation();
-	TargetRotation.Pitch = 0;
-	TargetRotation.Roll = 0;
-
-	CurrentRotation = Character->GetActorRotation();
-	
-	Character->PlayAnimMontage(DodgeAnimMontage, Character->Data->DodgeAnimPlayRate);
-	Character->OnStartDodging.Broadcast();
-
-	StartCooldown();
+	PlayerDodgeComponent->OnStopDodge.AddDynamic(this, &UDodge::OnDodgeFinished);
 }
 
 void UDodge::Update(AActor* Context, float DeltaTime)
@@ -63,39 +39,6 @@ void UDodge::Update(AActor* Context, float DeltaTime)
 		return;
 	}
 	Super::Update(Context, DeltaTime);
-
-	//if exit dodge time is reached we want to change the state
-	ElapsedTime += DeltaTime;
-	if (ElapsedTime >= DodgeAnimLenght * ExitNormalizedTime)
-	{
-		if (Character->GetCharacterMovement()->IsFalling())
-		{
-			Character->ChangeMotionState(3); //jump
-			return;
-		}
-
-		if (Controller->GetMoveInputValue().IsNearlyZero())
-		{
-			Character->ChangeMotionState(0); //idle
-			return;
-		}
-		
-		Character->ChangeMotionState(1); //walk
-		return;
-	}
-
-	//if the character is falling we want to apply gravity
-	if (Character->GetCharacterMovement()->IsFalling())
-	{
-		Character->GetCharacterMovement()->Velocity = TargetVelocity + FVector::DownVector * 981;
-	}
-	else
-	{
-		Character->GetCharacterMovement()->Velocity = TargetVelocity;
-	}
-
-	CurrentRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, RotationSpeed);
-	Character->SetActorRotation(CurrentRotation);
 }
 
 void UDodge::Exit(AActor* Context)
@@ -105,9 +48,8 @@ void UDodge::Exit(AActor* Context)
 		return;
 	}
 	Super::Exit(Context);
-	Character->GetCharacterMovement()->BrakingDecelerationWalking = DefaultBrakingDecelerationWalking;
 	Character->SetIsDodging(false);
-	Character->OnStopDodging.Broadcast();
+	PlayerDodgeComponent->OnStopDodge.RemoveDynamic(this, &UDodge::OnDodgeFinished);
 }
 
 void UDodge::HandleInput(AActor* Context, const EInputActionType InputAction, const FInputActionValue& Value)
@@ -119,34 +61,19 @@ void UDodge::HandleInput(AActor* Context, const EInputActionType InputAction, co
 	Super::HandleInput(Context, InputAction, Value);
 }
 
-FVector UDodge::GetRollVelocity() const
+void UDodge::OnDodgeFinished()
 {
+	if (Character->GetCharacterMovement()->IsFalling())
+	{
+		Character->ChangeMotionState(3); //jump
+		return;
+	}
+						
 	if (Controller->GetMoveInputValue().IsNearlyZero())
 	{
-		const FVector CharacterForward = Character->GetActorForwardVector();
-		return CharacterForward * DodgeSpeed;
+		Character->ChangeMotionState(0); //idle
+		return;
 	}
-	
-	FRotator OffsetRotation = Character->GetControlRotation();
-	OffsetRotation.Pitch = 0;
-	OffsetRotation.Roll = 0;
-	const FVector Direction = OffsetRotation.Quaternion() * Controller->GetMoveInputValue().GetSafeNormal();
-	return Direction * DodgeSpeed;
-}
-
-void UDodge::StartCooldown() const
-{
-	if (const UWorld* World = Character->GetWorld())
-	{
-		FTimerDelegate TimerDel;
-		TimerDel.BindLambda([this]() { Character->SetCanDodge(true); });
-		
-		FTimerHandle TimerHandle;
-		
-		World->GetTimerManager().SetTimer(TimerHandle, TimerDel, DodgeCooldown, false);
-
-		//if the DodgeCooldown <= 0 the timer does not start so we do not want bCanRoll to become false
-		const bool CanDodge = !(DodgeCooldown > 0);
-		Character->SetCanDodge(CanDodge);
-	}
+													
+	Character->ChangeMotionState(1); //walk
 }

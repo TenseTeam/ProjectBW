@@ -5,6 +5,7 @@
 
 #include <string>
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Utility/FGvDebug.h"
 
@@ -15,7 +16,9 @@ UGrapplingHookComponent::UGrapplingHookComponent()
 	bTargetAcquired = false;
 	bShowDebug = false;
 	bIsHooking = false;
+	bMotionDataCalculated = false;
 	bOrientRotationToMovement = true;
+	bInitialized = false;
 	MaxDistance = 3000.f;
 	MinDistance = 0.f;
 	LinearSpeed = 2000.f;
@@ -33,22 +36,47 @@ void UGrapplingHookComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	InRangeGrabPoints = TSet<IGrabPoint*>();
+	OwnerCharacter = Cast<ACharacter>(GetOwner());
+	if (!IsValid(OwnerCharacter))
+	{
+		FGvDebug::Error(GetOwner()->GetName() + " is not a character, " + GetName() + " need to be on a character to work properly", true);
+		bInitialized = false;
+		return;
+	}
+	bInitialized = true;
 }
 
 void UGrapplingHookComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                                FActorComponentTickFunction* ThisTickFunction)
 {
+	if (!bInitialized)
+	{
+		return;
+	}
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	//FGvDebug::Log(TargetGrabPoint != nullptr ? Cast<AActor>(TargetGrabPoint)->GetName() : "No Target", true);
-	//FGvDebug::Log(std::to_string(InRangeGrabPoints.Num()).c_str(), true);
 	if (bIsHooking)
 	{
+		if (bOrientRotationToMovement)
+		{
+			OrientRotationToMovement(DeltaTime);
+		}
+		
 		if (ElapsedTime < StartDelay)
 		{
 			ElapsedTime += DeltaTime;
 			return;
 		}
+		
+		if (!bMotionDataCalculated)
+		{
+			if (CalculateMotionData())
+			{
+				bMotionDataCalculated = true;
+				OnHookMotionStarted.Broadcast();
+			}
+			else return;
+		}
+		
 		PerformHooking(DeltaTime);
 		return;
 	}
@@ -75,31 +103,33 @@ void UGrapplingHookComponent::StartHooking()
 		return;
 	}
 	ElapsedTime = 0.f;
-	StartHookLocation = GetOwner()->GetActorLocation();
-	EndHookLocation = TargetGrabPoint->GetLandingPoint();
-	TotalHookDistance = FVector::Dist(StartHookLocation, EndHookLocation);
-	StartHookDirection = (EndHookLocation - StartHookLocation).GetSafeNormal();
-	OnStartHooking.Broadcast();
-	if (bOrientRotationToMovement)
-		GetOwner()->SetActorRotation(FRotator(StartHookDirection.Rotation().Roll, StartHookDirection.Rotation().Yaw, 0.f));
 	bIsHooking = true;
+	if (!bApplyMomentumDuringHookThrow)
+	{
+		OwnerCharacter->GetCharacterMovement()->GravityScale = 0.f;
+		OwnerCharacter->GetCharacterMovement()->Velocity = FVector::ZeroVector;
+	}
+	OnStartHooking.Broadcast();
 }
 
 void UGrapplingHookComponent::StopHooking()
 {
 	TargetGrabPoint = nullptr;
 	bTargetAcquired = false;
+	bMotionDataCalculated = false;
 	bIsHooking = false;
+	OwnerCharacter->GetCharacterMovement()->GravityScale = 1.f;
 	OnStopHooking.Broadcast();
 }
 
 void UGrapplingHookComponent::PerformHooking(float DeltaTime)
 {
-	GetOwner()->SetActorLocation(GetOwner()->GetActorLocation() + StartHookDirection * GetSpeed() * DeltaTime/*, false, nullptr, ETeleportType::TeleportPhysics*/);
+	OwnerCharacter->GetCharacterMovement()->Velocity = FVector::ZeroVector;
+	OwnerCharacter->SetActorLocation(OwnerCharacter->GetActorLocation() + StartHookDirection * GetSpeed() * DeltaTime);
 	OnHooking.Broadcast();
 	if (GetElapsedNormalizedDistance() >= 1)
 	{
-		GetOwner()->SetActorLocation(EndHookLocation);
+		OwnerCharacter->SetActorLocation(EndHookLocation);
 		StopHooking();
 	}
 }
@@ -170,6 +200,36 @@ float UGrapplingHookComponent::GetElapsedNormalizedDistance() const
 	return FVector::DistSquared(GetOwner()->GetActorLocation(), StartHookLocation) / (TotalHookDistance * TotalHookDistance);
 }
 
+void UGrapplingHookComponent::OrientRotationToMovement(float DeltaTime) const
+{
+	FRotator TargetRotation = (TargetGrabPoint->GetLandingPoint() - GetOwner()->GetActorLocation()).Rotation();
+	TargetRotation.Pitch = 0.f;
+	TargetRotation.Roll = 0.f;
+	const FRotator NewRotation = FMath::RInterpConstantTo(GetOwner()->GetActorRotation(), TargetRotation, DeltaTime, 1000.f);
+	GetOwner()->SetActorRotation(NewRotation);
+}
+
+bool UGrapplingHookComponent::CalculateMotionData()
+{
+	// check if there are any obstacles between the player and the target grab point
+	TArray<FHitResult> HitResults;
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(GetOwner());
+	CollisionParams.AddIgnoredActor(Cast<AActor>(TargetGrabPoint));
+	GetWorld()->LineTraceMultiByChannel(HitResults, GetOwner()->GetActorLocation(), TargetGrabPoint->GetLocation(), ECC_Visibility, CollisionParams);
+	if (HitResults.Num() > 0)
+	{
+		OnInterruptHooking.Broadcast();
+		StopHooking();
+		return false;
+	}
+	
+	StartHookLocation = GetOwner()->GetActorLocation();
+	EndHookLocation = TargetGrabPoint->GetLandingPoint();
+	TotalHookDistance = FVector::Dist(StartHookLocation, EndHookLocation);
+	StartHookDirection = (EndHookLocation - StartHookLocation).GetSafeNormal();
+	return true;
+}
 
 bool UGrapplingHookComponent::PerformSphereTrace(TArray<FHitResult>& HitResults) const
 {

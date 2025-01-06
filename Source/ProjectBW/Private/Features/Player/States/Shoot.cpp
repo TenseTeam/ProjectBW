@@ -6,6 +6,18 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Utility/FGvDebug.h"
 
+void UShoot::Initialize(AActor* Context)
+{
+	Super::Initialize(Context);
+	if (!IsValid(Character->Data))
+	{
+		FGvDebug::Warning("Shoot state has missing required data", true);
+		bInitialized = false;
+		return;
+	}
+	bInitialized = true;
+}
+
 void UShoot::Enter(AActor* Context)
 {
 	if (!bInitialized)
@@ -16,7 +28,11 @@ void UShoot::Enter(AActor* Context)
 
 	Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 	Character->GetCharacterMovement()->bUseControllerDesiredRotation = true;
-	Character->SetActorRotation(Controller->GetControlRotation());
+	
+	RotationSpeed = Character->Data->RotationSpeedAiming;
+	TargetRotation = FRotator(0.f, Controller->GetControlRotation().Yaw, 0.f);
+	CurrentRotation = Character->GetActorRotation();
+	
 	Character->ActionState = ECharacterState::Shooting;
 	
 	if (Character->WantAiming())
@@ -44,66 +60,26 @@ void UShoot::Update(AActor* Context, float DeltaTime)
 		return;
 	}
 	Super::Update(Context, DeltaTime);
-	
-	//FGvDebug::Warning(bPaused ? "Paused" : "Not Paused", true);
-	
-	//Temporary solution: need to refactor
-	// if (!Character->WantAiming() && !Character->WantShooting())
-	// {
-	// 	Character->ChangeActionState(0);
-	// 	return;
-	// }
-	//
-	// if (!bPaused)
-	// {
-	// 	if (Character->WantAiming())
-	// 	{
-	// 		bIsAiming = true;
-	// 		Character->OnAiming.Broadcast();
-	// 	}
-	// 	else if (bIsAiming)
-	// 	{
-	// 		bIsAiming = false;
-	// 		Character->OnStopAiming.Broadcast();
-	// 	}
-	//
-	// 	if (Character->WantShooting())
-	// 	{
-	// 		bIsShooting = true;
-	// 		Character->OnShooting.Broadcast();
-	// 	}
-	// 	else if (bIsShooting)
-	// 	{
-	// 		bIsShooting = false;
-	// 		Character->OnStopShooting.Broadcast();
-	// 	}
-	// }
-	//
-	// if (bPaused)
-	// {
-	// 	if (!Character->IsRunning() && !Character->IsDodging() && !Character->IsHooking())
-	// 	{
-	// 		UnpauseState();
-	// 	}
-	// }
-	// else if (Character->IsRunning() || Character->IsDodging() || Character->IsHooking())
-	// {
-	// 	PauseState();
-	// }
 
 	if (Character->IsAiming())
 	{
 		Character->OnAiming.Broadcast();
 	}
+	
+	
+	if (!CurrentRotation.EqualsOrientation(TargetRotation, 0.1f))
+	{
+		CurrentRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, RotationSpeed);
+		Character->SetActorRotation(CurrentRotation);
+		return;
+	}
+	Character->SetActorRotation(FRotator(0.f, Controller->GetControlRotation().Yaw, 0.f));
+
+	
 	if (Character->IsShooting())
 	{
 		Character->OnShooting.Broadcast();
 	}
-	
-	// if (Character->IsDodging() || Character->IsHooking() || (!Character->WantAiming() && !Character->WantShooting()))
- //    {
- //        Character->ChangeActionState(0);
- //    }
 }
 
 void UShoot::Exit(AActor* Context)
@@ -141,20 +117,10 @@ void UShoot::HandleInput(AActor* Context, const EInputActionType InputAction, co
 		return;
 	}
 	Super::HandleInput(Context, InputAction, Value);
-	
-	// if (InputAction == EInputActionType::Shoot && !bIsShooting)
-	// {
-	// 	bIsShooting = true;
-	// 	Character->OnStartShooting.Broadcast();
-	// }
-	// if (InputAction == EInputActionType::Aim && !bIsAiming)
-	// {
-	// 	bIsAiming = true;
-	// 	Character->OnStartAiming.Broadcast();
-	// }
+
+	//Handle shoot input
 	if (InputAction == EInputActionType::Shoot)
 	{
-		//bIsShooting = Value.Get<bool>();
 		Character->SetIsShooting(Value.Get<bool>());
 		if (Character->IsShooting())
 		{
@@ -171,9 +137,10 @@ void UShoot::HandleInput(AActor* Context, const EInputActionType InputAction, co
 			}
 		}
 	}
+
+	//Handle aim input
 	if (InputAction == EInputActionType::Aim)
 	{
-		//bIsAiming = Value.Get<bool>();
 		Character->SetIsAiming(Value.Get<bool>());
 		if (Character->IsAiming())
 		{
@@ -196,42 +163,3 @@ void UShoot::InterruptShoot()
 {
 	Character->ChangeActionState(0);
 }
-
-// void UShoot::PauseState()
-// {
-// 	bPaused = true;
-// 	Character->GetCharacterMovement()->bOrientRotationToMovement = true;
-// 	Character->GetCharacterMovement()->bUseControllerDesiredRotation = false;
-// 	Character->ActionState = ECharacterState::None;
-//
-// 	if (Character->WantAiming())
-// 	{
-// 		bIsAiming = false;
-// 		Character->OnStopAiming.Broadcast();
-// 	}
-// 	if (Character->WantShooting())
-// 	{
-// 		bIsShooting = false;
-// 		Character->OnStopShooting.Broadcast();
-// 	}
-// }
-//
-// void UShoot::UnpauseState()
-// {
-// 	bPaused = false;
-// 	Character->GetCharacterMovement()->bOrientRotationToMovement = false;
-// 	Character->GetCharacterMovement()->bUseControllerDesiredRotation = true;
-// 	Character->SetActorRotation(Controller->GetControlRotation());
-// 	Character->ActionState = ECharacterState::Shooting;
-//
-// 	if (Character->WantAiming())
-// 	{
-// 		bIsAiming = true;
-// 		Character->OnStartAiming.Broadcast();
-// 	}
-// 	if (Character->WantShooting())
-// 	{
-// 		bIsShooting = true;		
-// 		Character->OnStartShooting.Broadcast();
-// 	}
-// }

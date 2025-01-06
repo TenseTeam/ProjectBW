@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Base/BWCharacterBase.h"
 #include "Camera/CameraComponent.h"
+#include "Components/Dodger/DodgerComponent.h"
 #include "Components/EnvironmentTracing/GroundCheckComponent.h"
 #include "Data/CharacterData.h"
 #include "Features/Gameplay/DynamicCameraSystem/GvSpringArmComponent.h"
@@ -67,6 +68,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopRunning);
 
 //Dodge events
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartDodging);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDodging);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopDodging);
 
 //Dodge events
@@ -105,6 +107,8 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
 	FStartDodging OnStartDodging;
 	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FDodging OnDodging;
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
 	FStopDodging OnStopDodging;
 
 	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
@@ -140,9 +144,11 @@ private:
 	UGrapplingHookComponent* GrapplingHook;
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UDodgerComponent* DodgerComponent;
+	
 	UPROPERTY()
 	AGameplayController* BWController;
-
 	
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bWantRunning;
@@ -182,6 +188,8 @@ public:
 	void HandleMotionInput(const EInputActionType InputAction, const FInputActionValue& Value) const;
 	void ChangeMotionState(const int Index) const;
 	const UCharacterState* GetMotionState(const int Index) const;
+	const UCharacterState* GetCurrentMotionState() const;
+	const UCharacterState* GetPreviousMotionState() const;
 
 	void HandleActionInput(const EInputActionType InputAction, const FInputActionValue& Value) const;
 	void ChangeActionState(const int Index) const;
@@ -193,6 +201,8 @@ public:
 	UGrapplingHookComponent* GetGrapplingHook() const;
 	UFUNCTION(BlueprintCallable)
 	UGvSpringArmComponent* GetSpringArm() const;
+	UFUNCTION(BlueprintCallable)
+	UDodgerComponent* GetDodgerComponent() const;
 
 	UFUNCTION(BlueprintCallable)
 	float GetGroundDistance() const;
@@ -259,8 +269,16 @@ public:
 private:
 	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode) override;
 	virtual void NotifyJumpApex() override;
+	
 	UFUNCTION()
 	void StartHooking();
 	UFUNCTION()
 	void StopHooking();
+
+	UFUNCTION()
+	void StartDodging();
+	UFUNCTION()
+	void Dodging();
+	UFUNCTION()
+	void StopDodging();
 };

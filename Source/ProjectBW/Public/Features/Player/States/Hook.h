@@ -28,5 +28,9 @@ class PROJECTBW_API UHook : public UMotionState
 
 	UFUNCTION()
 	void OnHookFinished();
+	UFUNCTION()
+	void OnHookStarted();
+	UFUNCTION()
+	void OnHookMotionStarted();
 	
 };

@@ -7,8 +7,10 @@
 #include "GrapplingHookComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartHooking);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FHookMotionStarted);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FHooking);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopHooking);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInterruptHooking);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class GVUEDK_API UGrapplingHookComponent : public UActorComponent
@@ -19,9 +21,13 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FStartHooking OnStartHooking;
 	UPROPERTY(BlueprintAssignable)
+	FHookMotionStarted OnHookMotionStarted;
+	UPROPERTY(BlueprintAssignable)
 	FHooking OnHooking;
 	UPROPERTY(BlueprintAssignable)
 	FStopHooking OnStopHooking;
+	UPROPERTY(BlueprintAssignable)
+	FInterruptHooking OnInterruptHooking;
 
 private:
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true", ClampMin = "1.0"))
@@ -37,8 +43,13 @@ private:
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
 	bool bOrientRotationToMovement;
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	bool bApplyMomentumDuringHookThrow;
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
 	bool bShowDebug;
 
+	UPROPERTY()
+	ACharacter* OwnerCharacter;
+	
 	TSet<IGrabPoint*> InRangeGrabPoints;
 	IGrabPoint* TargetGrabPoint;
 
@@ -50,21 +61,31 @@ private:
 	
 	bool bTargetAcquired;
 	bool bIsHooking;
+	bool bMotionDataCalculated;
+	bool bInitialized;
 
 public:
 	UGrapplingHookComponent();
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
+	
 
 	bool IsTargetAcquired() const { return bTargetAcquired; }
 	float GetMaxDistance() const { return MaxDistance; }
 	float GetMinDistance() const { return MinDistance; }
 	float GetTotalHookDistance() const { return bIsHooking ? TotalHookDistance : 0.f; }
+	UFUNCTION(BlueprintCallable)
+	float GetElapsedTime() const { return ElapsedTime; }
+	UFUNCTION(BlueprintCallable)
 	float GetStartDelay() const { return StartDelay; }
+	UFUNCTION(BlueprintCallable)
 	FVector GetStartLocation() const { return bIsHooking ? StartHookLocation : FVector::ZeroVector; }
-	FVector GetEndLocation() const { return bIsHooking ? EndHookLocation : FVector::ZeroVector; }
+	FVector GetLandingPointLocation() const { return bIsHooking ? EndHookLocation : FVector::ZeroVector; }
+	UFUNCTION(BlueprintCallable)
 	FVector GetStartDirection() const { return bIsHooking ? StartHookDirection : FVector::ZeroVector; }
+	UFUNCTION(BlueprintCallable)
+	FVector GetTargetGrabPointLocation() const { return bTargetAcquired ? TargetGrabPoint->GetLocation() : FVector::ZeroVector; }
 
 	UFUNCTION(BlueprintCallable)
 	void StartHooking();
@@ -78,9 +99,12 @@ protected:
 
 private:
 	bool LookForGrabPoints(TSet<IGrabPoint*>& OutGrabPoints) const;
-	bool PerformSphereTrace(TArray<FHitResult>& HitResults) const;
 	IGrabPoint* GetNearestGrabPoint(TSet<IGrabPoint*>& ValidGrabPoints) const;
 	float GetElapsedNormalizedDistance() const;
+	void OrientRotationToMovement(float DeltaTime) const;
+	// Returns true if the motion data is calculated successfully
+	bool CalculateMotionData();
+	bool PerformSphereTrace(TArray<FHitResult>& HitResults) const;
 	
 };
 

@@ -44,6 +44,8 @@ public:
 	UStateBase* GetState(const int Index);
 	UFUNCTION(Blueprintable, BlueprintPure)
 	FORCEINLINE UStateBase* const GetCurrentState() const { return CurrentState; }
+	UFUNCTION(Blueprintable, BlueprintPure)
+	FORCEINLINE UStateBase* const GetPreviousState() const { return PreviousState; }
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 							   FActorComponentTickFunction* ThisTickFunction) override;
