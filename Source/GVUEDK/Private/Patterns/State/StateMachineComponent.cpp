@@ -35,7 +35,7 @@ void UStateMachineComponent::Initialize()
 	//States initialization
 	if (StateClasses.Num() > 0)
 	{
-		FGvDebug::Log("Initializing States");
+		FGvDebug::Log(GetName() + ": Initializing States");
 		States = TArray<UStateBase*>();
 		for (const auto StateClass : StateClasses)
 		{

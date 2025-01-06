@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Base/CharacterState.h"
+#include "Base/MotionState.h"
 #include "Hook.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTBW_API UHook : public UCharacterState
+class PROJECTBW_API UHook : public UMotionState
 {
 	GENERATED_BODY()
 
@@ -28,5 +28,9 @@ class PROJECTBW_API UHook : public UCharacterState
 
 	UFUNCTION()
 	void OnHookFinished();
+	UFUNCTION()
+	void OnHookStarted();
+	UFUNCTION()
+	void OnHookMotionStarted();
 	
 };

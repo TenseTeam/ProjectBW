@@ -16,6 +16,6 @@ class GVUEDK_API UCameraPOV : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FCameraInfo POV;
 };

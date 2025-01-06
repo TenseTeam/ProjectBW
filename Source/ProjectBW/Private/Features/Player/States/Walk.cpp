@@ -11,12 +11,15 @@ void UWalk::Enter(AActor* Context)
 	}
 	
 	Super::Enter(Context);
-	if (Character->IsRunning())
+	if (Character->WantRunning() && !Character->IsAiming() && !Character->IsShooting())
 	{
-		Character->ChangeState(2);
+		Character->ChangeMotionState(2);
 		return;
 	}
-	Character->CharacterState = ECharacterState::Walking;
+	Character->MotionState = ECharacterState::Walking;
+
+	Character->OnStopAiming.AddDynamic(this, &UWalk::CheckWantRun);
+	Character->OnStopShooting.AddDynamic(this, &UWalk::CheckWantRun);
 }
 
 void UWalk::Update(AActor* Context, float DeltaTime)
@@ -29,8 +32,19 @@ void UWalk::Update(AActor* Context, float DeltaTime)
 	Super::Update(Context, DeltaTime);
 	if (Controller->GetMoveInputValue().IsNearlyZero())
 	{
-		Character->ChangeState(0);
+		Character->ChangeMotionState(0);
 	}
+}
+
+void UWalk::Exit(AActor* Context)
+{
+	if (!bInitialized)
+	{
+		return;
+	}
+	Super::Exit(Context);
+	Character->OnStopAiming.RemoveDynamic(this, &UWalk::CheckWantRun);
+	Character->OnStopShooting.RemoveDynamic(this, &UWalk::CheckWantRun);
 }
 
 void UWalk::HandleInput(AActor* Context, const EInputActionType InputAction, const FInputActionValue& Value)
@@ -51,25 +65,41 @@ void UWalk::HandleInput(AActor* Context, const EInputActionType InputAction, con
 
 	if (InputAction == EInputActionType::Run)
 	{
-		Character->ChangeState(2);
-		return;
+		if (Value.Get<bool>()) //important to check if the value is true
+		{
+			Character->ChangeMotionState(2);
+			return;
+		}
 	}
 
 	if (InputAction == EInputActionType::Jump)
 	{
-		Character->ChangeState(3);
+		Character->ChangeMotionState(3);
 		return;
 	}
 
-	if (InputAction == EInputActionType::Dodge /*&& !Character->GetCharacterMovement()->IsFalling() */)
+	if (InputAction == EInputActionType::Dodge)
 	{
-		Character->ChangeState(4);
+		Character->ChangeMotionState(4);
 		return;
 	}
 
 	if (InputAction == EInputActionType::Hook)
 	{
-		Character->ChangeState(5);
+		Character->ChangeMotionState(5);
 		return;
+	}
+}
+
+void UWalk::CheckWantRun()
+{
+	if (Character->IsAiming() || Character->IsShooting())
+    {
+        return;
+    }
+	
+	if (Character->WantRunning())
+	{
+		Character->ChangeMotionState(2);
 	}
 }

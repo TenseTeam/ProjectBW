@@ -6,6 +6,19 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Utility/FGvDebug.h"
 
+void URun::Initialize(AActor* Context)
+{
+	Super::Initialize(Context);
+	
+	if (!IsValid(Character->Data))
+	{
+		bInitialized = false;
+		FGvDebug::Warning(Context->GetName() + " Has Invalid Data", true);
+		return;
+	}
+	bInitialized = true;
+}
+
 void URun::Enter(AActor* Context)
 {
 	if (!bInitialized)
@@ -13,22 +26,18 @@ void URun::Enter(AActor* Context)
 		return;
 	}
 	Super::Enter(Context);
-	Character->CharacterState = ECharacterState::Running;
-	Character->SetIsRunning(true);
+	Character->MotionState = ECharacterState::Running;
+	//Character->SetWantRunning(true);
 	
 	DefaultAcceleration = Character->GetCharacterMovement()->MaxAcceleration;
 	DefaultSpeed = Character->GetCharacterMovement()->MaxWalkSpeed;
 
-	if (UCharacterData* charData = Character->Data)
-	{
-		Character->GetCharacterMovement()->MaxAcceleration = charData->RunAcceleration;
-		Character->GetCharacterMovement()->MaxWalkSpeed = charData->RunSpeed;
-	}
-	else
-	{
-		FGvDebug::Warning("Character Has Invalid Data", true);
-	}
-	
+	Character->GetCharacterMovement()->MaxAcceleration = Character->Data->RunAcceleration;
+	Character->GetCharacterMovement()->MaxWalkSpeed = Character->Data->RunSpeed;
+
+	Character->OnStartAiming.AddDynamic(this, &URun::InterruptRun);
+	Character->OnStartShooting.AddDynamic(this, &URun::InterruptRun);
+	Character->OnStartRunning.Broadcast();
 }
 
 void URun::Update(AActor* Context, float DeltaTime)
@@ -37,18 +46,12 @@ void URun::Update(AActor* Context, float DeltaTime)
 	{
 		return;
 	}
+	
 	Super::Update(Context, DeltaTime);
 
 	if (!Character->IsRunning())
 	{
-		if (Controller->GetMoveInputValue().IsNearlyZero())
-		{
-			Character->ChangeState(0); //idle
-		}
-		else
-		{
-			Character->ChangeState(1); //walk
-		}
+		InterruptRun();
 	}
 }
 
@@ -59,9 +62,13 @@ void URun::Exit(AActor* Context)
 		return;
 	}
 	Super::Exit(Context);
-	//Character->SetIsRunning(false); wrong do not need to set this
+	
 	Character->GetCharacterMovement()->MaxAcceleration = DefaultAcceleration;
 	Character->GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed;
+
+	Character->OnStartAiming.RemoveDynamic(this, &URun::InterruptRun);
+	Character->OnStartShooting.RemoveDynamic(this, &URun::InterruptRun);
+	Character->OnStopRunning.Broadcast();
 
 }
 
@@ -81,19 +88,31 @@ void URun::HandleInput(AActor* Context, const EInputActionType InputAction, cons
 
 	if (InputAction == EInputActionType::Jump)
 	{
-		Character->ChangeState(3);
+		Character->ChangeMotionState(3);
 		return;
 	}
 
-	if (InputAction == EInputActionType::Dodge /*&& !Character->GetCharacterMovement()->IsFalling() */)
+	if (InputAction == EInputActionType::Dodge)
 	{
-		Character->ChangeState(4);
+		Character->ChangeMotionState(4);
 		return;
 	}
 
 	if (InputAction == EInputActionType::Hook)
 	{
-		Character->ChangeState(5);
+		Character->ChangeMotionState(5);
 		return;
+	}
+}
+
+void URun::InterruptRun()
+{
+	if (Controller->GetMoveInputValue().IsNearlyZero())
+	{
+		Character->ChangeMotionState(0); //idle
+	}
+	else
+	{
+		Character->ChangeMotionState(1); //walk
 	}
 }

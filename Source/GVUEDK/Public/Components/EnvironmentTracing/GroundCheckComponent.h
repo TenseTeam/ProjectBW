@@ -13,6 +13,10 @@ class GVUEDK_API UGroundCheckComponent : public UEnvironmentTracingComponent
 	GENERATED_BODY()
 
 private:
+
+	UPROPERTY(EditAnywhere, meta = (MakeEditWidget = true, AllowPrivateAccess = "true"))
+	FVector StartTraceLocation;
+	
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true", ClampMin = "1.0"))
 	float MaxGroundDistance = 3000.0f;
 

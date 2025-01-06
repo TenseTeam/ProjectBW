@@ -3,7 +3,10 @@
 
 #include "Features/Player/States/Jump.h"
 
+#include <ThirdParty/ShaderConductor/ShaderConductor/External/DirectXShaderCompiler/include/dxc/DXIL/DxilConstants.h>
+
 #include "Chaos/Deformable/MuscleActivationConstraints.h"
+#include "Features/Player/States/Hook.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Utility/FGvDebug.h"
 
@@ -29,9 +32,8 @@ void UJump::Enter(AActor* Context)
 		return;
 	}
 	Super::Enter(Context);
-
-	// Check if character is going up or down and set the correct jump state
-	if (Character->GetVelocity().Z < 0)
+	// Check if character is going up or down or if the previous motion state was hook state, and set the correct jump state
+	if (Character->GetVelocity().Z < 0 || IsValid(Cast<UHook>(Character->GetPreviousMotionState())))
 	{
 		Character->JumpState = EJumpState::JumpLoop;
 	}
@@ -44,7 +46,7 @@ void UJump::Enter(AActor* Context)
 	AscentGravityCurve = Character->Data->AscentGravityCurve;
 	DescentGravityCurve = Character->Data->DescentGravityCurve;
 	JumpStartZPos = Character->GetActorLocation().Z;
-	Character->CharacterState = ECharacterState::Jumping;
+	Character->MotionState = ECharacterState::Jumping;
 }
 
 void UJump::Update(AActor* Context, float DeltaTime)
@@ -76,11 +78,11 @@ void UJump::Update(AActor* Context, float DeltaTime)
 	{
 		if (Controller->GetMoveInputValue().IsNearlyZero())
 		{
-			Character->ChangeState(0); //idle
+			Character->ChangeMotionState(0); //idle
 		}
 		else
 		{
-			Character->ChangeState(1); //walk
+			Character->ChangeMotionState(1); //walk
 		}
 	}
 }
@@ -110,9 +112,15 @@ void UJump::HandleInput(AActor* Context, const EInputActionType InputAction, con
 		return;
 	}
 
+	if (InputAction == EInputActionType::Dodge)
+	{
+		Character->ChangeMotionState(4);
+		return;
+	}
+
 	if (InputAction == EInputActionType::Hook)
 	{
-		Character->ChangeState(5);
+		Character->ChangeMotionState(5);
 		return;
 	}
 
@@ -133,13 +141,13 @@ void UJump::UpdateGravity(const float GroundDistance) const
 
 void UJump::OnJumpApexReached()
 {
-	if (Character->CharacterState == ECharacterState::Jumping)
+	if (Character->MotionState == ECharacterState::Jumping)
 	{
 		Character->JumpState = EJumpState::JumpLoop;
 	}
-	else if (Character->CharacterState != ECharacterState::Dodging && Character->CharacterState !=
+	else if (Character->MotionState != ECharacterState::Dodging && Character->MotionState !=
 		ECharacterState::Hooking)
 	{
-		Character->ChangeState(3); // Jump
+		Character->ChangeMotionState(3); // Jump
 	}
 }

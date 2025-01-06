@@ -31,6 +31,10 @@ private:
 	UInputAction* DodgeAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UInputAction* ThrowHookAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UInputAction* ShootAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UInputAction* AimAction;
 	
 	UPROPERTY()
 	UEnhancedInputComponent* EnhancedInputComponent;
@@ -57,8 +61,8 @@ private:
 	void Jump(const FInputActionValue& Value);
 	void Dodge(const FInputActionValue& Value);
 	void ThrowHook(const FInputActionValue& Value);
-	//void Shoot(const FInputActionValue& Value);
-	//void StopShoot(const FInputActionValue& Value);
-	//void Aim(const FInputActionValue& Value);
-	//void StopAim(const FInputActionValue& Value);
+	void Shoot(const FInputActionValue& Value);
+	void StopShoot(const FInputActionValue& Value);
+	void Aim(const FInputActionValue& Value);
+	void StopAim(const FInputActionValue& Value);
 };
