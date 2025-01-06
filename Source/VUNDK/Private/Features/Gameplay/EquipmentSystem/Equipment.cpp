@@ -15,6 +15,9 @@ void UEquipment::BeginPlay()
 	EquippedItems = TMap<FName, TMap<int32, UItemBase*>>();
 	for (const auto& SlotLimit : SlotLimits)
 	{
+		if (SlotLimit.Key == nullptr)
+			continue;
+		
 		TMap<int32, UItemBase*> IndexedItems = TMap<int32, UItemBase*>();
 
 		for (int32 i = 0; i < SlotLimit.Value; i++)
