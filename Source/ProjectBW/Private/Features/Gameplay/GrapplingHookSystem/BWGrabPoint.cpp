@@ -20,7 +20,11 @@ ABWGrabPoint::ABWGrabPoint()
 	Mesh->SetupAttachment(RootComponent);
 	Mesh->SetCollisionProfileName("BlockAllDynamic");
 	constexpr ECollisionChannel GrabPointsChannel = ECC_GameTraceChannel1;
+	constexpr ECollisionChannel PlayerChannel = ECC_GameTraceChannel3;
 	Mesh->SetCollisionResponseToChannel(GrabPointsChannel, ECR_Block);
+	Mesh->SetCollisionResponseToChannel(PlayerChannel, ECR_Overlap);
+	Mesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	Mesh->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
 }
 
 void ABWGrabPoint::BeginPlay()
@@ -121,7 +125,11 @@ void ABWGrabPoint::Initialize()
 
 	Mesh->SetCollisionProfileName("BlockAllDynamic");
 	constexpr ECollisionChannel GrabPointsChannel = ECC_GameTraceChannel1;
+	constexpr ECollisionChannel PlayerChannel = ECC_GameTraceChannel3;
 	Mesh->SetCollisionResponseToChannel(GrabPointsChannel, ECR_Block);
+	Mesh->SetCollisionResponseToChannel(PlayerChannel, ECR_Overlap);
+	Mesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	Mesh->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
 
 	TraceParams = FCollisionQueryParams(FName(TEXT("Trace")), true, this);
 	TraceParams.bTraceComplex = false;
