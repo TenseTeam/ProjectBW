@@ -22,4 +22,8 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
 	int32 GetResultOperation() const;
+
+protected:
+	UFUNCTION(BlueprintNativeEvent)
+	void OnInit();
 };

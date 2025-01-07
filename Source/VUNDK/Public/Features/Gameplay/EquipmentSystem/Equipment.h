@@ -31,6 +31,10 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(
 );
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(
+	FOnEquipChanged
+);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(
 	FOnEquipmentCleared
 );
 
@@ -47,13 +51,15 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnAnyItemEquipSlotChanged OnAnyItemEquipSlotChanged;
 	UPROPERTY(BlueprintAssignable)
+	FOnEquipChanged OnEquipChanged;
+	UPROPERTY(BlueprintAssignable)
 	FOnEquipmentCleared OnEquipmentCleared;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TMap<UEquipSlotKey*, int32> SlotLimits;
 
 private:
-	TMap<FName, TMap<int32, UItemBase*>> EquippedItems;
+	TMap<FName, TMap<int32, UItemBase*>> EquipSlots;
 
 public:
 	UEquipment();

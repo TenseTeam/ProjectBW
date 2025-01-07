@@ -6,6 +6,11 @@ void UStatOperation::Init(UObject* InPayload, const int32 InModifierValue)
 {
 	Payload = InPayload;
 	ModifierValue = InModifierValue;
+	OnInit();
+}
+
+void UStatOperation::OnInit_Implementation()
+{
 }
 
 int32 UStatOperation::GetResultOperation_Implementation() const

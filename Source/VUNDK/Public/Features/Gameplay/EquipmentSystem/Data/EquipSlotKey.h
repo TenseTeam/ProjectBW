@@ -12,11 +12,11 @@ class VUNDK_API UEquipSlotKey : public UPrimaryDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, AdvancedDisplay)
 	FName EquipSlotKey;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText EquipSlotName;
-
+	
 public:
 	UEquipSlotKey()
 	{

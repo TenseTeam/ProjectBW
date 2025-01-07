@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Features/Gameplay/RPGSystem/RPGInventory/Data/RPGGearItemData.h"
 #include "Features/Gameplay/RPGSystem/RPGInventory/Items/RPGGearItem.h"
+#include "Features/Gameplay/RPGSystem/RPGItemsGeneration/ItemStatOperation.h"
 #include "Features/Gameplay/RPGSystem/RPGItemsGeneration/Data/RPGGearItemGenerationData.h"
 #include "Features/Gameplay/RPGSystem/StatsSystem/StatsBridgeBase.h"
 #include "Features/Gameplay/RPGSystem/StatsSystem/Data/SpecialStatData.h"
@@ -24,8 +25,8 @@ public:
 	static URPGGearItem* CreateRPGGearItem(URPGGearItemData* Data, const URPGGearItemGenerationData* GenerationData, const bool bBuildItem = true);
 	
 	UFUNCTION(BlueprintCallable, Category = "VUNDK|Gameplay|RPGSystem")
-	static UStatOperation* CreateStatOperationForItem(const TSubclassOf<UStatOperation> OperationClass, URPGItem* Item);
+	static UItemStatOperation* CreateItemStatOperation(const TSubclassOf<UItemStatOperation> OperationClass, URPGItem* Item);
 
 	UFUNCTION(BlueprintCallable, Category = "VUNDK|Gameplay|RPGSystem")
-	static UStatOperation* CreateStatOperationForBridge(const TSubclassOf<UStatOperation> OperationClass, UStatsBridgeBase* Bridge, USpecialStatData* SpecialStatData);
+	static UStatOperation* CreateBridgeStatOperation(UStatsBridgeBase* Bridge, USpecialStatData* SpecialStatData);
 };

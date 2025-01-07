@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "Features/Gameplay/RPGSystem/StatsSystem/StatOperation.h"
 #include "SpecialStatData.generated.h"
 
 UCLASS(BlueprintType)
@@ -26,6 +27,8 @@ public:
 	UTexture2D* StatIcon;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int32 StatDefaultValue;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UStatOperation> StatBaseValueOperationClass;
 
 public:
 	USpecialStatData(): StatID(FGuid::NewGuid().ToString()),

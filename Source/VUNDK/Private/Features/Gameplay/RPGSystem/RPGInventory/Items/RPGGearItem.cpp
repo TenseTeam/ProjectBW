@@ -41,11 +41,11 @@ int32 URPGGearItem::GetItemStatValue(const UBaseStatData* Stat) const
 	return GearStats[Stat];
 }
 
-void URPGGearItem::AddItemStat(UBaseStatData* Stat, const TSubclassOf<UStatOperation> OperationClass, const bool bOverrideIfExist)
+void URPGGearItem::AddItemStat(UBaseStatData* Stat, const TSubclassOf<UItemStatOperation> OperationClass, const bool bOverrideIfExist)
 {
-	auto CalculateResult  = [this](const UBaseStatData* LocalStat, const TSubclassOf<UStatOperation>& LocalOperationClass) -> int32
+	auto CalculateResult  = [this](const UBaseStatData* LocalStat, const TSubclassOf<UItemStatOperation>& LocalOperationClass) -> int32
 	{
-		const UStatOperation* Operation = URPGFactory::CreateStatOperationForItem(LocalOperationClass, this);
+		const UStatOperation* Operation = URPGFactory::CreateItemStatOperation(LocalOperationClass, this);
 		return LocalStat->bIsUncapped ? Operation->GetResultOperation() : FMath::Clamp(Operation->GetResultOperation(), LocalStat->StatMinValue, LocalStat->StatMaxValue);
 	};
 	

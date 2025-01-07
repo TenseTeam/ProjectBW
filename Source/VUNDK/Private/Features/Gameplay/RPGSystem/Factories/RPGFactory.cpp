@@ -42,23 +42,23 @@ URPGGearItem* URPGFactory::CreateRPGGearItem(URPGGearItemData* Data, const URPGG
 	return GearItem;
 }
 
-UStatOperation* URPGFactory::CreateStatOperationForItem(const TSubclassOf<UStatOperation> OperationClass, URPGItem* Item)
+UItemStatOperation* URPGFactory::CreateItemStatOperation(const TSubclassOf<UItemStatOperation> OperationClass, URPGItem* Item)
 {
-	UStatOperation* Operation = NewObject<UStatOperation>(Item, OperationClass);
+	UItemStatOperation* Operation = NewObject<UItemStatOperation>(Item, OperationClass);
 	Operation->Init(Item, Item->RarityLevel->RarityValue);
 	return Operation;
 }
 
-UStatOperation* URPGFactory::CreateStatOperationForBridge(const TSubclassOf<UStatOperation> OperationClass, UStatsBridgeBase* Bridge, USpecialStatData* SpecialStatData)
+UStatOperation* URPGFactory::CreateBridgeStatOperation(UStatsBridgeBase* Bridge, USpecialStatData* SpecialStatData)
 {
-	UStatOperation* Operation = NewObject<UStatOperation>(Bridge, OperationClass);
+	UStatOperation* Operation = NewObject<UStatOperation>(Bridge, SpecialStatData->StatBaseValueOperationClass);
 
-	if (!IsValid(Bridge) || !IsValid(Bridge->SpecialStats))
+	if (!IsValid(Bridge) || !IsValid(Bridge->SpecialStatsContainer))
 	{
 		UE_LOG(LogStatsSystem, Error, TEXT("Stats Bridge or Special Stats Container not found."));
 		return nullptr;
 	}
 	
-	Operation->Init(SpecialStatData, Bridge->SpecialStats->GetStatDefaultValue(SpecialStatData));
+	Operation->Init(SpecialStatData, Bridge->SpecialStatsContainer->GetStatDefaultValue(SpecialStatData));
 	return Operation;
 }
