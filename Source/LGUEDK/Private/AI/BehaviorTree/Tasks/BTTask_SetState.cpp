@@ -32,5 +32,6 @@ EBTNodeResult::Type UBTTask_SetState::ExecuteTask(UBehaviorTreeComponent& OwnerC
 	
 	LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)DesiredState).ToString(),true);
 
+	FinishLatentTask(OwnerComp,EBTNodeResult::Succeeded);
 	return EBTNodeResult::Succeeded;
 }

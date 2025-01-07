@@ -14,6 +14,7 @@ UCLASS()
 class LGUEDK_API UBTTask_SetMovementSpeed : public UBTTaskNode
 {
 	GENERATED_BODY()
+	
 public:
 	explicit UBTTask_SetMovementSpeed(FObjectInitializer const& ObjectInitializer);
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;

@@ -25,6 +25,10 @@ public:
 	EEnemyState GetState() const { return CurrentState; }
 	void SetEnemyState(EEnemyState NewState) { CurrentState = NewState; }
 	
+	int GetMinInvestigatingRadius() const { return MinInvestigatingRadius; }
+	int GetMaxInvestigatingRadius() const { return MaxInvestigatingRadius; }
+
+	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Movement")
 	float IdleSpeed = 0.0f;
@@ -40,18 +44,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|State")
 	EEnemyState CurrentState = EEnemyState::Patrolling;
-
 	
-	// Range ottimale
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Range")
-	float OptimalRangeMin = 300.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Range")
-	float OptimalRangeMax = 600.0f;
-
-	// Altezza massima di salto
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Jump")
-	float MaxJumpHeight = 500.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Investigating", meta = (ClampMin = "0", ClampMax = "1000", UIMin = "0", UIMax = "1000"))
+	int MinInvestigatingRadius = 200.0f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Investigating", meta = (ClampMin = "0", ClampMax = "2000", UIMin = "0", UIMax = "2000"))
+	int MaxInvestigatingRadius = 600.0f;
 
 	virtual void BeginPlay() override;
 

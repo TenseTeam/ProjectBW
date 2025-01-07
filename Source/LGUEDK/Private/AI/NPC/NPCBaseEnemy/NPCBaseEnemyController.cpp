@@ -200,8 +200,15 @@ void ANPCBaseEnemyController::HandleHear(AActor* Actor, FAIStimulus Stimulus)
 			// 		GetAIOwner()->RunBehaviorTree(BehaviorTreeAsset);  
 			// 	}
 			// }
+
+			if (GetBlackboardComponent()->GetValueAsBool("HasBeenInvestigating") == false)
+			{
+				GetBlackboardComponent()->SetValueAsVector("InitialPosition",ControlledPawn->GetActorLocation());
+				GetBlackboardComponent()->SetValueAsBool("HasBeenInvestigating",true);
+			}
 			
 			GetBlackboardComponent()->SetValueAsVector("TargetLocation",RandomPosition(Stimulus.StimulusLocation));
+			
 			SetStateAsPassive();
 			SetStateAsInvestigating();
 			LGDebug::Log("HEAR PLAYER ",true);
@@ -210,8 +217,8 @@ void ANPCBaseEnemyController::HandleHear(AActor* Actor, FAIStimulus Stimulus)
 
 FVector ANPCBaseEnemyController::RandomPosition(FVector Position)
 {
-	const float MinRadius = 200.0f;
-	const float MaxRadius = 600.0f;
+	const float MinRadius = ControlledPawn->GetMinInvestigatingRadius();
+	const float MaxRadius = ControlledPawn->GetMaxInvestigatingRadius();
 	
 	float RandomRadius = FMath::FRandRange(MinRadius, MaxRadius);
 	

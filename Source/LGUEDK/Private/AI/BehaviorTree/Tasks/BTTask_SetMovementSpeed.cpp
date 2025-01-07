@@ -14,7 +14,6 @@ UBTTask_SetMovementSpeed::UBTTask_SetMovementSpeed(FObjectInitializer const& Obj
 
 EBTNodeResult::Type UBTTask_SetMovementSpeed::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	// Ottieni il controller AI
 	AAIController* AIController = OwnerComp.GetAIOwner();
 	if (!AIController)
 	{
@@ -29,5 +28,6 @@ EBTNodeResult::Type UBTTask_SetMovementSpeed::ExecuteTask(UBehaviorTreeComponent
 	
 	Enemy->SetMovementSpeed(MovementSpeed);
 
+	FinishLatentTask(OwnerComp,EBTNodeResult::Succeeded);
 	return EBTNodeResult::Succeeded;
 }
