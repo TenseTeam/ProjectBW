@@ -1,7 +1,6 @@
 // Copyright VUNDK, Inc. All Rights Reserved.
 
 #include "Features/Gameplay/RPGSystem/StatsSystem/CharacterStats.h"
-
 #include "Features/Gameplay/RPGSystem/RPGInventory/Items/RPGGearItem.h"
 #include "Features/Gameplay/RPGSystem/RPGInventory/Items/RPGItem.h"
 
@@ -37,10 +36,10 @@ void UCharacterStats::OnCalculateFullStatsValues_Implementation()
 	{
 		if (const URPGGearItem* RPGItem = Cast<URPGGearItem>(Item); RPGItem != nullptr)
 		{
-			for (const auto& Values : FullValues)
+			for (const auto& Values : GetFullStatsValues())
 			{
-				const UBaseStatData* Stat = Values.Key;
-				FullValues[Stat] += RPGItem->GetItemStatValue(Stat);
+				UBaseStatData* Stat = Values.Key;
+				ModifyFullStatValue(Stat, RPGItem->GetItemStatValue(Stat));
 			}
 		}
 	}

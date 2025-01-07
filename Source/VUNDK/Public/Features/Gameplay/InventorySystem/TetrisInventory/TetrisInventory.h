@@ -95,7 +95,7 @@ private:
 
 	void FreeSlots(const FIntPoint StartPosition, const FIntPoint Size);
 
-	void OccupySlotsWithItem(UTetrisItem* Item, const FIntPoint StartSlotPosition, const bool bAddItemToList = true, const bool bUseRelativeSize = true);
+	void OccupySlotsWithItem(UTetrisItem* Item, const FIntPoint StartSlotPosition, const bool bAddItemToList = true);
 
 	bool TryOccupySlotsWithItem(UTetrisItem* Item, const FIntPoint StartSlotPosition, const bool bAddItemToList = true);
 

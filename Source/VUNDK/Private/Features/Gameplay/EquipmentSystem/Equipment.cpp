@@ -111,7 +111,7 @@ void UEquipment::OnUnequipItem_Implementation(UEquipSlotKey* EquipSlotKey, UItem
 void UEquipment::EquipItem(UItemBase* Item, UEquipSlotKey* EquipSlotKey, const int32 SlotIndex, const bool bRemoveFromInventory)
 {
 	SetItemInEquipSlot(Item, EquipSlotKey, SlotIndex);
-	Item->Equip(SlotIndex);
+	Item->SetEquipSlot(this, SlotIndex);
 	OnAnyItemEquipped.Broadcast(EquipSlotKey, SlotIndex, Item);
 	OnEquipChanged.Broadcast();
 	
@@ -128,7 +128,7 @@ void UEquipment::UnequipItem(UItemBase* Item, UEquipSlotKey* EquipSlotKey)
 	const int32 Index = *(SlotItems.FindKey(Item));
 
 	SetItemInEquipSlot(nullptr, EquipSlotKey, Index);
-	Item->Unequip();
+	Item->ClearEquipSlot();
 	OnAnyItemUnequipped.Broadcast(EquipSlotKey, Index, Item);
 	OnEquipChanged.Broadcast();
 	Item->OnItemAdded.RemoveDynamic(this, &UEquipment::OnItemAddedToAnyInventory);
@@ -152,7 +152,7 @@ void UEquipment::ChangeItemEquipSlot(UItemBase* Item, UEquipSlotKey* EquipSlotKe
 	
 	SetItemInEquipSlot(nullptr, EquipSlotKey, *OldSlotKeyRef);
 	SetItemInEquipSlot(Item, EquipSlotKey, NewSlotIndex);
-	Item->Equip(NewSlotIndex);
+	Item->SetEquipSlot(this, NewSlotIndex);
 
 	OnAnyItemEquipSlotChanged.Broadcast(EquipSlotKey, Item, NewSlotIndex, *OldSlotKeyRef);
 }

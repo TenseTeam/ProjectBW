@@ -151,7 +151,8 @@ bool UTetrisInventory::TryMoveItem(UTetrisItem* Item, const FIntPoint NewPositio
 
 	if (!TryOccupySlotsWithItem(Item, NewPosition, false)) // Try to occupy the new slots
 	{
-		OccupySlotsWithItem(Item, OldPosition, false, false); // Re-occupy the old slots if failed
+		Item->ResetToCachedRotation();
+		OccupySlotsWithItem(Item, OldPosition, false); // Re-occupy the old slots if failed
 		return false;
 	}
 
@@ -248,9 +249,9 @@ void UTetrisInventory::FreeSlots(const FIntPoint StartPosition, const FIntPoint 
 	}
 }
 
-void UTetrisInventory::OccupySlotsWithItem(UTetrisItem* Item, const FIntPoint StartSlotPosition, const bool bAddItemToList, const bool bUseRelativeSize)
+void UTetrisInventory::OccupySlotsWithItem(UTetrisItem* Item, const FIntPoint StartSlotPosition, const bool bAddItemToList)
 {
-	const FIntPoint ItemSize = bUseRelativeSize ? Item->GetRelativeSize() : Item->GetCachedSize();
+	const FIntPoint ItemSize = Item->GetRelativeSize();
 
 	for (int32 x = StartSlotPosition.X; x < StartSlotPosition.X + ItemSize.X; x++)
 	{

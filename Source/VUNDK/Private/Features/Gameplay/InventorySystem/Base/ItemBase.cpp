@@ -51,18 +51,25 @@ void UItemBase::DeassignInventory()
 	RelatedInventory = nullptr;
 }
 
-void UItemBase::Equip(const int32 SlotIndex)
+void UItemBase::SetEquipSlot(UEquipment* InEquipment, const int32 SlotIndex)
 {
+	RelatedEquipment = InEquipment;
 	EquipSlotIndex = SlotIndex;
 	OnItemEquipped.Broadcast(this);
 	OnEquip();
 }
 
-void UItemBase::Unequip()
+void UItemBase::ClearEquipSlot()
 {
+	RelatedEquipment = nullptr;
 	EquipSlotIndex = -1;
 	OnItemUnequipped.Broadcast(this);
 	OnUnequip();
+}
+
+bool UItemBase::IsEquipped() const
+{
+	return IsValid(RelatedEquipment) && EquipSlotIndex > -1;
 }
 
 void UItemBase::Drop(const APlayerController* PlayerController, const FVector Location, const FRotator Rotation)
@@ -79,6 +86,9 @@ void UItemBase::Drop(const APlayerController* PlayerController, const FVector Lo
 
 	ItemDropActor->SetActorLocationAndRotation(Location, Rotation);
 	Remove();
+
+	if (IsEquipped())
+		RelatedEquipment->TryUnequipItem(this);
 }
 
 void UItemBase::Remove()
@@ -131,11 +141,6 @@ FSlateBrush UItemBase::GetItemIcon() const
 FText UItemBase::GetItemDescription() const
 {
 	return ItemData->ItemDescription;
-}
-
-bool UItemBase::IsEquipped() const
-{
-	return EquipSlotIndex > -1;
 }
 
 int32 UItemBase::GetEquipSlotIndex() const

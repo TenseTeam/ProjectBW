@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "BaseStatsContainer.h"
 #include "SpecialStatsContainer.h"
-#include "StatOperation.h"
 #include "Components/ActorComponent.h"
 #include "Features/Generic/SaveSystem/Interfaces/Saveable.h"
 #include "StatsBridgeBase.generated.h"
@@ -16,8 +15,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(
 	FOnBaseStatsValuesChanged
 );
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(
-	FOnFullStatsValuesChanged
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
+	FOnFullStatsValuesChanged,
+	UStatsBridgeBase*, StatsBridge
 );
 
 UCLASS(Abstract, Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -36,9 +36,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Instanced, BlueprintReadOnly)
 	UBaseStatsContainer* BaseStatsContainer;
 
-protected:
+private:
 	UPROPERTY()
-	TMap<UBaseStatData*, int32> FullValues;
+	TMap<UBaseStatData*, int32> FullStatsValues;
 	
 public:
 	UStatsBridgeBase();
@@ -63,6 +63,15 @@ public:
 	void CalculateAllStatsValues();
 	
 protected:
+	UFUNCTION(BlueprintCallable)
+	void ClearFullStatsValues();
+	
+	UFUNCTION(BlueprintCallable)
+	void SetFullStatValue(UBaseStatData* BaseStatData, int32 Value);
+
+	UFUNCTION(BlueprintCallable)
+	void ModifyFullStatValue(UBaseStatData* BaseStatData, int32 Value);
+	
 	UFUNCTION()
 	void CalculateBaseStatsValues();
 

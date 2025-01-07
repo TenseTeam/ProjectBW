@@ -81,6 +81,8 @@ protected:
 
 private:
 	UPROPERTY()
+	UEquipment* RelatedEquipment;
+	UPROPERTY()
 	int32 EquipSlotIndex;
 	UPROPERTY()
 	int32 CurrentQuantity;
@@ -101,9 +103,12 @@ public:
 
 	void DeassignInventory();
 
-	void Equip(const int32 SlotIndex);
+	void SetEquipSlot(UEquipment* InEquipment, const int32 SlotIndex);
 
-	void Unequip();
+	void ClearEquipSlot();
+
+	UFUNCTION(BlueprintPure)
+	bool IsEquipped() const;
 
 	UFUNCTION(BlueprintCallable)
 	void Drop(const APlayerController* PlayerController, FVector Location, FRotator Rotation);
@@ -125,10 +130,7 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	virtual FText GetItemDescription() const;
-
-	UFUNCTION(BlueprintPure)
-	bool IsEquipped() const;
-
+	
 	int32 GetEquipSlotIndex() const;
 
 	UFUNCTION(BlueprintPure)

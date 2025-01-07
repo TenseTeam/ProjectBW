@@ -50,7 +50,7 @@ bool UStatsBridgeBase::LoadSaveData(USaveData* SavedData)
 
 TMap<UBaseStatData*, int32> const& UStatsBridgeBase::GetFullStatsValues() const
 {
-	return FullValues;
+	return FullStatsValues;
 }
 
 void UStatsBridgeBase::SetStatBaseValueBySpecialStat(USpecialStatData* SpecialStatData, UBaseStatData* BaseStatData)
@@ -75,6 +75,27 @@ void UStatsBridgeBase::CalculateAllStatsValues()
 	OnCalculateFullStatsValues();
 }
 
+void UStatsBridgeBase::ClearFullStatsValues()
+{
+	FullStatsValues.Empty();
+}
+
+void UStatsBridgeBase::SetFullStatValue(UBaseStatData* BaseStatData, const int32 Value)
+{
+	if (!FullStatsValues.Contains(BaseStatData))
+		return;
+
+	FullStatsValues[BaseStatData] = BaseStatData->bIsUncapped ? Value : FMath::Clamp(Value, BaseStatData->StatMinValue, BaseStatData->StatMaxValue);
+}
+
+void UStatsBridgeBase::ModifyFullStatValue(UBaseStatData* BaseStatData, const int32 Value)
+{
+	if (!FullStatsValues.Contains(BaseStatData))
+		return;
+
+	SetFullStatValue(BaseStatData, FullStatsValues[BaseStatData] + Value);
+}
+
 void UStatsBridgeBase::CalculateBaseStatsValues()
 {
 	OnCalculateBaseStatsValues();
@@ -83,9 +104,9 @@ void UStatsBridgeBase::CalculateBaseStatsValues()
 
 void UStatsBridgeBase::CalculateFullStatsValues()
 {
-	FullValues = BaseStatsContainer->GetBaseValues(); // By default, full values are equal to base values
+	FullStatsValues = BaseStatsContainer->GetBaseValues(); // By default, full values are equal to base values
 	OnCalculateFullStatsValues();
-	OnFullStatsValuesChanged.Broadcast();
+	OnFullStatsValuesChanged.Broadcast(this);
 }
 
 void UStatsBridgeBase::OnCalculateBaseStatsValues_Implementation()
