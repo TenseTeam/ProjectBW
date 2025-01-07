@@ -13,15 +13,14 @@ class VUNDK_API UDefaultSaveGame : public USaveGame
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VUNDK|Generic|Save System")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FName SlotNameKey;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VUNDK|Generic|Save System")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TMap<FName, FTransform> ActorTransforms;
 
-	UDefaultSaveGame()
+	UDefaultSaveGame(): SlotNameKey(""),
+	                    ActorTransforms(TMap<FName, FTransform>())
 	{
-		SlotNameKey = "";
-		ActorTransforms = TMap<FName, FTransform>();
 	}
 
 	void SetSlotNameKey(const FName& Key)

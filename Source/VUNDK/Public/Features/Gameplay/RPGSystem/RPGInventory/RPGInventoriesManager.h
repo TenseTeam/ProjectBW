@@ -4,8 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Features/Gameplay/InventorySystem/TetrisInventory/TetrisInventoriesManager.h"
-#include "Features/Gameplay/RPGSystem/RPGItemsGeneration/Data/RPGItemsRaritiesData.h"
+#include "Features/Gameplay/RPGSystem/RPGItemsGeneration/Data/ItemsStatsData.h"
+#include "Features/Gameplay/RPGSystem/StatsSystem/Data/BaseStatData.h"
+#include "Features/Gameplay/RPGSystem/RPGItemsGeneration/Data/Rarities/RPGItemsRaritiesData.h"
 #include "RPGInventoriesManager.generated.h"
+
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class VUNDK_API URPGInventoriesManager : public UTetrisInventoriesManager
@@ -14,6 +17,8 @@ class VUNDK_API URPGInventoriesManager : public UTetrisInventoriesManager
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UItemsStatsData* ItemsStats;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	URPGItemsRaritiesData* ItemsRarities;
 	
 public:
@@ -21,4 +26,7 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	URPGRarityLevelData* GetRarityByID(const FName RarityID) const;
+
+	UFUNCTION(BlueprintPure)
+	UBaseStatData* GetStatByID(const FName StatID) const;
 };

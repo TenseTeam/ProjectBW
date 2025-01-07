@@ -14,6 +14,4 @@ struct FClassicItemSaveData
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FItemSaveData ItemSaveData;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Quantity;
 };

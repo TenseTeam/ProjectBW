@@ -19,10 +19,9 @@ public:
 	bool bCanBeRotated;
 
 public:
-	UTetrisItemData()
+	UTetrisItemData(): Size(FIntPoint(1, 1)),
+	                   bCanBeRotated(false)
 	{
 		ItemClass = UTetrisItem::StaticClass();
-		Size = FIntPoint(1, 1);
-		bCanBeRotated = false;
 	}
 };

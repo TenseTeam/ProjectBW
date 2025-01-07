@@ -11,33 +11,12 @@
 class UClassicItemData;
 struct FClassicItemSlotData;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
-	FOnItemIncreased,
-	int32, CurrentQuantity
-);
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
-	FOnItemDecreased,
-	int32, CurrentQuantity
-);
-
 UCLASS(Blueprintable, BlueprintType)
 class VUNDK_API UClassicItem : public UItemBase
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintAssignable)
-	FOnItemIncreased OnItemIncreased;
-	UPROPERTY(BlueprintAssignable)
-	FOnItemDecreased OnItemDecreased;
-
-private:
-	int32 CurrentQuantity;
-
-public:
-	void OnInit_Implementation() override;
-
 	FClassicItemSaveData CreateClassicItemSaveData() const;
 
 	void LoadClassicItemSaveData(const FClassicItemSaveData ItemSaveData);
@@ -50,17 +29,4 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	int32 GetMinRequiredSlots() const;
-
-	UFUNCTION(BlueprintPure)
-	int32 GetMaxStackSize() const;
-	
-	UFUNCTION(BlueprintPure)
-	int32 GetCurrentQuantity() const;
-	
-	void IncreaseQuantity();
-
-	void DecreaseQuantity();
-
-protected:
-	virtual void OnConsume_Implementation() override;
 };
