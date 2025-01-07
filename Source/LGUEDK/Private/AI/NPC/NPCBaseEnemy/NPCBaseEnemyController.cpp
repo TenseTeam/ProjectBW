@@ -18,6 +18,7 @@
 ANPCBaseEnemyController::ANPCBaseEnemyController(FObjectInitializer const& ObjectInitializer)
 {
 	SetUpPerceptionSystem();
+	
 }
 
 void ANPCBaseEnemyController::BeginPlay()
@@ -38,10 +39,27 @@ void ANPCBaseEnemyController::OnPossess(APawn* InPawn)
 			UBlackboardComponent* BlackboardComponent;
 			UseBlackboard(tree->BlackboardAsset,BlackboardComponent);
 			Blackboard = BlackboardComponent;
+			InitializeBlackboardValues();
 			RunBehaviorTree(tree);
 			UE_LOG(LogTemp, Warning, TEXT("Aic controller: %s"), *InPawn->GetName());
 		}
 	}
+}
+
+void ANPCBaseEnemyController::InitializeBlackboardValues()
+{
+	if (!Blackboard)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Blackboard is not initialized."));
+		return;
+	}
+	
+	Blackboard->SetValueAsVector(TEXT("TargetLocation"), FVector::ZeroVector);
+	Blackboard->SetValueAsObject(TEXT("AttackTarget"), nullptr);
+	Blackboard->SetValueAsFloat(TEXT("TimeBeforeInvestigating"), ControlledPawn->GetTimeBeforeInvestigating());
+	Blackboard->SetValueAsFloat(TEXT("RandomInvestigatingTimeDeviation"), ControlledPawn->GetRandomInvestigatingTimeDeviation());
+
+	LGDebug::Log("InitializeBlackboardValues",true);
 }
 
 void ANPCBaseEnemyController::SetStateAsPatrolling()

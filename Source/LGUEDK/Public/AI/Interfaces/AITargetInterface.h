@@ -25,5 +25,4 @@ public:
 	// virtual void ReleaseToken() = 0; ASTRATTO = 0;
 	UFUNCTION()
 	virtual void ReleaseToken();
-	
 };

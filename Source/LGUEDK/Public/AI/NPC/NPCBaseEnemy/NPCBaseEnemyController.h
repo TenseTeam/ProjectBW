@@ -29,6 +29,9 @@ protected:
 	
 	UFUNCTION()
 	void OnPossess(APawn* InPawn) override;
+
+	UFUNCTION()
+	void InitializeBlackboardValues();
 	
 	UFUNCTION()
 	void SetStateAsPatrolling();
@@ -108,3 +111,5 @@ private:
 	
 	
 };
+
+
