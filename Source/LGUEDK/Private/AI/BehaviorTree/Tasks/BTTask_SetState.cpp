@@ -4,7 +4,7 @@
 #include "BTTask_SetState.h"
 
 #include "AI/NPC/NPCBaseEnemy/NPCBaseEnemy.h"
-#include "AI/NPC/NPCBaseEnemy/NPCBaseEnemyController.h"
+#include "AI/NPC/NPCBaseEnemy/NPCPerceptionSystemController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Utility/LGDebug.h"
 

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BehaviorTree/BehaviorTree.h"
 #include "GameFramework/Character.h"
 #include "NPCBase.generated.h"
 
@@ -14,5 +15,13 @@ class LGUEDK_API ANPCBase : public ACharacter
 public:
 	// Sets default values for this character's properties
 	ANPCBase();
+
+	UBehaviorTree* GetBehaviorTree() const;
 	
+protected:
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "AI",meta=(AllowPrivateAccess="true"))
+	UBehaviorTree* BehaviorTree;
+
+	virtual void BeginPlay() override;
 };

@@ -17,8 +17,6 @@ class LGUEDK_API ANPCBaseEnemy : public ANPCBase
 public:
 	
 	ANPCBaseEnemy();
-	
-	UBehaviorTree* GetBehaviorTree() const;
 
 	void SetMovementSpeed(EMovementSpeed MovementSpeed) const;
 
@@ -32,6 +30,7 @@ public:
 
 	
 protected:
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Movement")
 	float IdleSpeed = 0.0f;
 
@@ -61,8 +60,4 @@ protected:
 
 	virtual void BeginPlay() override;
 
-public:
-
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "AI",meta=(AllowPrivateAccess="true"))
-	UBehaviorTree* BehaviorTree;
 };

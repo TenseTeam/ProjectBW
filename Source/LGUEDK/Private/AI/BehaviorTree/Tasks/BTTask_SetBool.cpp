@@ -13,7 +13,7 @@ UBTTask_SetBool::UBTTask_SetBool(FObjectInitializer const& ObjectInitializer)
 EBTNodeResult::Type UBTTask_SetBool::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	OwnerComp.GetBlackboardComponent()->SetValueAsBool(BoolKey.SelectedKeyName,bNewValue);
-
+	
 	FinishLatentTask(OwnerComp,EBTNodeResult::Succeeded);
 	return EBTNodeResult::Succeeded;
 }

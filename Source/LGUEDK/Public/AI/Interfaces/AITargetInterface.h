@@ -7,7 +7,7 @@
 #include "AITargetInterface.generated.h"
 
 // This class does not need to be modified.
-UINTERFACE()
+UINTERFACE(Blueprintable)
 class UAITargetInterface : public UInterface
 {
 	GENERATED_BODY()

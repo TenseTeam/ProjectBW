@@ -3,19 +3,15 @@
 #include "LGUEDK/Public/AI/NPC/NPCBaseEnemy/NPCBaseEnemy.h"
 #include "AI/Enumerators/EMovementSpeed.h"
 #include "AI/NPC/NPCBase/NPCBaseController.h"
+#include "AI/NPC/NPCBaseEnemy/NPCPerceptionSystemController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Utility/LGDebug.h"
 
 
-// Sets default values
+
 ANPCBaseEnemy::ANPCBaseEnemy()
 {
-	AIControllerClass = ANPCBaseController::StaticClass();
-}
-
-UBehaviorTree* ANPCBaseEnemy::GetBehaviorTree() const
-{
-	return BehaviorTree;
+	AIControllerClass = ANPCPerceptionSystemController::StaticClass();
 }
 
 void ANPCBaseEnemy::SetMovementSpeed(EMovementSpeed MovementSpeed) const

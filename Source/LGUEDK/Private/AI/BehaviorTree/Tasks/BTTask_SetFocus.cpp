@@ -30,7 +30,6 @@ EBTNodeResult::Type UBTTask_SetFocus::ExecuteTask(UBehaviorTreeComponent& OwnerC
 	{
 		return EBTNodeResult::Failed;
 	}
-	
 	AIController->SetFocus(TargetActor, EAIFocusPriority::Gameplay);
 
 	FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
