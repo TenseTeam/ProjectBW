@@ -4,6 +4,7 @@
 #include "AI/Enumerators/EMovementSpeed.h"
 #include "AI/NPC/NPCBase/NPCBaseController.h"
 #include "AI/NPC/NPCBaseEnemy/NPCPerceptionSystemController.h"
+#include "AI/NPC/NPCBaseStateEnemy/NPCBaseEnemyController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Utility/LGDebug.h"
 
@@ -11,7 +12,7 @@
 
 ANPCBaseEnemy::ANPCBaseEnemy()
 {
-	AIControllerClass = ANPCPerceptionSystemController::StaticClass();
+	
 }
 
 void ANPCBaseEnemy::SetMovementSpeed(EMovementSpeed MovementSpeed) const

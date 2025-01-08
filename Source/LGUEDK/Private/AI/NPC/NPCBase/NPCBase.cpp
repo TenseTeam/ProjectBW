@@ -8,7 +8,7 @@
 
 ANPCBase::ANPCBase()
 {
-	AIControllerClass = ANPCBaseController::StaticClass();
+	
 }
 
 UBehaviorTree* ANPCBase::GetBehaviorTree() const

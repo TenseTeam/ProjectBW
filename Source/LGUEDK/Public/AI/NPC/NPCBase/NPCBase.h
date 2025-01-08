@@ -13,7 +13,6 @@ class LGUEDK_API ANPCBase : public ACharacter
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	ANPCBase();
 
 	UBehaviorTree* GetBehaviorTree() const;

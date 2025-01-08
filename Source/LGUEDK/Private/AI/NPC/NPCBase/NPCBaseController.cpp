@@ -4,11 +4,12 @@
 #include "AI/NPC/NPCBase/NPCBaseController.h"
 
 #include "AI/NPC/NPCBase/NPCBase.h"
+#include "Utility/LGDebug.h"
 
 
 ANPCBaseController::ANPCBaseController()
 {
-	
+	ControlledPawn = nullptr;
 }
 
 void ANPCBaseController::OnPossess(APawn* InPawn)
@@ -22,16 +23,10 @@ void ANPCBaseController::OnPossess(APawn* InPawn)
 			UBlackboardComponent* BlackboardComponent;
 			UseBlackboard(tree->BlackboardAsset,BlackboardComponent);
 			Blackboard = BlackboardComponent;
-			InitializeBlackboardValues();
 			RunBehaviorTree(tree);
-			UE_LOG(LogTemp, Warning, TEXT("Aic controller: %s"), *InPawn->GetName());
+			LGDebug::Log("aic controller inizializzata",true);
 		}
 	}
-}
-
-void ANPCBaseController::InitializeBlackboardValues()
-{
-	
 }
 
 ANPCBase* ANPCBaseController::GetControlledPawn() const
@@ -42,4 +37,5 @@ ANPCBase* ANPCBaseController::GetControlledPawn() const
 void ANPCBaseController::BeginPlay()
 {
 	Super::BeginPlay();
+	InitializeBlackboardValues();
 }

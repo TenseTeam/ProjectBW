@@ -17,13 +17,27 @@
 
 ANPCPerceptionSystemController::ANPCPerceptionSystemController()
 {
+	CanSee = true;
+	CanHear = true;
+	CanTakeDamage = true;
 	SetUpPerceptionSystem();
+	LGDebug::Log("ANPCPerceptionSystemController COSTRUTTORE",true);
 }
 
 void ANPCPerceptionSystemController::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void ANPCPerceptionSystemController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+}
+
+void ANPCPerceptionSystemController::InitializeBlackboardValues()
+{
+	Super::InitializeBlackboardValues();
 }
 
 void ANPCPerceptionSystemController::SetUpPerceptionSystem()
@@ -53,6 +67,7 @@ void ANPCPerceptionSystemController::SetUpSightConfig()
 		SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
 		SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
 
+		LGDebug::Log("inizialize senso vista ",true);
 		AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ANPCPerceptionSystemController::HandleSight);
 		AIPerceptionComponent->ConfigureSense(*SightConfig);
 		AIPerceptionComponent->SetDominantSense(*SightConfig->GetSenseImplementation());

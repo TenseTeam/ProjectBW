@@ -20,35 +20,35 @@ public:
 protected:
 	
 	virtual void BeginPlay() override;
+
+	virtual void OnPossess(APawn* InPawn) override { Super::OnPossess(InPawn); };
 	
-	virtual void InitializeBlackboardValues() override;
+	virtual void InitializeBlackboardValues() override { Super::InitializeBlackboardValues(); };
 	
 	UFUNCTION()
-	void SetStateAsPassive();
+	virtual void SetStateAsPassive() {};
 	
 	UFUNCTION()
-	void SetStateAsPatrolling();
+	virtual void SetStateAsPatrolling() {};
 
 	UFUNCTION()
-	void SetStateAsAttacking(AActor* Actor);
+	virtual void SetStateAsAttacking(AActor* Actor) {};
 
 	UFUNCTION()
-	void SetStateAsInvestigating();
-
+	virtual void SetStateAsInvestigating() {};
+	
+	virtual void HandleSight(AActor* Actor, FAIStimulus Stimulus) override { Super::HandleSight(Actor, Stimulus); };
+	virtual void HandleHear(AActor* Actor, FAIStimulus Stimulus) override { Super::HandleHear(Actor, Stimulus); };
+	virtual void HandleDamage(AActor* Actor, FAIStimulus Stimulus) override { Super::HandleDamage(Actor, Stimulus); };
+	
+	virtual void OnLostSight() override { Super::OnLostSight(); };
+	virtual void OnLostHear() override { Super::OnLostHear(); };
+	virtual void OnLostDamage() override { Super::OnLostDamage(); };
+	
 private:
 	
 	UPROPERTY()
 	ANPCBaseEnemy* MyControlledPawn;
 	
-	virtual void HandleSight(AActor* Actor, FAIStimulus Stimulus) override ;
-	virtual void HandleHear(AActor* Actor, FAIStimulus Stimulus) override ;
-	virtual void HandleDamage(AActor* Actor, FAIStimulus Stimulus) override ;
-	
-	virtual void OnLostSight() override ;
-	virtual void OnLostHear() override ;
-	virtual void OnLostDamage() override ;
-	
-	UFUNCTION()
-	FVector RandomPosition(FVector Position);
 	
 };

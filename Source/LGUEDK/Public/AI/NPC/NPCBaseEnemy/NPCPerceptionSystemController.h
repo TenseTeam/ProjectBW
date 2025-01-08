@@ -9,10 +9,10 @@
 #include "Perception/AISenseConfig_Damage.h"
 #include "Perception/AISenseConfig_Hearing.h"
 #include "Perception/AISenseConfig_Sight.h"
+#include "Utility/LGDebug.h"
 #include "NPCPerceptionSystemController.generated.h"
 
 class ANPCBaseEnemy;
-
 
 UCLASS()
 class LGUEDK_API ANPCPerceptionSystemController : public ANPCBaseController
@@ -68,14 +68,17 @@ protected:
 
 	virtual void BeginPlay() override;
 	
-	virtual void InitializeBlackboardValues() override {};
+	virtual void OnPossess(APawn* InPawn) override;
 	
+	virtual void InitializeBlackboardValues() override;
+
+
 	UFUNCTION()
-	virtual void HandleSight(AActor* Actor, FAIStimulus Stimulus) {};
+	virtual void HandleSight(AActor* Actor, FAIStimulus Stimulus) { };
 	UFUNCTION()
-	virtual void HandleHear(AActor* Actor, FAIStimulus Stimulus) {};
+	virtual void HandleHear(AActor* Actor, FAIStimulus Stimulus) { };
 	UFUNCTION()
-	virtual void HandleDamage(AActor* Actor, FAIStimulus Stimulus) {};
+	virtual void HandleDamage(AActor* Actor, FAIStimulus Stimulus) { };
 	
 	UFUNCTION()
 	virtual void OnLostSight() {};
@@ -102,7 +105,7 @@ private:
 	void SetUpSightConfig();
 	void SetUpHearingConfig();
 	void SetUpDamageConfig();
-	
+
 };
 
 

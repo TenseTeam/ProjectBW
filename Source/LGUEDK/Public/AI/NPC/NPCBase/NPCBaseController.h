@@ -7,7 +7,7 @@
 #include "Runtime/AIModule/Classes/AIController.h"
 #include "NPCBaseController.generated.h"
 
-class NPCBase;
+class ANPCBase;
 
 UCLASS()
 class LGUEDK_API ANPCBaseController : public AAIController
@@ -20,10 +20,10 @@ public:
 protected:
 
 	UFUNCTION()
-	void OnPossess(APawn* InPawn) override;
+	virtual void OnPossess(APawn* InPawn) override;
 
 	UFUNCTION()
-	virtual void InitializeBlackboardValues();
+	virtual void InitializeBlackboardValues() {};
 
 	ANPCBase* GetControlledPawn() const;
 	
