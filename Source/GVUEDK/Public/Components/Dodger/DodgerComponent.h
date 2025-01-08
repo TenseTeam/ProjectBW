@@ -9,6 +9,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartDodge);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDodge);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopDodge);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDodgeCooldownComplete);
 
 #define GRAVITY 980.665f // cm/s^2
 
@@ -37,6 +38,8 @@ public:
 	FDodge OnDodge;
 	UPROPERTY(BlueprintAssignable)
 	FStopDodge OnStopDodge;
+	UPROPERTY(BlueprintAssignable)
+	FDodgeCooldownComplete OnDodgeCooldownComplete;
 
 private:
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true", EditCondition = "!bApplyUniformVelocity"))
@@ -89,6 +92,8 @@ public:
 	void StartDodge(FVector WorldDirection = FVector::ZeroVector);
 	UFUNCTION(BlueprintCallable)
 	void StopDodge();
+	UFUNCTION(BlueprintCallable)
+	bool IsCoolingDown() const { return bIsCoolingDown; }
 	
 private:
 	virtual void BeginPlay() override;

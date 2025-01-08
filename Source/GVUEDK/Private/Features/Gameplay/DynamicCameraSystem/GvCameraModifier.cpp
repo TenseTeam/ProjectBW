@@ -3,7 +3,11 @@
 
 #include "Features/Gameplay/DynamicCameraSystem/GvCameraModifier.h"
 
+#include <string>
+
 #include "Features/Gameplay/DynamicCameraSystem/GvSpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Utility/FGvDebug.h"
 
 void UGvCameraModifier::Initialize()
 {
@@ -32,7 +36,7 @@ bool UGvCameraModifier::ApplyCameraTransition(const FCameraInfo& CameraInfo, con
         ApplyCameraInfo(CurrentModifiers, 1.0f, InOutPOV);
         return true;
     }
-
+	
     // Initialize the application factor and the modifiers to apply
     float applicationFactor = 0.0f;
     FCameraInfo modifiersToApply = TargetModifiers.IsZero() ? CurrentModifiers : TargetModifiers;
@@ -64,8 +68,9 @@ bool UGvCameraModifier::ApplyCameraTransition(const FCameraInfo& CameraInfo, con
 	return false;
 }
 
+
 void UGvCameraModifier::ApplyCameraInfo(const FCameraInfo& CameraInfo, const float Factor,
-	FMinimalViewInfo& InOutPOV) const
+                                        FMinimalViewInfo& InOutPOV) const
 {
     AActor* viewTarget = GetViewTarget();
 
@@ -76,7 +81,7 @@ void UGvCameraModifier::ApplyCameraInfo(const FCameraInfo& CameraInfo, const flo
 
 	TArray<USceneComponent*> children;
 	viewTarget->GetRootComponent()->GetChildrenComponents(true, children);
-
+	
 	// Apply FOV.
 	float appliedFOV = CameraInfo.FOV * Factor;
 	InOutPOV.FOV = InOutPOV.FOV + appliedFOV;
@@ -111,3 +116,30 @@ void UGvCameraModifier::ApplyCameraInfo(const FCameraInfo& CameraInfo, const flo
 		InOutPOV.Rotation += CameraInfo.Rotation * Factor;
 	}
 }
+
+// bool UGvCameraModifier::ApplyCameraTransition_Test(const FCameraInfo& CameraInfo, const float TransitionSpeed,
+// 	FMinimalViewInfo& InOutPOV, const float DeltaTime)
+// {
+// 	if (!IsValid(PlayerCameraManager))
+// 	{
+// 		return true;
+// 	}
+//
+// 	bool bTransitionComplete = true;
+//
+// 	// Apply FOV.
+// 	float currentFOV = PlayerCameraManager->GetCameraCacheView().FOV;
+// 	if (FMath::IsNearlyEqual(currentFOV, CameraInfo.FOV, DeltaTime * TransitionSpeed))
+// 	{
+// 		InOutPOV.FOV = CameraInfo.FOV;
+// 	}
+// 	else
+// 	{
+// 		currentFOV += DeltaTime * TransitionSpeed * (currentFOV > CameraInfo.FOV ? -1 : 1);
+// 		InOutPOV.FOV = currentFOV;
+// 		bTransitionComplete = false;
+// 	}
+//
+// 	return bTransitionComplete;
+// }
+

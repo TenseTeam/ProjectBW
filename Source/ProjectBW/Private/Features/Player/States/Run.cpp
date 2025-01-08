@@ -34,6 +34,7 @@ void URun::Enter(AActor* Context)
 
 	Character->GetCharacterMovement()->MaxAcceleration = Character->Data->RunAcceleration;
 	Character->GetCharacterMovement()->MaxWalkSpeed = Character->Data->RunSpeed;
+	Character->SetIsRunning(true);
 
 	Character->OnStartAiming.AddDynamic(this, &URun::InterruptRun);
 	Character->OnStartShooting.AddDynamic(this, &URun::InterruptRun);
@@ -65,6 +66,7 @@ void URun::Exit(AActor* Context)
 	
 	Character->GetCharacterMovement()->MaxAcceleration = DefaultAcceleration;
 	Character->GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed;
+	Character->SetIsRunning(false);
 
 	Character->OnStartAiming.RemoveDynamic(this, &URun::InterruptRun);
 	Character->OnStartShooting.RemoveDynamic(this, &URun::InterruptRun);
