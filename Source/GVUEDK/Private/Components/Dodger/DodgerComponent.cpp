@@ -177,7 +177,11 @@ void UDodgerComponent::StartCooldown()
 	if (const UWorld* World = GetWorld())
 	{
 		FTimerDelegate TimerDel;
-		TimerDel.BindLambda([this] { bIsCoolingDown = false; });
+		TimerDel.BindLambda([this]
+		{
+			bIsCoolingDown = false;
+			OnDodgeCooldownComplete.Broadcast();
+		});
 		
 		FTimerHandle TimerHandle;
 		

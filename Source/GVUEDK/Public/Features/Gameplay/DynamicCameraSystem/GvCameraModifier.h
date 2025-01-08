@@ -39,6 +39,7 @@ protected:
 	 * @return True if the transition is complete, false otherwise
 	 */
 	bool ApplyCameraTransition(const FCameraInfo& CameraInfo, const float TransitionTime, FMinimalViewInfo& InOutPOV, const float DeltaTime);
+	//bool ApplyCameraTransition_Test(const FCameraInfo& CameraInfo, const float TransitionSpeed, FMinimalViewInfo& InOutPOV, const float DeltaTime);
 	
 private:
 	/**
