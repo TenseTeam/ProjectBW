@@ -10,24 +10,22 @@ struct FAutoSaveData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "VUNDK|Generic|Save System")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bInitPauseState;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "VUNDK|Generic|Save System", meta = (ClampMin = "30.0"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "30.0"))
 	float AutoSaveIntervalSeconds = 60.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "VUNDK|Generic|Save System", meta = (ClampMin = "1"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "1"))
 	int32 MaxAutoSaves = 3;
 
-	FAutoSaveData()
+	FAutoSaveData(): bInitPauseState(false),
+	                 AutoSaveIntervalSeconds(60.0f),
+	                 MaxAutoSaves(3)
 	{
-		bInitPauseState = false;
-		AutoSaveIntervalSeconds = 60.0f;
-		MaxAutoSaves = 3;
 	}
 
-	FAutoSaveData(const bool bInitPause, const float IntervalSeconds, const int32 MaxAutoSavesNumber)
+	FAutoSaveData(const bool bInitPause, const float IntervalSeconds, const int32 MaxAutoSavesNumber): bInitPauseState(bInitPause),
+	                                                                                                   AutoSaveIntervalSeconds(IntervalSeconds),
+	                                                                                                   MaxAutoSaves(MaxAutoSavesNumber)
 	{
-		bInitPauseState = bInitPause;
-		AutoSaveIntervalSeconds = IntervalSeconds;
-		MaxAutoSaves = MaxAutoSavesNumber;
 	}
 };

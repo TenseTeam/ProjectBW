@@ -20,6 +20,7 @@ void UBlueprintCameraModifier::Initialize()
 			return;
 		}
 	}
+	BeginPlay(Character);
 	
 	if (!IsValid(CustomPOV))
 	{
@@ -36,25 +37,20 @@ void UBlueprintCameraModifier::Initialize()
 	bInitialized = true;
 }
 
+void UBlueprintCameraModifier::BeginPlay_Implementation(ACharacter* Context)
+{
+}
+
 bool UBlueprintCameraModifier::ModifyCamera(float DeltaTime, struct FMinimalViewInfo& InOutPOV)
 {
 	if (!IsValid(CustomPOV))
 	{
 		return false;
 	}
-	
 	Super::ModifyCamera(DeltaTime, InOutPOV);
 	
-	if (ApplyModifier(Character))
-	{
-		ApplyCameraTransition(CustomPOV->POV, CustomPOVTransitionTime, InOutPOV, DeltaTime);
-		bExitTransitionCompleted = false;
-		return true;
-	}
-	if (!bExitTransitionCompleted)
-	{
-		bExitTransitionCompleted = ApplyCameraTransition(DefaultPov, CustomPOVTransitionTime, InOutPOV, DeltaTime);
-	}
+	ApplyCameraTransition(ApplyModifier(Character) ? CustomPOV->POV : DefaultPov, CustomPOVTransitionTime, InOutPOV, DeltaTime);
+	
 	return false;
 }
 

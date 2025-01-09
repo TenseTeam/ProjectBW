@@ -30,6 +30,14 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(
 	int32, OldSlotIndex
 );
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(
+	FOnEquipChanged
+);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(
+	FOnEquipmentCleared
+);
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class VUNDK_API UEquipment : public UActorComponent
 {
@@ -42,17 +50,19 @@ public:
 	FOnAnyItemUnequipped OnAnyItemUnequipped;
 	UPROPERTY(BlueprintAssignable)
 	FOnAnyItemEquipSlotChanged OnAnyItemEquipSlotChanged;
+	UPROPERTY(BlueprintAssignable)
+	FOnEquipChanged OnEquipChanged;
+	UPROPERTY(BlueprintAssignable)
+	FOnEquipmentCleared OnEquipmentCleared;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TMap<UEquipSlotKey*, int32> SlotLimits;
 
 private:
-	TMap<FName, TMap<int32, UItemBase*>> EquippedItems;
+	TMap<FName, TMap<int32, UItemBase*>> EquipSlots;
 
 public:
 	UEquipment();
-
-	void LoadEquippedItems(TArray<UItemBase*> InEquippedItems);
 	
 	virtual void BeginPlay() override;
 	
@@ -64,6 +74,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	TSet<UItemBase*> GetEquippedItems();
+
+	UFUNCTION(BlueprintCallable)
+	void ClearEquipment();
 
 protected:
 	virtual bool CanEquipItem(const UItemBase* Item, const UEquipSlotKey* TargetSlotKey, const int32 SlotIndex) const;
@@ -79,7 +92,9 @@ private:
 
 	void UnequipItem(UItemBase* Item, UEquipSlotKey* EquipSlotKey);
 	
-	void SetItemInEquipSlot(UItemBase* Item, const UEquipSlotKey* EquipSlotKey, int32 NewSlotIndex);
+	void AddItemInEquipSlot(UItemBase* Item, const UEquipSlotKey* EquipSlotKey, int32 NewSlotIndex);
+
+	void RemoveItemFromEquipSlot(UItemBase* Item, const UEquipSlotKey* EquipSlotKey, const int32 SlotIndex);
 
 	void ChangeItemEquipSlot(UItemBase* Item, UEquipSlotKey* EquipSlotKey, const int32 NewSlotIndex);
 	

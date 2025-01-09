@@ -15,6 +15,11 @@ void AGameplayController::BeginPlay()
 {
 	Super::BeginPlay();
 	BWCharacter = Cast<ABWCharacter>(GetCharacter());
+	if (!BWCharacter)
+	{
+		FGvDebug::Warning(GetName() + " Has Invalid Character, input will not work", true);
+		return;
+	}
 	AddMappingContext();
 	
 }
@@ -31,6 +36,11 @@ void AGameplayController::SetupInputComponent()
 		enhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this, &AGameplayController::StopRun);
 		enhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AGameplayController::Jump);
 		enhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &AGameplayController::Dodge);
+		enhancedInputComponent->BindAction(ThrowHookAction, ETriggerEvent::Triggered, this, &AGameplayController::ThrowHook);
+		enhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &AGameplayController::Shoot);
+		enhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Completed, this, &AGameplayController::StopShoot);
+		enhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &AGameplayController::Aim);
+		enhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &AGameplayController::StopAim);
 		EnhancedInputComponent = enhancedInputComponent;
 	}
 }
@@ -50,6 +60,8 @@ void AGameplayController::AddMappingContext() const
 	}
 }
 
+//Controller input functions
+
 void AGameplayController::Look(const FInputActionValue& Value)
 {
 	if (!BWCharacter->CanLook()) return;
@@ -62,7 +74,7 @@ void AGameplayController::Walk(const FInputActionValue& Value)
 {
 	MoveInputValue = Value.Get<FVector>();
 	if (!BWCharacter->CanMove()) return;
-	BWCharacter->HandleInput(EInputActionType::Walk, Value);
+	BWCharacter->HandleMotionInput(EInputActionType::Walk, Value);
 }
 
 void AGameplayController::StopWalk(const FInputActionValue& Value)
@@ -72,24 +84,55 @@ void AGameplayController::StopWalk(const FInputActionValue& Value)
 
 void AGameplayController::Run(const FInputActionValue& Value)
 {
+	BWCharacter->SetWantRunning(true);
 	if (!BWCharacter->CanRun()) return;
-	BWCharacter->HandleInput(EInputActionType::Run, Value);
+	BWCharacter->HandleMotionInput(EInputActionType::Run, Value);
 }
 
 void AGameplayController::StopRun(const FInputActionValue& Value)
 {
-	BWCharacter->SetIsRunning(false);
+	BWCharacter->SetWantRunning(false);
 }
 
 void AGameplayController::Jump(const FInputActionValue& Value)
 {
-	if (!BWCharacter->CanJump()) return;
-	BWCharacter->HandleInput(EInputActionType::Jump, Value);
+	//if (BWCharacter->JumpState != EJumpState::None) return;
+	BWCharacter->HandleMotionInput(EInputActionType::Jump, Value);
 }
 
 void AGameplayController::Dodge(const FInputActionValue& Value)
 {
 	if (!BWCharacter->CanDodge()) return;
-	BWCharacter->HandleInput(EInputActionType::Dodge, Value);
+	BWCharacter->HandleMotionInput(EInputActionType::Dodge, Value);
+}
+
+void AGameplayController::ThrowHook(const FInputActionValue& Value)
+{
+	if (!BWCharacter->CanHook()) return;
+	BWCharacter->HandleMotionInput(EInputActionType::Hook, Value);
+}
+
+void AGameplayController::Shoot(const FInputActionValue& Value)
+{
+	BWCharacter->SetWantShooting(true);
+	if (!BWCharacter->CanShoot()) return;
+	BWCharacter->HandleActionInput(EInputActionType::Shoot, Value);
+}
+
+void AGameplayController::StopShoot(const FInputActionValue& Value)
+{
+	BWCharacter->SetWantShooting(false);
+}
+
+void AGameplayController::Aim(const FInputActionValue& Value)
+{
+	BWCharacter->SetWantAiming(true);
+	if (!BWCharacter->CanShoot()) return;
+	BWCharacter->HandleActionInput(EInputActionType::Aim, Value);
+}
+
+void AGameplayController::StopAim(const FInputActionValue& Value)
+{
+	BWCharacter->SetWantAiming(false);
 }
 
