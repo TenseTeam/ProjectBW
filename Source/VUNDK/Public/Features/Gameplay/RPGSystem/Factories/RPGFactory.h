@@ -28,5 +28,5 @@ public:
 	static UItemStatOperation* CreateItemStatOperation(const TSubclassOf<UItemStatOperation> OperationClass, URPGItem* Item);
 
 	UFUNCTION(BlueprintCallable, Category = "VUNDK|Gameplay|RPGSystem")
-	static UStatOperation* CreateBridgeStatOperation(UStatsBridgeBase* Bridge, USpecialStatData* SpecialStatData);
+	static UStatOperation* CreateBridgeStatOperation(UStatsBridgeBase* Bridge, USpecialStatData* SpecialStatData, const TSubclassOf<UStatOperation>& OperationClass);
 };

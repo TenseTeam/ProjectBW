@@ -1,7 +1,6 @@
 // Copyright VUNDK, Inc. All Rights Reserved.
 
 #include "Features/Gameplay/InventorySystem/Factories/ISFactory.h"
-
 #include "Features/Gameplay/InventorySystem/Base/InventoryBase.h"
 #include "Features/Gameplay/InventorySystem/Base/ItemBase.h"
 #include "Features/Gameplay/InventorySystem/Base/Data/ItemDataBase.h"
@@ -60,7 +59,7 @@ AItemDropActor* UISFactory::CreateItemDropActor(UItemBase* Item, const APlayerCo
 		return nullptr;
 	}
 	
-	AItemDropActor* ItemDropActor = Cast<AItemDropActor>(PlayerController->GetWorld()->SpawnActor(Item->GetItemDropActorClass()));
+	AItemDropActor* ItemDropActor = Cast<AItemDropActor>(PlayerController->GetWorld()->SpawnActor(Item->GetItemData()->ItemDropActorClass));
 	ItemDropActor->Init(Item);
 	return ItemDropActor;
 }

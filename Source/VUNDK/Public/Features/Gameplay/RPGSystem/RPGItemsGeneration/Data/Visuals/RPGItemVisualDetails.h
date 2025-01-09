@@ -18,14 +18,14 @@ struct FRPGItemVisualDetails
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText Description;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<AItemDropActor> DropActorClass;
+	UStaticMesh* ItemMesh;
 
 	bool operator==(const FRPGItemVisualDetails& Other) const
 	{
 		return Name.EqualTo(Other.Name) &&
 			   Icon.GetResourceObject() == Other.Icon.GetResourceObject() &&
 			   Description.EqualTo(Other.Description) &&
-			   DropActorClass == Other.DropActorClass;
+			   ItemMesh == Other.ItemMesh;
 	}
 };
 

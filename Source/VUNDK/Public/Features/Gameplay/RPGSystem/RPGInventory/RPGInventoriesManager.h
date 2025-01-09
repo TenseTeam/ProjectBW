@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Features/Gameplay/InventorySystem/TetrisInventory/TetrisInventoriesManager.h"
 #include "Features/Gameplay/RPGSystem/RPGItemsGeneration/Data/ItemsStatsData.h"
-#include "Features/Gameplay/RPGSystem/StatsSystem/Data/BaseStatData.h"
+#include "Features/Gameplay/RPGSystem/StatsSystem/Data/CoreStatData.h"
 #include "Features/Gameplay/RPGSystem/RPGItemsGeneration/Data/Rarities/RPGItemsRaritiesData.h"
 #include "RPGInventoriesManager.generated.h"
 
@@ -28,5 +28,5 @@ public:
 	URPGRarityLevelData* GetRarityByID(const FName RarityID) const;
 
 	UFUNCTION(BlueprintPure)
-	UBaseStatData* GetStatByID(const FName StatID) const;
+	UCoreStatData* GetStatByID(const FName StatID) const;
 };

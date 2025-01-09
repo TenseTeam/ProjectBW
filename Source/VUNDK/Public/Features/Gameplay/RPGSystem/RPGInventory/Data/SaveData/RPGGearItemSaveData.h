@@ -14,11 +14,9 @@ struct FRPGGearItemSaveData
 	UPROPERTY(BlueprintReadWrite)
 	FRPGItemSaveData RPGItemSaveData;
 	UPROPERTY(BlueprintReadWrite)
-	TMap<FName, int32> GearBonusStats;
+	TMap<FName, int32> GearStats;
 
-	FRPGGearItemSaveData()
+	FRPGGearItemSaveData(): RPGItemSaveData()
 	{
-		RPGItemSaveData = FRPGItemSaveData();
-		GearBonusStats = TMap<FName, int32>();
 	}
 };

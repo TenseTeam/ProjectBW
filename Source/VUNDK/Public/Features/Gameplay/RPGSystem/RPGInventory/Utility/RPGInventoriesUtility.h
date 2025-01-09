@@ -15,7 +15,7 @@ class VUNDK_API URPGInventoriesUtility : public UBlueprintFunctionLibrary
 
 public:
 	UFUNCTION(BlueprintPure, Category = "VUNDK|Gameplay|RPGSystem")
-	static UBaseStatData* GetStatByID(const FName StatID);
+	static UCoreStatData* GetStatByID(const FName StatID);
 	
 	UFUNCTION(BlueprintPure, Category = "VUNDK|Gameplay|RPGSystem")
 	static URPGRarityLevelData* GetRarityByID(const FName RarityID);

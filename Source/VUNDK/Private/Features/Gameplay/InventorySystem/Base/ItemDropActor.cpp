@@ -5,11 +5,14 @@
 AItemDropActor::AItemDropActor(): RelatedItem(nullptr)
 {
 	PrimaryActorTick.bCanEverTick = true;
+	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 }
 
 void AItemDropActor::Init(class UItemBase* Item)
 {
 	RelatedItem = Item;
+	Mesh->SetStaticMesh(Item->GetItemMesh());
+	Mesh->SetCollisionProfileName("OverlapAll");
 }
 
 bool AItemDropActor::Check() const

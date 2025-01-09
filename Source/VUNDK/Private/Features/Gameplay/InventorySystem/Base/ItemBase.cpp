@@ -171,9 +171,9 @@ FText UItemBase::GetItemDescription() const
 	return ItemData->ItemDescription;
 }
 
-TSubclassOf<AItemDropActor> UItemBase::GetItemDropActorClass() const
+UStaticMesh* UItemBase::GetItemMesh() const
 {
-	return ItemData->ItemDropClass;
+	return ItemData->ItemMesh;
 }
 
 int32 UItemBase::GetEquipSlotIndex() const
@@ -349,5 +349,5 @@ APlayerState* UItemBase::GetPlayerState(const int PlayerStateIndex) const
 
 bool UItemBase::CanDrop() const
 {
-	return ItemData->ItemDropClass != nullptr;
+	return ItemData->ItemDropActorClass != nullptr;
 }
