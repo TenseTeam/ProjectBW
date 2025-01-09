@@ -3,6 +3,8 @@
 
 #include "AI/NPC/BWNPCBaseEnemy/BWNPCBaseEnemy.h"
 
+#include "Kismet/GameplayStatics.h"
+
 
 // Sets default values
 ABWNPCBaseEnemy::ABWNPCBaseEnemy()
@@ -13,7 +15,7 @@ ABWNPCBaseEnemy::ABWNPCBaseEnemy()
 void ABWNPCBaseEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 

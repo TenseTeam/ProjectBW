@@ -16,6 +16,7 @@ void ABWNPCbaseEnemyController::BeginPlay()
 {
 	BWControlledPawn = Cast<ABWNPCBaseEnemy>(GetControlledPawn());
 	Super::BeginPlay();
+	
 }
 
 void ABWNPCbaseEnemyController::OnPossess(APawn* InPawn)
@@ -50,7 +51,7 @@ void ABWNPCbaseEnemyController::SetStateAsPassive()
 		LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)EEnemyState::Passive).ToString(),true);
 	}
 
-	if (ControlledPawn)
+	if (BWControlledPawn)
 	{
 		BWControlledPawn->SetEnemyState(EEnemyState::Passive);
 	}
@@ -66,7 +67,7 @@ void ABWNPCbaseEnemyController::SetStateAsPatrolling()
 		LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)EEnemyState::Patrolling).ToString(),true);
 	}
 
-	if (ControlledPawn)
+	if (BWControlledPawn)
 	{
 		BWControlledPawn->SetEnemyState(EEnemyState::Patrolling);
 	}
@@ -79,13 +80,13 @@ void ABWNPCbaseEnemyController::SetStateAsAttacking(AActor* Actor)
 	{
 		BlackboardComp->SetValueAsEnum(TEXT("EnemyState"), uint8(EEnemyState::Attacking));
 		BlackboardComp->SetValueAsObject(TEXT("AttackTarget"),Actor);
-
 		LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)EEnemyState::Attacking).ToString(),true);
 	}
 
-	if (ControlledPawn)
+	if (BWControlledPawn)
 	{
 		BWControlledPawn->SetEnemyState(EEnemyState::Attacking);
+		BWControlledPawn->AttackTarget = Actor;
 	}
 }
 
@@ -97,7 +98,7 @@ void ABWNPCbaseEnemyController::SetStateAsInvestigating()
 		BlackboardComp->SetValueAsEnum(TEXT("EnemyState"), uint8(EEnemyState::Investigating));
 	}
 
-	if (ControlledPawn)
+	if (BWControlledPawn)
 	{
 		BWControlledPawn->SetEnemyState(EEnemyState::Investigating);
 	}
@@ -110,7 +111,6 @@ void ABWNPCbaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 	if (Stimulus.WasSuccessfullySensed())
 	{
 		if (Stimulus.Type != UAISense::GetSenseID<UAISense_Sight>())return;
-		if (BWControlledPawn->GetState() == EEnemyState::Attacking)return;
 
 		if (Actor->Implements<UAITargetInterface>())
 		{
@@ -169,13 +169,18 @@ void ABWNPCbaseEnemyController::HandleHear(AActor* Actor, FAIStimulus Stimulus)
 void ABWNPCbaseEnemyController::HandleDamage(AActor* Actor, FAIStimulus Stimulus)
 {
 	Super::HandleDamage(Actor, Stimulus);
+	if (Stimulus.WasSuccessfullySensed())
+	{
+		if (Stimulus.Type != UAISense::GetSenseID<UAISense_Damage>())return;
+		if (BWControlledPawn->GetState() == EEnemyState::Attacking)return;
+		SetStateAsAttacking(Actor);
+	}
 }
 
 
 void ABWNPCbaseEnemyController::OnLostSight()
 {
 	Super::OnLostSight();
-	
 	SetStateAsPatrolling();
 	LGDebug::Log("LOST SIGHT PLAYER", true);
 }

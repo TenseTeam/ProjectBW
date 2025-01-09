@@ -42,6 +42,8 @@ void UBTService_StopAttackingTarget::OnBecomeRelevant(UBehaviorTreeComponent& Ow
 		CachedHealthComponent = CachedPlayerActor->FindComponentByClass<UHealthBaseComponent>();
 		LGDebug::Log("Player and HealthComponent cached", true);
 	}
+
+	
 }
 
 void UBTService_StopAttackingTarget::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
@@ -64,15 +66,9 @@ void UBTService_StopAttackingTarget::TickNode(UBehaviorTreeComponent& OwnerComp,
 			ABWNPCbaseEnemyController* BWNPCbaseEnemyController = Cast<ABWNPCbaseEnemyController>(AIController);
 			if (BWNPCbaseEnemyController)
 			{
-				BWNPCbaseEnemyController->SetStateAsPatrolling();
+				BWNPCbaseEnemyController->SetStateAsPassive();
 			}
 
-			if (AIController)
-			{
-				AIController->StopMovement();
-				AIController->ClearFocus(EAIFocusPriority::Gameplay);
-			}
-			
 			CachedPlayerActor = nullptr;
 			CachedHealthComponent = nullptr;
 		}

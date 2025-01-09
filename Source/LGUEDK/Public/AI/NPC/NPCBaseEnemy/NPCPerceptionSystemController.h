@@ -86,8 +86,6 @@ protected:
 	virtual void OnLostHear() {};
 	UFUNCTION()
 	virtual void OnLostDamage() {};
-	
-private:
 
 	UPROPERTY()
 	UAIPerceptionComponent* AIPerceptionComponent;

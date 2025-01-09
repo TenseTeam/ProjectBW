@@ -20,6 +20,9 @@ public:
 	float GetTimeBeforeInvestigating() const { return TimeBeforeInvestigating; }
 	float GetRandomInvestigatingTimeDeviation() const { return RandomInvestigatingTimeDeviation; }
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Target")
+	AActor* AttackTarget;
+	
 protected:
 	
 	virtual void BeginPlay() override;
@@ -35,5 +38,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Investigating", meta = (ClampMin = "0", ClampMax = "10", UIMin = "0", UIMax = "10"))
 	float RandomInvestigatingTimeDeviation = 2.f;
+
+	
 	
 };
