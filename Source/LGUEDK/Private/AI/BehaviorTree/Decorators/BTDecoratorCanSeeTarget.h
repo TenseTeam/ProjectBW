@@ -19,11 +19,9 @@ protected:
 	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
 
 private:
-	/** Draw debug line trace (can be enabled for debugging purposes) */
 	UPROPERTY(EditAnywhere, Category = "Raycast")
 	bool bDebugLineTrace = false;
-
-	/** Trace channel to use for the line trace */
+	
 	UPROPERTY(EditAnywhere, Category = "Raycast")
 	TEnumAsByte<ECollisionChannel> TraceChannel = ECC_Visibility;
 };

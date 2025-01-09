@@ -16,15 +16,7 @@ class LGUEDK_API ANPCBaseEnemyController : public ANPCPerceptionSystemController
 public:
 	
 	ANPCBaseEnemyController();
-
-protected:
-	
-	virtual void BeginPlay() override;
-
-	virtual void OnPossess(APawn* InPawn) override { Super::OnPossess(InPawn); };
-	
-	virtual void InitializeBlackboardValues() override { Super::InitializeBlackboardValues(); };
-	
+		
 	UFUNCTION()
 	virtual void SetStateAsPassive() {};
 	
@@ -36,6 +28,14 @@ protected:
 
 	UFUNCTION()
 	virtual void SetStateAsInvestigating() {};
+
+protected:
+	
+	virtual void BeginPlay() override;
+
+	virtual void OnPossess(APawn* InPawn) override { Super::OnPossess(InPawn); };
+	
+	virtual void InitializeBlackboardValues() override { Super::InitializeBlackboardValues(); };
 	
 	virtual void HandleSight(AActor* Actor, FAIStimulus Stimulus) override { Super::HandleSight(Actor, Stimulus); };
 	virtual void HandleHear(AActor* Actor, FAIStimulus Stimulus) override { Super::HandleHear(Actor, Stimulus); };

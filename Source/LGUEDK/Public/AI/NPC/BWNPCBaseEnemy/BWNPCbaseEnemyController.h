@@ -17,14 +17,6 @@ class LGUEDK_API ABWNPCbaseEnemyController : public ANPCBaseEnemyController
 public:
 
 	ABWNPCbaseEnemyController();
-
-protected:
-
-	virtual void BeginPlay() override;
-
-	virtual void OnPossess(APawn* InPawn) override ;
-	
-	virtual void InitializeBlackboardValues() override;
 	
 	virtual void SetStateAsPassive() override;
 	
@@ -33,7 +25,15 @@ protected:
 	virtual void SetStateAsAttacking(AActor* Actor) override;
 	
 	virtual void SetStateAsInvestigating() override;
+	
+protected:
 
+	virtual void BeginPlay() override;
+
+	virtual void OnPossess(APawn* InPawn) override ;
+	
+	virtual void InitializeBlackboardValues() override;
+	
 	virtual void HandleSight(AActor* Actor, FAIStimulus Stimulus) override ;
 	virtual void HandleHear(AActor* Actor, FAIStimulus Stimulus) override ;
 	virtual void HandleDamage(AActor* Actor, FAIStimulus Stimulus) override ;
