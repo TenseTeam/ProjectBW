@@ -31,11 +31,17 @@ public:
 	TSubclassOf<UStatOperation> StatBaseValueOperationClass;
 
 public:
-	USpecialStatData(): StatID(FGuid::NewGuid().ToString()),
+	USpecialStatData(): StatID("NotGeneratedID"),
 	                    StatCodeName("AAA"),
 	                    StatColor(),
 	                    StatIcon(nullptr),
 	                    StatDefaultValue(10)
 	{
+	}
+
+	FORCEINLINE virtual void PostInitProperties() override
+	{
+		Super::PostInitProperties();
+		StatID = FName(FGuid::NewGuid().ToString());
 	}
 };

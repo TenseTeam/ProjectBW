@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Features/Gameplay/InventorySystem/Base/ItemDropActor.h"
 #include "RPGItemVisualDetails.generated.h"
 
 USTRUCT(BlueprintType)
@@ -16,12 +17,15 @@ struct FRPGItemVisualDetails
 	FSlateBrush Icon;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText Description;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<AItemDropActor> DropActorClass;
 
 	bool operator==(const FRPGItemVisualDetails& Other) const
 	{
 		return Name.EqualTo(Other.Name) &&
 			   Icon.GetResourceObject() == Other.Icon.GetResourceObject() &&
-			   Description.EqualTo(Other.Description);
+			   Description.EqualTo(Other.Description) &&
+			   DropActorClass == Other.DropActorClass;
 	}
 };
 

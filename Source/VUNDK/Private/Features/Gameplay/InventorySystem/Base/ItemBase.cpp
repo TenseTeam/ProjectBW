@@ -9,6 +9,7 @@
 
 UItemBase::UItemBase(): RelatedInventory(nullptr),
                         ItemData(nullptr),
+                        RelatedEquipment(nullptr),
                         EquipSlotIndex(-1),
                         CurrentQuantity(1)
 {
@@ -22,10 +23,28 @@ FItemSaveData UItemBase::CreateItemBaseSaveData() const
 	return ItemSaveData;
 }
 
-void UItemBase::LoadItemBaseSaveData(const FItemSaveData ItemSaveData)
+void UItemBase::LoadItemBaseSaveData(UInventoryBase* LoadingInventory, const FItemSaveData ItemSaveData, bool& bOutHasBeenEquipped)
 {
+	bOutHasBeenEquipped = false;
 	EquipSlotIndex = ItemSaveData.EquipSlotIndex;
 	CurrentQuantity = ItemSaveData.Quantity;
+
+	if (EquipSlotIndex == -1)
+	{
+		if (!LoadingInventory->TryAddItem(this))
+			UE_LOG(LogInventorySystem, Error, TEXT("ItemBase::LoadItemBaseSaveData, Item %s couldn't be added to the inventory %s."), *ItemData->ItemTypeID, *LoadingInventory->GetName());
+		
+		return;
+	}
+	
+	if (!LoadingInventory->GetEquipment()->TryEquipItem(this, ItemData->EquipSlotKey, EquipSlotIndex))
+	{
+		UE_LOG(LogInventorySystem, Error, TEXT("ItemBase::LoadItemBaseSaveData, Item %s couldn't be equipped to the equipment %s."), *ItemData->ItemTypeID, *LoadingInventory->GetEquipment()->GetName());
+		ClearEquipSlot();
+		return;
+	}
+
+	bOutHasBeenEquipped = true;
 }
 
 void UItemBase::Init(UItemDataBase* Data)
@@ -72,16 +91,23 @@ bool UItemBase::IsEquipped() const
 	return IsValid(RelatedEquipment) && EquipSlotIndex > -1;
 }
 
-void UItemBase::Drop(const APlayerController* PlayerController, const FVector Location, const FRotator Rotation)
+bool UItemBase::TryDrop(APlayerController* PlayerController, const FVector Location, const FRotator Rotation)
 {
-	if (!CanDrop()) return;
+	if (!CanDrop())
+		return false;
+	
+	if (!IsValid(PlayerController))
+	{
+		UE_LOG(LogInventorySystem, Error, TEXT("ItemBase::Drop(), PlayerController is nullptr."));
+		return false;
+	}
 	
 	AItemDropActor* ItemDropActor = UISFactory::CreateItemDropActor(this, PlayerController);
 	
 	if (ItemDropActor == nullptr)
 	{
 		UE_LOG(LogInventorySystem, Error, TEXT("ItemBase::Drop(), ItemDropActor is nullptr."));
-		return;
+		return false;
 	}
 
 	ItemDropActor->SetActorLocationAndRotation(Location, Rotation);
@@ -89,6 +115,8 @@ void UItemBase::Drop(const APlayerController* PlayerController, const FVector Lo
 
 	if (IsEquipped())
 		RelatedEquipment->TryUnequipItem(this);
+	
+	return true;
 }
 
 void UItemBase::Remove()
@@ -141,6 +169,11 @@ FSlateBrush UItemBase::GetItemIcon() const
 FText UItemBase::GetItemDescription() const
 {
 	return ItemData->ItemDescription;
+}
+
+TSubclassOf<AItemDropActor> UItemBase::GetItemDropActorClass() const
+{
+	return ItemData->ItemDropClass;
 }
 
 int32 UItemBase::GetEquipSlotIndex() const

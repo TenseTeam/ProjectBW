@@ -31,7 +31,7 @@ UItemDataBase* UInventoriesManager::GetItemDataFromRegistry(const FName& ItemDat
 			continue;
 		}
 
-		if (ItemData->GetItemDataID() == ItemDataID)
+		if (ItemData->ItemDataID == ItemDataID)
 			return ItemData;
 	}
 

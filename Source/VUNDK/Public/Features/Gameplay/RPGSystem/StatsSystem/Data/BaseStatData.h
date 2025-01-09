@@ -30,11 +30,17 @@ public:
 	int32 StatMaxValue;
 
 public:
-	UBaseStatData(): StatID(FGuid::NewGuid().ToString()),
+	UBaseStatData(): StatID(FName("NotGeneratedID")),
 	                 StatCodeName("AAA"),
 	                 bIsUncapped(false),
 	                 StatMinValue(0),
 	                 StatMaxValue(1)
 	{
+	}
+
+	FORCEINLINE virtual void PostInitProperties() override
+	{
+		Super::PostInitProperties();
+		StatID = FName(FGuid::NewGuid().ToString());
 	}
 };

@@ -12,9 +12,10 @@ FClassicItemSaveData UClassicItem::CreateClassicItemSaveData() const
 	return ClassicItemSaveData;
 }
 
-void UClassicItem::LoadClassicItemSaveData(const FClassicItemSaveData ItemSaveData)
+void UClassicItem::LoadClassicItemSaveData(UInventoryBase* LoadingInventory, const FClassicItemSaveData ItemSaveData)
 {
-	LoadItemBaseSaveData(ItemSaveData.ItemSaveData);
+	bool bHasBeenEquipped;
+	LoadItemBaseSaveData(LoadingInventory, ItemSaveData.ItemSaveData, bHasBeenEquipped);
 }
 
 UClassicItemData* UClassicItem::GetClassicItemData() const

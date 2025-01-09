@@ -24,12 +24,17 @@ public:
 	int32 RarityValue;
 
 public:
-	URPGRarityLevelData()
+	URPGRarityLevelData() : RarityID(FName("NotGeneratedID")),
+	                        RarityName(FText::GetEmpty()),
+	                        RarityColor(FLinearColor::White),
+	                        Probability(0.0f),
+	                        RarityValue(0)
 	{
+	}
+	
+	FORCEINLINE virtual void PostInitProperties() override
+	{
+		Super::PostInitProperties();
 		RarityID = FName(FGuid::NewGuid().ToString());
-		RarityName = FText::GetEmpty();
-		RarityColor = FLinearColor::White;
-		Probability = 0.0f;
-		RarityValue = 0;
 	}
 };

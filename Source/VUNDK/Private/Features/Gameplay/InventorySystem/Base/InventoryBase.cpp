@@ -90,24 +90,25 @@ UItemBase* UInventoryBase::AddNewItem(UItemDataBase* ItemData, int32& OutOverflo
 	return NewItem;
 }
 
-void UInventoryBase::AddItem(UItemBase* Item)
+bool UInventoryBase::TryAddItem(UItemBase* Item)
 {
 	if (!IsValid(Item))
 	{
 		UE_LOG(LogInventorySystem, Error, TEXT("AddItem(), Cannot add Item, Item is null."));
-		return;
+		return false;
 	}
 
 	const UItemDataBase* ItemData = Item->GetItemData();
 
 	if (TryIncreaseAvailableStackForItem(Item))
-		return;
+		return true;
 
 	if (!CanContainItem(ItemData))
-		return;
+		return false;
 
 	AddItemToList(Item);
 	OnItemAdded(Item);
+	return true;
 }
 
 bool UInventoryBase::RemoveItemByDataID(UItemDataBase* ItemData)
@@ -174,7 +175,7 @@ UItemBase* UInventoryBase::Find(const UItemDataBase* ItemData) const
 {
 	for (UItemBase* Item : Items)
 	{
-		if (Item->GetItemData()->GetItemDataID() == ItemData->GetItemDataID())
+		if (Item->GetItemData()->ItemDataID == ItemData->ItemDataID)
 			return Item;
 	}
 
@@ -243,7 +244,7 @@ bool UInventoryBase::HasItemOfDataID(const UItemDataBase* ItemData) const
 {
 	for (const UItemBase* Item : Items)
 	{
-		if (Item->GetItemData()->GetItemDataID() == ItemData->GetItemDataID())
+		if (Item->GetItemData()->ItemDataID == ItemData->ItemDataID)
 			return true;
 	}
 
@@ -262,7 +263,7 @@ bool UInventoryBase::HasEnoughQuantity(const UItemDataBase* ItemData, const int3
 
 	for (const UItemBase* Item : Items)
 	{
-		if (Item->GetItemData()->GetItemDataID() == ItemData->GetItemDataID())
+		if (Item->GetItemData()->ItemDataID == ItemData->ItemDataID)
 			FoundQuantity += Item->GetCurrentQuantity();
 	}
 
@@ -369,7 +370,7 @@ UItemBase* UInventoryBase::FindAvailableStackForNewItem(const UItemDataBase* Ite
 {
 	for (UItemBase* Item : Items)
 	{
-		if (Item->GetItemData()->GetItemDataID() == ItemData->GetItemDataID() && Item->CanStack())
+		if (Item->GetItemData()->ItemDataID == ItemData->ItemDataID && Item->CanStack())
 			return Item;
 	}
 

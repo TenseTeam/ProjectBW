@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "RPGItemBaseGenerationData.h"
 #include "Features/Gameplay/RPGSystem/StatsSystem/Data/BaseStatData.h"
+#include "Features/Gameplay/RPGSystem/RPGItemsGeneration/ItemStatOperation.h"
 #include "RPGGearItemGenerationData.generated.h"
 
 UCLASS()

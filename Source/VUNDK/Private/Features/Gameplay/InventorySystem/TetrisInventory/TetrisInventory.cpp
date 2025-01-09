@@ -21,7 +21,7 @@ USaveData* UTetrisInventory::CreateSaveData()
 		const UTetrisItem* TetrisItem = Cast<UTetrisItem>(Item);
 		FTetrisItemSaveData ItemSaveData = TetrisItem->CreateTetrisSaveData();
 
-		FName ItemID = Item->GetItemData()->GetItemDataID();
+		FName ItemID = Item->GetItemData()->ItemDataID;
 
 		if (!TetrisInventorySaveData->TetrisItems.Contains(ItemID))
 			TetrisInventorySaveData->TetrisItems.Add(ItemID, FTetrisItemsSaveArray());
@@ -38,16 +38,14 @@ void UTetrisInventory::LoadInventorySaveData_Implementation(UInventoryBaseSaveDa
 
 	for (const TPair<FName, FTetrisItemsSaveArray>& LoadedItem : TetrisInventorySaveData->TetrisItems)
 	{
-		const FName ItemID = LoadedItem.Key;
-		FTetrisItemsSaveArray ItemsArr = LoadedItem.Value;
+		auto [ItemID, ItemsSaveArray] = LoadedItem;
 
 		if (UItemDataBase* ItemData = GetItemDataFromRegistry(ItemID))
 		{
-			for (FTetrisItemSaveData& ItemSaveData : ItemsArr.Items)
+			for (FTetrisItemSaveData& ItemSaveData : ItemsSaveArray.Items)
 			{
 				UTetrisItem* CreatedItem = Cast<UTetrisItem>(UISFactory::CreateItem(ItemData));
-				CreatedItem->LoadTetrisSaveData(ItemSaveData, this);
-				AddLoadedTetrisItem(ItemData, ItemSaveData, CreatedItem);
+				CreatedItem->LoadTetrisSaveData(this, ItemSaveData);
 			}
 		}
 		else
@@ -164,14 +162,6 @@ void UTetrisInventory::BeginPlay()
 {
 	Super::BeginPlay();
 	ConstructGrid();
-}
-
-void UTetrisInventory::AddLoadedTetrisItem(UItemDataBase* ItemData, FTetrisItemSaveData& ItemSaveData, UTetrisItem* CreatedItem)
-{
-	if (CreatedItem->IsEquipped())
-		GetEquipment()->TryEquipItem(CreatedItem, ItemData->EquipSlotKey, CreatedItem->GetEquipSlotIndex());
-	else
-		TryAddItemAtSlots(CreatedItem, ItemSaveData.SlotPosition);
 }
 
 void UTetrisInventory::OnItemAdded_Implementation(UItemBase* Item)

@@ -10,6 +10,7 @@
 class UClassicInventory;
 class UItemDataBase;
 class UEquipment;
+class AItemDropActor;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
 	FOnItemAdded,
@@ -92,7 +93,7 @@ public:
 
 	FItemSaveData CreateItemBaseSaveData() const;
 
-	void LoadItemBaseSaveData(const FItemSaveData ItemSaveData);
+	void LoadItemBaseSaveData(UInventoryBase* LoadingInventory, const FItemSaveData ItemSaveData, bool& bOutHasBeenEquipped);
 
 	virtual void Init(UItemDataBase* Data);
 
@@ -111,7 +112,7 @@ public:
 	bool IsEquipped() const;
 
 	UFUNCTION(BlueprintCallable)
-	void Drop(const APlayerController* PlayerController, FVector Location, FRotator Rotation);
+	bool TryDrop(APlayerController* PlayerController, FVector Location, FRotator Rotation);
 	
 	UFUNCTION(BlueprintCallable)
 	void Remove();
@@ -130,6 +131,9 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	virtual FText GetItemDescription() const;
+
+	UFUNCTION(BlueprintPure)
+	virtual TSubclassOf<AItemDropActor> GetItemDropActorClass() const;
 	
 	int32 GetEquipSlotIndex() const;
 

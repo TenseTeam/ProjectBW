@@ -60,7 +60,7 @@ AItemDropActor* UISFactory::CreateItemDropActor(UItemBase* Item, const APlayerCo
 		return nullptr;
 	}
 	
-	AItemDropActor* ItemDropActor = Cast<AItemDropActor>(PlayerController->GetWorld()->SpawnActor(Item->GetItemData()->ItemDropClass));
+	AItemDropActor* ItemDropActor = Cast<AItemDropActor>(PlayerController->GetWorld()->SpawnActor(Item->GetItemDropActorClass()));
 	ItemDropActor->Init(Item);
 	return ItemDropActor;
 }

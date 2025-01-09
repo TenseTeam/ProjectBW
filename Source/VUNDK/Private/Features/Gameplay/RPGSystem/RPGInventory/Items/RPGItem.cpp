@@ -48,11 +48,11 @@ FRPGItemSaveData URPGItem::CreateRPGItemSaveData() const
 	return RPGItemSaveData;
 }
 
-void URPGItem::LoadRPGItemSaveData(const FRPGItemSaveData& RPGItemSaveData, URPGInventory* Inventory)
+void URPGItem::LoadRPGItemSaveData(URPGInventory* LoadingInventory, const FRPGItemSaveData& RPGItemSaveData)
 {
 	VisualDetails = RPGItemSaveData.VisualDetails;
 	RarityLevel = URPGInventoriesUtility::GetRarityByID(RPGItemSaveData.RarityID);
-	LoadTetrisSaveData(RPGItemSaveData.TetrisItemSaveData, Inventory); // Call this after setting VisualDetails so that the item's icon is set correctly
+	LoadTetrisSaveData(LoadingInventory, RPGItemSaveData.TetrisItemSaveData); // Call this after setting VisualDetails so that the item's icon is set correctly
 }
 
 FText URPGItem::GetItemFullName() const
@@ -73,6 +73,11 @@ FSlateBrush URPGItem::GetItemIcon() const
 FText URPGItem::GetItemDescription() const
 {
 	return VisualDetails.Description.IsEmpty() ? Super::GetItemDescription() : VisualDetails.Description;
+}
+
+TSubclassOf<AItemDropActor> URPGItem::GetItemDropActorClass() const
+{
+	return VisualDetails.DropActorClass != nullptr ? VisualDetails.DropActorClass : Super::GetItemDropActorClass();
 }
 
 URPGItemData* URPGItem::GetRPGItemData() const

@@ -2,7 +2,7 @@
 
 #include "Features/Gameplay/InventorySystem/Base/ItemDropActor.h"
 
-AItemDropActor::AItemDropActor()
+AItemDropActor::AItemDropActor(): RelatedItem(nullptr)
 {
 	PrimaryActorTick.bCanEverTick = true;
 }

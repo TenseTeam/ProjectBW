@@ -3,8 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EnhancedInputSubsystemInterface.h"
-#include "EnhancedInputSubsystems.h"
 #include "Components/ActorComponent.h"
 #include "Widgets/MenuWidget.h"
 #include "MenuManager.generated.h"
@@ -15,19 +13,13 @@ class VUNDK_API UMenuManager : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
+	bool bSwitchMappingContexts = true;
+	
+private:
+	UPROPERTY()
 	UMenuWidget* CurrentOpenMenu;
-
-protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	UInputMappingContext* GameplayContext;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	UInputMappingContext* MenuContext;
-	UPROPERTY()
-	APlayerController* PlayerController;
-	UPROPERTY()
-	UEnhancedInputLocalPlayerSubsystem* EnhancedInputSubsystem;
-
+	
 public:
 	UFUNCTION(BlueprintCallable)
 	void OpenMenu(UMenuWidget* Menu);
@@ -40,14 +32,4 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	UMenuWidget* GetCurrentOpenMenu() const;
-
-protected:
-	virtual void BeginPlay() override;
-
-private:
-	void SetGameplayMappingContext() const;
-
-	void SetMenuMappingContext() const;
-	
-	bool Check() const;
 };
