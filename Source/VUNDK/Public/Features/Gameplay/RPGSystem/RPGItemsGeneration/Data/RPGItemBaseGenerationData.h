@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RPGItemVisualSetData.h"
+#include "Visuals/RPGItemVisualSetData.h"
 #include "Engine/DataAsset.h"
 #include "RPGItemBaseGenerationData.generated.h"
 

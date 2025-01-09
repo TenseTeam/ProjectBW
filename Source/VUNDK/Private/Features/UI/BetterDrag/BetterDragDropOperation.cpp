@@ -8,16 +8,16 @@
 #include "Features/UI/BetterDrag/BetterDragDropManager.h"
 #include "Kismet/GameplayStatics.h"
 
-UBetterDragDropOperation::UBetterDragDropOperation()
+UBetterDragDropOperation::UBetterDragDropOperation(): OwnerWidget(nullptr),
+                                                      DragVisual(nullptr),
+                                                      Payload(nullptr),
+                                                      PlayerController(nullptr),
+                                                      DropReceiver(nullptr),
+                                                      OwnerWidgetVisibility(ESlateVisibility::Hidden),
+                                                      CachedOwnerWidgetVisibility(ESlateVisibility::Hidden),
+                                                      DropKey(EKeys::LeftMouseButton),
+                                                      bIsDragging(false)
 {
-	bIsDragging = false;
-	OwnerWidget = nullptr;
-	DragVisual = nullptr;
-	DropReceiver = nullptr;
-	OwnerWidgetVisibility = ESlateVisibility::Hidden;
-	CachedOwnerWidgetVisibility = ESlateVisibility::Hidden;
-	DropKey = EKeys::LeftMouseButton;
-
 	AddToRoot();
 }
 
@@ -53,7 +53,7 @@ void UBetterDragDropOperation::LeaveReceiver()
 		OnDragLeave(DropReceiver);
 		IBetterDragDropReceiver::Execute_OnBetterDragLeave(DropReceiver, this, OwnerWidget, DragVisual, Payload);
 	}
-	
+
 	DropReceiver = nullptr;
 }
 
@@ -75,7 +75,7 @@ TStatId UBetterDragDropOperation::GetStatId() const
 void UBetterDragDropOperation::UpdateDrag_Implementation(const FVector2D Size)
 {
 	if (!Check()) return;
-	
+
 	FVector2D MousePosition = UWidgetLayoutLibrary::GetMousePositionOnViewport(PlayerController);
 	MousePosition -= Size * FVector2D(0.5f, 0.5f);
 	SetDragVisualPosition(MousePosition);
@@ -102,8 +102,9 @@ void UBetterDragDropOperation::OnDragLeave_Implementation(UUserWidget* LeftWidge
 {
 }
 
-void UBetterDragDropOperation::OnDragDrop_Implementation()
+bool UBetterDragDropOperation::OnDragDrop_Implementation()
 {
+	return true;
 }
 
 void UBetterDragDropOperation::OnDragCancelled_Implementation()
@@ -116,18 +117,18 @@ void UBetterDragDropOperation::BeginDrag()
 
 	int32 ZOrder = 100;
 	CachedSize = OwnerWidget->GetDesiredSize();
-	
+
 	PlayerController->InputComponent->BindKey(DropKey, IE_Released, this, &UBetterDragDropOperation::CheckEndDrag);
 
 	CachedOwnerWidgetVisibility = OwnerWidget->GetVisibility();
 	OwnerWidget->SetVisibility(OwnerWidgetVisibility);
-	
+
 	if (const UCanvasPanelSlot* Slot = UWidgetLayoutLibrary::SlotAsCanvasSlot(OwnerWidget))
 	{
 		CachedSize = Slot->GetSize();
 		ZOrder = Slot->GetZOrder() + 1;
 	}
-	
+
 	DragVisual->SetDesiredSizeInViewport(CachedSize);
 	DragVisual->SetVisibility(ESlateVisibility::HitTestInvisible);
 	DragVisual->AddToViewport(ZOrder);
@@ -138,17 +139,17 @@ void UBetterDragDropOperation::BeginDrag()
 void UBetterDragDropOperation::EndDrag()
 {
 	if (!Check()) return;
-	
+
 	if (IsValid(DropReceiver))
 	{
-		OnDragDrop();
-		IBetterDragDropReceiver::Execute_OnBetterDragDrop(DropReceiver, this, OwnerWidget, DragVisual, Payload);
+		if (OnDragDrop())
+			IBetterDragDropReceiver::Execute_OnBetterDragDrop(DropReceiver, this, OwnerWidget, DragVisual, Payload);
 	}
 	else
 	{
 		OnDragCancelled();
 	}
-	
+
 	OwnerWidget->SetVisibility(CachedOwnerWidgetVisibility);
 	DragVisual->RemoveFromParent();
 

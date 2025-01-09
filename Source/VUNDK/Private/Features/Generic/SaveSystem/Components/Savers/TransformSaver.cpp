@@ -27,7 +27,7 @@ FTransform UTransformSaver::GetOwnerTransform() const
 void UTransformSaver::BeginPlay()
 {
 	Super::BeginPlay();
-	SetActorLoadedTransform(USSUtility::GetSaveGame());
+	SetActorLoadedTransform(SaveManager->GetSaveGameInstance());
 }
 
 void UTransformSaver::SetActorLoadedTransform(UDefaultSaveGame* LoadedData) const

@@ -2,12 +2,6 @@
 
 #include "UGameFramework/VUNDKControllerBase.h"
 
-void AVUNDKControllerBase::Tick(float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-	OnTick.Broadcast(DeltaSeconds);
-}
-
 void AVUNDKControllerBase::SetupInputComponent()
 {
 	Super::SetupInputComponent();

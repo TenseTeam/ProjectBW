@@ -13,12 +13,13 @@ class VUNDK_API UTransformSaver : public USaver
 
 public:
 	UTransformSaver();
+	
 	virtual void OnPrepareSave_Implementation(UDefaultSaveGame* SaveGameData, USlotInfoItem* SlotInfoItem, UObject* Instigator) override;
 
 protected:
 	virtual void OnLoadCompletedEvent_Implementation(const FString& SlotName, const int32 UserIndex, UDefaultSaveGame* LoadedData, UObject* Instigator) override;
 
-	UFUNCTION(BlueprintCallable, Category = "VUNDK|Generic|Save System")
+	UFUNCTION(BlueprintCallable)
 	FTransform GetOwnerTransform() const;
 
 	virtual void BeginPlay() override;
