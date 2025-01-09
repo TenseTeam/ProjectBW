@@ -21,16 +21,19 @@ FRPGGearItemSaveData URPGGearItem::CreateRPGGearItemSaveData() const
 	return GearSaveData;
 }
 
-void URPGGearItem::LoadRPGGearItemSaveData(FRPGGearItemSaveData& GearSaveData, URPGInventory* Inventory)
+void URPGGearItem::LoadRPGGearItemSaveData(URPGInventory* LoadingInventory, FRPGGearItemSaveData& GearSaveData)
 {
 	FRPGItemSaveData ItemSaveData = GearSaveData.RPGItemSaveData;
-	LoadRPGItemSaveData(ItemSaveData, Inventory);
 
 	for (TMap<FName, int32> BonusStats = GearSaveData.GearBonusStats; const auto& Stats : BonusStats)
 	{
 		if (UBaseStatData* StatData = URPGInventoriesUtility::GetStatByID(Stats.Key); IsValid(StatData))
 			GearStats.Add(StatData, Stats.Value);
+		else
+			UE_LOG(LogTemp, Error, TEXT("Failed to load RPGGearItem bonus stat with ID: %s"), *Stats.Key.ToString());
 	}
+	
+	LoadRPGItemSaveData(LoadingInventory, ItemSaveData);
 }
 
 int32 URPGGearItem::GetItemStatValue(const UBaseStatData* Stat) const

@@ -92,7 +92,7 @@ void UStatsBridgeBase::ModifyFullStatValue(UBaseStatData* BaseStatData, const in
 {
 	if (!FullStatsValues.Contains(BaseStatData))
 		return;
-
+	
 	SetFullStatValue(BaseStatData, FullStatsValues[BaseStatData] + Value);
 }
 

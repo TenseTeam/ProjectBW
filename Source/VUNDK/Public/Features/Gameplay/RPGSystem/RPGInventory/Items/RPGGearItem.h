@@ -25,7 +25,7 @@ public:
 	
 	FRPGGearItemSaveData CreateRPGGearItemSaveData() const;
 	
-	void LoadRPGGearItemSaveData(FRPGGearItemSaveData& GearSaveData, URPGInventory* Inventory);
+	void LoadRPGGearItemSaveData(URPGInventory* LoadingInventory, FRPGGearItemSaveData& GearSaveData);
 
 	UFUNCTION(BlueprintPure)
 	int32 GetItemStatValue(const UBaseStatData* Stat) const;

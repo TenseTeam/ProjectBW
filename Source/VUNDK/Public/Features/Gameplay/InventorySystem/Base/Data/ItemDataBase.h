@@ -15,7 +15,9 @@ class VUNDK_API UItemDataBase : public UPrimaryDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, AdvancedDisplay)
+	FName ItemDataID;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, AdvancedDisplay)
 	FString ItemTypeID;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UItemBase> ItemClass;
@@ -39,7 +41,8 @@ public:
 	bool bConsumeUponUse;
 
 public:
-	UItemDataBase(): ItemTypeID(FGuid::NewGuid().ToString()),
+	UItemDataBase(): ItemDataID(FName("NotGeneratedID")),
+	                 ItemTypeID(FGuid::NewGuid().ToString()),
 	                 ItemClass(UItemBase::StaticClass()),
 	                 ItemDropClass(nullptr),
 	                 EquipSlotKey(nullptr),
@@ -50,10 +53,9 @@ public:
 	{
 	}
 
-	FORCEINLINE FName GetItemDataID() const
+	FORCEINLINE virtual void PostInitProperties() override
 	{
-		const FName ClassName = ItemClass ? FName(*ItemClass->GetName()) : NAME_None;
-		const int32 Hash = GetTypeHash(ItemTypeID + ItemName.ToString() + ClassName.ToString());
-		return FName(*FString::Printf(TEXT("ItemData_%d"), Hash));
+		Super::PostInitProperties();
+		ItemDataID = FName(FGuid::NewGuid().ToString());
 	}
 };

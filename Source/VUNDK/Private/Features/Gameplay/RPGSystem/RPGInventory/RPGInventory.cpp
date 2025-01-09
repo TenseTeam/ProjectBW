@@ -20,7 +20,7 @@ USaveData* URPGInventory::CreateSaveData()
 		if (Item->IsA(URPGGearItem::StaticClass()))
 		{
 			const URPGGearItem* GearItem = Cast<URPGGearItem>(Item);
-			FName ItemID = Item->GetItemData()->GetItemDataID();
+			FName ItemID = Item->GetItemData()->ItemDataID;
 
 			if (!SaveData->ItemsSaveData.GearItems.Contains(ItemID))
 				SaveData->ItemsSaveData.GearItems.Add(ItemID, FRPGGearItemsSaveArray());
@@ -31,7 +31,7 @@ USaveData* URPGInventory::CreateSaveData()
 		}
 
 		const URPGItem* RPGItem = Cast<URPGItem>(Item);
-		FName ItemID = Item->GetItemData()->GetItemDataID();
+		FName ItemID = Item->GetItemData()->ItemDataID;
 
 		if (!SaveData->ItemsSaveData.GenericItems.Contains(ItemID))
 			SaveData->ItemsSaveData.GenericItems.Add(ItemID, FRPGItemsSaveArray());
@@ -64,8 +64,7 @@ void URPGInventory::LoadInventorySaveData_Implementation(UInventoryBaseSaveData*
 			if (URPGItemData* RPGItemData = Cast<URPGItemData>(ItemData))
 			{
 				URPGItem* RPGItem = URPGFactory::CreateRPGItem(RPGItemData, nullptr, false);
-				RPGItem->LoadRPGItemSaveData(RPGItemSaveData, this);
-				AddLoadedTetrisItem(RPGItemData, RPGItemSaveData.TetrisItemSaveData, RPGItem);
+				RPGItem->LoadRPGItemSaveData(this, RPGItemSaveData);
 			}
 		}
 	}
@@ -87,8 +86,7 @@ void URPGInventory::LoadInventorySaveData_Implementation(UInventoryBaseSaveData*
 			if (URPGGearItemData* GearData = Cast<URPGGearItemData>(ItemData))
 			{
 				URPGGearItem* GearItem = URPGFactory::CreateRPGGearItem(GearData, nullptr, false);
-				GearItem->LoadRPGGearItemSaveData(GearItemSaveData, this);
-				AddLoadedTetrisItem(GearData, GearItemSaveData.RPGItemSaveData.TetrisItemSaveData, GearItem);
+				GearItem->LoadRPGGearItemSaveData(this, GearItemSaveData);
 			}
 		}
 	}

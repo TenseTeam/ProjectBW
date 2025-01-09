@@ -42,7 +42,7 @@ public:
 
 	FTetrisItemSaveData CreateTetrisSaveData() const;
 
-	void LoadTetrisSaveData(const FTetrisItemSaveData& TetrisSaveData, UTetrisInventory* Inventory);
+	void LoadTetrisSaveData(UInventoryBase* LoadingInventory, const FTetrisItemSaveData& TetrisSaveData);
 
 	UFUNCTION(BlueprintCallable)
 	void SetRotation(const bool bNewRotation);

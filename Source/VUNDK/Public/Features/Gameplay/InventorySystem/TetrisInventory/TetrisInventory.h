@@ -79,9 +79,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
-	virtual void AddLoadedTetrisItem(UItemDataBase* ItemData, FTetrisItemSaveData& ItemSaveData, UTetrisItem* CreatedItem);
-
+	
 	virtual void OnItemAdded_Implementation(UItemBase* Item) override;
 
 	virtual void OnItemRemoved_Implementation(UItemBase* Item) override;

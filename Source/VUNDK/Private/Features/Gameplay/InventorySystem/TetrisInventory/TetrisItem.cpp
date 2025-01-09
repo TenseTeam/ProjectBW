@@ -27,13 +27,17 @@ FTetrisItemSaveData UTetrisItem::CreateTetrisSaveData() const
 	return TetrisSaveData;
 }
 
-void UTetrisItem::LoadTetrisSaveData(const FTetrisItemSaveData& TetrisSaveData, UTetrisInventory* Inventory)
+void UTetrisItem::LoadTetrisSaveData(UInventoryBase* LoadingInventory, const FTetrisItemSaveData& TetrisSaveData)
 {
-	LoadItemBaseSaveData(TetrisSaveData.ItemSaveData);
-	UTetrisInventory* TetrisInventory = Cast<UTetrisInventory>(Inventory);
-	
-	if (TetrisSaveData.bIsRotated)
-		Rotate();
+	bool bHasBeenEquipped;
+	LoadItemBaseSaveData(LoadingInventory, TetrisSaveData.ItemSaveData, bHasBeenEquipped);
+	UTetrisInventory* TetrisInventory = Cast<UTetrisInventory>(LoadingInventory);
+
+	if (bHasBeenEquipped)
+		return;
+
+	SetRotation(TetrisSaveData.bIsRotated);
+	TetrisInventory->TryMoveItem(this, TetrisSaveData.SlotPosition); // Since the item is already added in LoadItemBaseSaveData
 }
 
 void UTetrisItem::SetRotation(const bool bNewRotation)

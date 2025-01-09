@@ -31,13 +31,15 @@ public:
 	
 	FRPGItemSaveData CreateRPGItemSaveData() const;
 
-	void LoadRPGItemSaveData(const FRPGItemSaveData& RPGItemSaveData, URPGInventory* Inventory);
+	void LoadRPGItemSaveData(URPGInventory* LoadingInventory, const FRPGItemSaveData& RPGItemSaveData);
 
 	virtual FText GetItemFullName() const override;
 
 	virtual FSlateBrush GetItemIcon() const override;
 
 	virtual FText GetItemDescription() const override;
+
+	virtual TSubclassOf<AItemDropActor> GetItemDropActorClass() const override;
 	
 	UFUNCTION(BlueprintPure)
 	URPGItemData* GetRPGItemData() const;

@@ -19,7 +19,7 @@ class VUNDK_API UClassicItem : public UItemBase
 public:
 	FClassicItemSaveData CreateClassicItemSaveData() const;
 
-	void LoadClassicItemSaveData(const FClassicItemSaveData ItemSaveData);
+	void LoadClassicItemSaveData(UInventoryBase* LoadingInventory, const FClassicItemSaveData ItemSaveData);
 
 	UFUNCTION(BlueprintPure)
 	UClassicItemData* GetClassicItemData() const;

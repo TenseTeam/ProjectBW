@@ -96,7 +96,7 @@ public:
 	UItemBase* AddNewItem(UItemDataBase* ItemData, int32& OutOverflow, const int32 Amount = 1);
 
 	UFUNCTION(BlueprintCallable)
-	void AddItem(UItemBase* Item);
+	bool TryAddItem(UItemBase* Item);
 
 	UFUNCTION(BlueprintCallable)
 	bool RemoveItemByDataID(UItemDataBase* ItemData);
