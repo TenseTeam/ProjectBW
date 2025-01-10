@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "Features/Gameplay/RPGSystem/StatsSystem/Data/BaseStatData.h"
+#include "Features/Gameplay/RPGSystem/StatsSystem/Data/CoreStatData.h"
 #include "ItemsStatsData.generated.h"
 
 UCLASS()
@@ -14,5 +14,5 @@ class VUNDK_API UItemsStatsData : public UPrimaryDataAsset
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSet<UBaseStatData*> Stats;
+	TSet<UCoreStatData*> Stats;
 };

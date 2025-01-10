@@ -22,7 +22,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UItemBase> ItemClass;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSubclassOf<AItemDropActor> ItemDropClass;
+	TSubclassOf<AItemDropActor> ItemDropActorClass;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UStaticMesh* ItemMesh;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UEquipSlotKey* EquipSlotKey;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -44,7 +46,8 @@ public:
 	UItemDataBase(): ItemDataID(FName("NotGeneratedID")),
 	                 ItemTypeID(FGuid::NewGuid().ToString()),
 	                 ItemClass(UItemBase::StaticClass()),
-	                 ItemDropClass(nullptr),
+	                 ItemDropActorClass(nullptr),
+	                 ItemMesh(nullptr),
 	                 EquipSlotKey(nullptr),
 	                 MaxStackSize(1),
 	                 bIsUnique(false),

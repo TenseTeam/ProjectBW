@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "StatsSaveData.h"
 #include "Features/Generic/SaveSystem/Data/SaveData.h"
 #include "StatsBridgeSaveData.generated.h"
 
@@ -14,7 +13,7 @@ class VUNDK_API UStatsBridgeSaveData : public USaveData
 
 public:
 	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = true))
-	UStatsSaveData* BaseStatsSaveData;
+	TMap<FName, int32> SavedSpecialStats;
 	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = true))
-	UStatsSaveData* SpecialStatsSaveData;
+	TMap<FName, int32> SavedCoreStats;
 };

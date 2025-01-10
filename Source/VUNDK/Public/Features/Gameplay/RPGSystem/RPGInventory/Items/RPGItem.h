@@ -39,7 +39,7 @@ public:
 
 	virtual FText GetItemDescription() const override;
 
-	virtual TSubclassOf<AItemDropActor> GetItemDropActorClass() const override;
+	virtual UStaticMesh* GetItemMesh() const override;
 	
 	UFUNCTION(BlueprintPure)
 	URPGItemData* GetRPGItemData() const;

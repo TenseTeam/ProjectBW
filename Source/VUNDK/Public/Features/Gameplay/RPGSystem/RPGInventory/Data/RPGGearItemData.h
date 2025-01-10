@@ -6,7 +6,7 @@
 #include "RPGItemData.h"
 #include "Features/Gameplay/RPGSystem/RPGInventory/Items/RPGGearItem.h"
 #include "VUNDK/Public/Features/Gameplay/RPGSystem/StatsSystem/StatOperation.h"
-#include "VUNDK/Public/Features/Gameplay/RPGSystem/StatsSystem/Data/BaseStatData.h"
+#include "VUNDK/Public/Features/Gameplay/RPGSystem/StatsSystem/Data/CoreStatData.h"
 #include "RPGGearItemData.generated.h"
 
 UCLASS()

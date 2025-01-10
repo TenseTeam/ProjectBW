@@ -51,8 +51,8 @@ URPGRarityLevelData* URPGItemsGenerator::GenerateRarityLevel(const URPGItemsRari
 
 void URPGItemsGenerator::GenerateItemStatsModifiers(URPGGearItem* Item, const URPGGearItemGenerationData* GenerationData)
 {
-	TMap<UBaseStatData*, int32> StatsModifiers = TMap<UBaseStatData*, int32>();
+	TMap<UCoreStatData*, int32> StatsModifiers = TMap<UCoreStatData*, int32>();
 
 	for (const auto& StatModifier : GenerationData->StatsModifiers)
-		Item->AddItemStat(StatModifier.Key, StatModifier.Value, true);
+		Item->AddItemStat(StatModifier.Key, StatModifier.Value);
 }

@@ -18,12 +18,12 @@ URPGRarityLevelData* URPGInventoriesManager::GetRarityByID(const FName RarityID)
 	return nullptr;
 }
 
-UBaseStatData* URPGInventoriesManager::GetStatByID(const FName StatID) const
+UCoreStatData* URPGInventoriesManager::GetStatByID(const FName StatID) const
 {
 	if (!ItemsStats)
 		return nullptr;
 	
-	for (UBaseStatData* Stat : ItemsStats->Stats)
+	for (UCoreStatData* Stat : ItemsStats->Stats)
 	{
 		if (Stat->StatID.IsEqual(StatID))
 			return Stat;
