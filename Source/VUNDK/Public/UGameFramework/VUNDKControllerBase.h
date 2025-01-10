@@ -27,16 +27,11 @@ class VUNDK_API AVUNDKControllerBase : public APlayerController
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadOnly, Category = "VUNDK|Input")
-	FOnPlayerControllerTick OnTick;
-	UPROPERTY(BlueprintAssignable, Category = "VUNDK|Input")
+	UPROPERTY(BlueprintAssignable)
 	FOnAnyKeyPressed OnKeyPressed;
-	UPROPERTY(BlueprintAssignable, Category = "VUNDK|Input")
+	UPROPERTY(BlueprintAssignable)
 	FOnAnyKeyReleased OnKeyReleased;
 
-public:
-	virtual void Tick(float DeltaSeconds) override;
-	
 protected:
 	virtual void SetupInputComponent() override;
 

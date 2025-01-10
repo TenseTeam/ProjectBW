@@ -6,7 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "UGameFramework/VUNDKGameInstance.h"
 
-USaver::USaver()
+USaver::USaver(): SaveManager(nullptr)
 {
 	PrimaryComponentTick.bCanEverTick = false;
 }
@@ -83,30 +83,130 @@ void USaver::OnSharedLoadCompletedEvent_Implementation(const FString& SlotName, 
 	OnSharedLoadGameCompleted.Broadcast(SlotName, UserIndex, LoadedData, Instigator);
 }
 
+void USaver::OnBeginWithLoadedSaveGameEvent_Implementation(UDefaultSaveGame* SaveGame)
+{
+}
+
+void USaver::OnBeginWithNewSaveGameEvent_Implementation(UDefaultSaveGame* SaveGame)
+{
+}
+
+void USaver::OnBeginWithLoadedSharedSaveGameEvent_Implementation(UDefaultSaveGame* SaveGame)
+{
+}
+
+void USaver::OnBeginWithNewSharedSaveGameEvent_Implementation(UDefaultSaveGame* SaveGame)
+{
+}
+
 void USaver::BeginPlay()
 {
 	Super::BeginPlay();
-	if (!USSUtility::GetSaveManager()) return;
-	USSUtility::GetSaveManager()->OnPrepareSave.AddDynamic(this, &USaver::PrepareSave);
-	USSUtility::GetSaveManager()->OnPrepareLoad.AddDynamic(this, &USaver::PrepareLoad);
-	USSUtility::GetSaveManager()->OnSaveGame.AddDynamic(this, &USaver::OnSaveCompletedEvent);
-	USSUtility::GetSaveManager()->OnLoadGame.AddDynamic(this, &USaver::OnLoadCompletedEvent);
-	USSUtility::GetSaveManager()->OnPrepareSharedSave.AddDynamic(this, &USaver::PrepareSharedSave);
-	USSUtility::GetSaveManager()->OnPrepareSharedLoad.AddDynamic(this, &USaver::PrepareSharedLoad);
-	USSUtility::GetSaveManager()->OnSharedSaveGame.AddDynamic(this, &USaver::OnSharedSaveCompletedEvent);
-	USSUtility::GetSaveManager()->OnSharedLoadGame.AddDynamic(this, &USaver::OnSharedLoadCompletedEvent);
+	SaveManager = USSUtility::GetSaveManager();
+	
+	if (!Check()) return;
+	
+	SaveManager->OnPrepareSave.AddDynamic(this, &USaver::PrepareSave);
+	SaveManager->OnPrepareLoad.AddDynamic(this, &USaver::PrepareLoad);
+	SaveManager->OnSaveGame.AddDynamic(this, &USaver::OnSaveCompletedEvent);
+	SaveManager->OnLoadGame.AddDynamic(this, &USaver::OnLoadCompletedEvent);
+	SaveManager->OnPrepareSharedSave.AddDynamic(this, &USaver::PrepareSharedSave);
+	SaveManager->OnPrepareSharedLoad.AddDynamic(this, &USaver::PrepareSharedLoad);
+	SaveManager->OnSharedSaveGame.AddDynamic(this, &USaver::OnSharedSaveCompletedEvent);
+	SaveManager->OnSharedLoadGame.AddDynamic(this, &USaver::OnSharedLoadCompletedEvent);
+
+	if (bDelayBeginWithLoadForNextTick)
+		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &USaver::CheckBeginWithLoad);
+	else
+		CheckBeginWithLoad();
 }
 
 void USaver::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-	if (!USSUtility::GetSaveManager()) return;
-	USSUtility::GetSaveManager()->OnPrepareSave.RemoveDynamic(this, &USaver::PrepareSave);
-	USSUtility::GetSaveManager()->OnPrepareLoad.RemoveDynamic(this, &USaver::PrepareLoad);
-	USSUtility::GetSaveManager()->OnSaveGame.RemoveDynamic(this, &USaver::OnSaveCompletedEvent);
-	USSUtility::GetSaveManager()->OnLoadGame.RemoveDynamic(this, &USaver::OnLoadCompletedEvent);
-	USSUtility::GetSaveManager()->OnPrepareSharedSave.RemoveDynamic(this, &USaver::PrepareSharedSave);
-	USSUtility::GetSaveManager()->OnPrepareSharedLoad.RemoveDynamic(this, &USaver::PrepareSharedLoad);
-	USSUtility::GetSaveManager()->OnSharedSaveGame.RemoveDynamic(this, &USaver::OnSharedSaveCompletedEvent);
-	USSUtility::GetSaveManager()->OnSharedLoadGame.RemoveDynamic(this, &USaver::OnSharedLoadCompletedEvent);
+	
+	if (!Check()) return;
+	
+	SaveManager->OnPrepareSave.RemoveDynamic(this, &USaver::PrepareSave);
+	SaveManager->OnPrepareLoad.RemoveDynamic(this, &USaver::PrepareLoad);
+	SaveManager->OnSaveGame.RemoveDynamic(this, &USaver::OnSaveCompletedEvent);
+	SaveManager->OnLoadGame.RemoveDynamic(this, &USaver::OnLoadCompletedEvent);
+	SaveManager->OnPrepareSharedSave.RemoveDynamic(this, &USaver::PrepareSharedSave);
+	SaveManager->OnPrepareSharedLoad.RemoveDynamic(this, &USaver::PrepareSharedLoad);
+	SaveManager->OnSharedSaveGame.RemoveDynamic(this, &USaver::OnSharedSaveCompletedEvent);
+	SaveManager->OnSharedLoadGame.RemoveDynamic(this, &USaver::OnSharedLoadCompletedEvent);
+}
+
+void USaver::CheckBeginWithLoad()
+{
+	if (SaveManager->HasInstanceEverLoaded())
+		BeginWithLoadedSaveGame();
+	else
+		BeginWithNewSaveGame();
+
+	if (SaveManager->HasSharedInstanceEverLoaded())
+		BeginWithLoadedSharedSaveGame();
+	else
+		BeginWithNewSharedSaveGame();
+}
+
+void USaver::BeginWithLoadedSaveGame()
+{
+	UDefaultSaveGame* SaveGame = SaveManager->GetSaveGameInstance();
+
+	if (!IsValid(SaveGame))
+	{
+		UE_LOG(LogSaveSystem, Error, TEXT("BeginWithLoadedSaveGame(), SaveGame is not valid."));
+		return;
+	}
+		
+	OnBeginWithLoadedSaveGameEvent(SaveGame);
+	OnBeginWithLoadedSaveGame.Broadcast(SaveGame);
+}
+
+void USaver::BeginWithNewSaveGame()
+{
+	UDefaultSaveGame* SaveGame = SaveManager->GetSaveGameInstance();
+
+	if (!IsValid(SaveGame))
+	{
+		UE_LOG(LogSaveSystem, Error, TEXT("BeginWithNewSaveGame(), SaveGame is not valid."));
+		return;
+	}
+	
+	OnBeginWithNewSaveGameEvent(SaveGame);
+	OnBeginWithNewSaveGame.Broadcast(SaveGame);
+}
+
+void USaver::BeginWithLoadedSharedSaveGame()
+{
+	UDefaultSaveGame* SaveGame = SaveManager->GetSharedSaveGameInstance();
+
+	if (!IsValid(SaveGame))
+	{
+		UE_LOG(LogSaveSystem, Error, TEXT("BeginWithLoadedSharedSaveGame(), SharedSaveGame is not valid."));
+		return;
+	}
+	
+	OnBeginWithLoadedSharedSaveGameEvent(SaveGame);
+	OnBeginWithLoadedSharedSaveGame.Broadcast(SaveGame);
+}
+
+void USaver::BeginWithNewSharedSaveGame()
+{
+	UDefaultSaveGame* SaveGame = SaveManager->GetSharedSaveGameInstance();
+
+	if (!IsValid(SaveGame))
+	{
+		UE_LOG(LogSaveSystem, Error, TEXT("BeginWithNewSharedSaveGame(), SharedSaveGame is not valid."));
+		return;
+	}
+	
+	OnBeginWithNewSharedSaveGameEvent(SaveGame);
+	OnBeginWithNewSharedSaveGame.Broadcast(SaveGame);
+}
+
+bool USaver::Check() const
+{
+	return SaveManager != nullptr;
 }

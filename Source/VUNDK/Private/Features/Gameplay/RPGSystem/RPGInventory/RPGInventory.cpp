@@ -3,9 +3,8 @@
 #include "Features/Gameplay/RPGSystem/RPGInventory/RPGInventory.h"
 #include "Features/Gameplay/InventorySystem/Base/ItemBase.h"
 #include "Features/Gameplay/RPGSystem/RPGInventory/Items/RPGGearItem.h"
-#include "Features/Gameplay/RPGSystem/RPGInventory/Items/RPGWeaponItem.h"
 #include "Features/Gameplay/RPGSystem/RPGInventory/Data/SaveData/RPGInventorySaveData.h"
-#include "Features/Gameplay/RPGSystem/Factories/RPGISFactory.h"
+#include "Features/Gameplay/RPGSystem/Factories/RPGFactory.h"
 
 URPGInventory::URPGInventory()
 {
@@ -16,12 +15,12 @@ USaveData* URPGInventory::CreateSaveData()
 {
 	URPGInventorySaveData* SaveData = NewObject<URPGInventorySaveData>();
 
-	for (UItemBase* Item : GetAllItems())
+	for (UItemBase* Item : GetItems())
 	{
 		if (Item->IsA(URPGGearItem::StaticClass()))
 		{
 			const URPGGearItem* GearItem = Cast<URPGGearItem>(Item);
-			FName ItemID = Item->GetItemData()->GetItemDataID();
+			FName ItemID = Item->GetItemData()->ItemDataID;
 
 			if (!SaveData->ItemsSaveData.GearItems.Contains(ItemID))
 				SaveData->ItemsSaveData.GearItems.Add(ItemID, FRPGGearItemsSaveArray());
@@ -31,17 +30,14 @@ USaveData* URPGInventory::CreateSaveData()
 			continue;
 		}
 
-		if (Item->IsA(URPGWeaponItem::StaticClass()))
-		{
-			const URPGWeaponItem* WeaponItem = Cast<URPGWeaponItem>(Item);
-			FName ItemID = Item->GetItemData()->GetItemDataID();
-			
-			if (!SaveData->ItemsSaveData.WeaponItems.Contains(ItemID))
-				SaveData->ItemsSaveData.WeaponItems.Add(ItemID, FRPGWeaponItemsSaveArray());
+		const URPGItem* RPGItem = Cast<URPGItem>(Item);
+		FName ItemID = Item->GetItemData()->ItemDataID;
 
-			FRPGItemSaveData WeaponItemSaveData = WeaponItem->CreateRPGItemSaveData();
-			SaveData->ItemsSaveData.WeaponItems[ItemID].WeaponItems.Add(WeaponItemSaveData);
-		}
+		if (!SaveData->ItemsSaveData.GenericItems.Contains(ItemID))
+			SaveData->ItemsSaveData.GenericItems.Add(ItemID, FRPGItemsSaveArray());
+
+		FRPGItemSaveData ItemSaveData = RPGItem->CreateRPGItemSaveData();
+		SaveData->ItemsSaveData.GenericItems[ItemID].Items.Add(ItemSaveData);
 	}
 
 	return SaveData;
@@ -50,47 +46,47 @@ USaveData* URPGInventory::CreateSaveData()
 void URPGInventory::LoadInventorySaveData_Implementation(UInventoryBaseSaveData* InventorySaveData)
 {
 	URPGInventorySaveData* RPGInventorySaveData = Cast<URPGInventorySaveData>(InventorySaveData);
+
+	for (TPair<FName, FRPGItemsSaveArray>& GenericItems : RPGInventorySaveData->ItemsSaveData.GenericItems)
+	{
+		const FName ItemID = GenericItems.Key;
+
+		for (FRPGItemSaveData& RPGItemSaveData : GenericItems.Value.Items)
+		{
+			UItemDataBase* ItemData = GetItemDataFromRegistry(ItemID);
+
+			if (ItemData == nullptr)
+			{
+				UE_LOG(LogInventorySystem, Warning, TEXT("Item data not found for item ID: %s"), *ItemID.ToString());
+				continue;
+			}
+
+			if (URPGItemData* RPGItemData = Cast<URPGItemData>(ItemData))
+			{
+				URPGItem* RPGItem = URPGFactory::CreateRPGItem(RPGItemData, nullptr, false);
+				RPGItem->LoadRPGItemSaveData(this, RPGItemSaveData);
+			}
+		}
+	}
 	
 	for (TPair<FName, FRPGGearItemsSaveArray>& GearItems : RPGInventorySaveData->ItemsSaveData.GearItems)
 	{
 		const FName ItemID = GearItems.Key;
-		
+
 		for (FRPGGearItemSaveData& GearItemSaveData : GearItems.Value.GearItems)
 		{
-			UItemDataBase* ItemData = GetItemDataByID(ItemID);
+			UItemDataBase* ItemData = GetItemDataFromRegistry(ItemID);
 
 			if (ItemData == nullptr)
 			{
 				UE_LOG(LogInventorySystem, Warning, TEXT("Item data not found for item ID: %s"), *ItemID.ToString());
 				continue;
 			}
-			
+
 			if (URPGGearItemData* GearData = Cast<URPGGearItemData>(ItemData))
 			{
-				URPGGearItem* GearItem = URPGISFactory::CreateRPGGearItem(GearData, nullptr, false);
-				GearItem->LoadRPGGearItemSaveData(GearItemSaveData, this);
-			}
-		}
-	}
-
-	for (TPair<FName, FRPGWeaponItemsSaveArray>& WeaponItems : RPGInventorySaveData->ItemsSaveData.WeaponItems)
-	{
-		const FName ItemID = WeaponItems.Key;
-		
-		for (FRPGItemSaveData& RPGItemSaveData : WeaponItems.Value.WeaponItems)
-		{
-			UItemDataBase* ItemData = GetItemDataByID(ItemID);
-
-			if (ItemData == nullptr)
-			{
-				UE_LOG(LogInventorySystem, Warning, TEXT("Item data not found for item ID: %s"), *ItemID.ToString());
-				continue;
-			}
-			
-			if (URPGWeaponItemData* WeaponData = Cast<URPGWeaponItemData>(ItemData))
-			{
-				URPGWeaponItem* WeaponItem = URPGISFactory::CreateRPGWeaponItem(WeaponData, nullptr, false);
-				WeaponItem->LoadRPGWeaponItemSaveData(RPGItemSaveData, this);
+				URPGGearItem* GearItem = URPGFactory::CreateRPGGearItem(GearData, nullptr, false);
+				GearItem->LoadRPGGearItemSaveData(this, GearItemSaveData);
 			}
 		}
 	}

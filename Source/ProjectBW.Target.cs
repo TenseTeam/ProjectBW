@@ -14,7 +14,8 @@ public class ProjectBWTarget : TargetRules
 		ExtraModuleNames.AddRange( new string[]
 		{
 			"ProjectBW",
-			"VUNDK"
+			"VUNDK",
+			"GVUEDK"
 		} );
 	}
 }

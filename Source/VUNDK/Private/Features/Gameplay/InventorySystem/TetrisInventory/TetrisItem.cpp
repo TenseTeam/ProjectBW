@@ -5,12 +5,11 @@
 #include "Features/Gameplay/InventorySystem/TetrisInventory/Data/TetrisItemData.h"
 #include "Features/Gameplay/InventorySystem/TetrisInventory/Data/SaveData/TetrisItemSaveData.h"
 
-UTetrisItem::UTetrisItem()
+UTetrisItem::UTetrisItem(): TopLeftCornerPosition(),
+                            bIsRotated(false),
+                            CachedSize(),
+                            bCachedRotation(false)
 {
-	TopLeftCornerPosition = FIntPoint();
-	CachedSize = FIntPoint();
-	bIsRotated = false;
-	bCachedRotation = false;
 }
 
 void UTetrisItem::Init(UItemDataBase* Data)
@@ -28,20 +27,22 @@ FTetrisItemSaveData UTetrisItem::CreateTetrisSaveData() const
 	return TetrisSaveData;
 }
 
-void UTetrisItem::LoadTetrisSaveData(const FTetrisItemSaveData& TetrisSaveData, UTetrisInventory* Inventory)
+void UTetrisItem::LoadTetrisSaveData(UInventoryBase* LoadingInventory, const FTetrisItemSaveData& TetrisSaveData)
 {
-	UTetrisInventory* TetrisInventory = Cast<UTetrisInventory>(Inventory);
-	
-	if (TetrisSaveData.bIsRotated)
-		Rotate();
-	
-	TetrisInventory->TryAddItemAtSlots(this, TetrisSaveData.SlotPosition);
-	LoadItemBaseSaveData(TetrisSaveData.ItemSaveData);
+	bool bHasBeenEquipped;
+	LoadItemBaseSaveData(LoadingInventory, TetrisSaveData.ItemSaveData, bHasBeenEquipped);
+	UTetrisInventory* TetrisInventory = Cast<UTetrisInventory>(LoadingInventory);
+
+	if (bHasBeenEquipped)
+		return;
+
+	SetRotation(TetrisSaveData.bIsRotated);
+	TetrisInventory->TryMoveItem(this, TetrisSaveData.SlotPosition); // Since the item is already added in LoadItemBaseSaveData
 }
 
 void UTetrisItem::SetRotation(const bool bNewRotation)
 {
-	if (!GetTetrisItemData()->bCanBeRotated)
+	if (!GetTetrisItemData()->bCanBeRotated || GetTetrisItemData()->Size.X == GetTetrisItemData()->Size.Y)
 		return;
 
 	bIsRotated = bNewRotation;
@@ -98,4 +99,10 @@ void UTetrisItem::CacheCurrentRotation()
 {
 	bCachedRotation = bIsRotated;
 	CachedSize = GetRelativeSize();
+}
+
+void UTetrisItem::OnEquip_Implementation()
+{
+	Super::OnEquip_Implementation();
+	SetRotation(false);
 }

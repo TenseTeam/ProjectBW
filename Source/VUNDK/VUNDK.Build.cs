@@ -17,7 +17,8 @@ public class VUNDK : ModuleRules
                 "Slate",
                 "SlateCore",
                 "AIModule",
-                "UMG"
+                "UMG",
+                "EnhancedInput"
             }
         );
     }

@@ -6,7 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 
 USaveManager* USSSlotsUtility::CurrentSaveManager = nullptr;
-FString USSSlotsUtility::CurrentSlotName = "";
+FString USSSlotsUtility::SelectedSlotName = "";
 
 void USSSlotsUtility::Init(USaveManager* SaveManager)
 {
@@ -16,9 +16,19 @@ void USSSlotsUtility::Init(USaveManager* SaveManager)
 	TrySelectMostRecentSaveGame();
 }
 
+void USSSlotsUtility::ClearSelectedSlotName()
+{
+	SelectedSlotName = "";
+}
+
 FString USSSlotsUtility::GetSelectedSlotName()
 {
-	return CurrentSlotName;
+	return SelectedSlotName;
+}
+
+bool USSSlotsUtility::IsSelectedSlotValid()
+{
+	return !SelectedSlotName.IsEmpty() && DoesSlotFileExist(SelectedSlotName) && !IsSharedSlotName(SelectedSlotName);
 }
 
 bool USSSlotsUtility::DoesSlotFileExist(const FString& SlotName)
@@ -141,11 +151,11 @@ bool USSSlotsUtility::TryGetMostAncientSlotInfoData(FSlotInfoData& OutSlotData, 
 	return true;
 }
 
-bool USSSlotsUtility::TrySelectSaveGameSlot(const FString& SlotName)
+bool USSSlotsUtility::TrySelectSaveGameSlot(const FString SlotName)
 {
 	if (!DoesSlotFileExist(SlotName) || IsSharedSlotName(SlotName)) return false;
 	
-	CurrentSlotName = SlotName;
+	SelectedSlotName = SlotName;
 	return true;
 }
 
