@@ -14,13 +14,8 @@ class VUNDK_API UClassicItemData : public UItemDataBase
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="1", UIMin="1"))
-	int32 MaxStackSize;
-
-public:
 	UClassicItemData()
 	{
-		MaxStackSize = 1;
 		ItemClass = UClassicItem::StaticClass();
 	}
 };

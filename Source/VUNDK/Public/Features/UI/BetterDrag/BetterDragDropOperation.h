@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UGameFramework/VUNDKControllerBase.h"
 #include "Widgets/DropReceiverWidget.h"
 #include "BetterDragDropOperation.generated.h"
 
@@ -21,10 +20,10 @@ protected:
 	UObject* Payload;
 	UPROPERTY(BlueprintReadOnly)
 	APlayerController* PlayerController;
+	UPROPERTY(BlueprintReadOnly)
+   	UUserWidget* DropReceiver;
 	
 private:
-	UPROPERTY()
-	UUserWidget* DropReceiver;
 	ESlateVisibility OwnerWidgetVisibility;
 	ESlateVisibility CachedOwnerWidgetVisibility;
 	FKey DropKey;
@@ -66,7 +65,7 @@ protected:
 	void OnDragLeave(UUserWidget* LeftWidget);
 	
 	UFUNCTION(BlueprintNativeEvent)
-	void OnDragDrop();
+	bool OnDragDrop();
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void OnDragCancelled();

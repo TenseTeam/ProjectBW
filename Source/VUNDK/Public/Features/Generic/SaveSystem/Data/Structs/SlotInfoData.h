@@ -11,29 +11,27 @@ struct FSlotInfoData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VUNDK|Generic|Save System")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FString SlotInfoName;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VUNDK|Generic|Save System")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FDateTime LastSaveDate;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VUNDK|Generic|Save System")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	double TimePlayed;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VUNDK|Generic|Save System")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	USlotInfoItem* SlotInfoItem;
 
-	FSlotInfoData()
+	FSlotInfoData(): SlotInfoName(""),
+	                 LastSaveDate(FDateTime::Now()),
+	                 TimePlayed(0),
+	                 SlotInfoItem(nullptr)
 	{
-		SlotInfoName = "";
-		SlotInfoItem = nullptr;
-		LastSaveDate = FDateTime::Now();
-		TimePlayed = 0;
 	}
 
-	explicit FSlotInfoData(const FString& SlotName)
+	explicit FSlotInfoData(const FString& SlotName): SlotInfoName(SlotName),
+	                                                 LastSaveDate(FDateTime::Now()),
+	                                                 TimePlayed(0),
+	                                                 SlotInfoItem(nullptr)
 	{
-		SlotInfoName = SlotName;
-		SlotInfoItem = nullptr;
-		LastSaveDate = FDateTime::Now();
-		TimePlayed = 0.f;
 	}
 
 	bool operator==(const FSlotInfoData& Other) const

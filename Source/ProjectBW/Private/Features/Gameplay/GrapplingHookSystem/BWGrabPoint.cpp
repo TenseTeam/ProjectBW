@@ -20,7 +20,11 @@ ABWGrabPoint::ABWGrabPoint()
 	Mesh->SetupAttachment(RootComponent);
 	Mesh->SetCollisionProfileName("BlockAllDynamic");
 	constexpr ECollisionChannel GrabPointsChannel = ECC_GameTraceChannel1;
+	constexpr ECollisionChannel PlayerChannel = ECC_GameTraceChannel3;
 	Mesh->SetCollisionResponseToChannel(GrabPointsChannel, ECR_Block);
+	Mesh->SetCollisionResponseToChannel(PlayerChannel, ECR_Overlap);
+	Mesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	Mesh->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
 }
 
 void ABWGrabPoint::BeginPlay()
@@ -68,12 +72,12 @@ bool ABWGrabPoint::CanBeGrabbed(const ACharacter* Character) const
 	const float Tolerance = FMath::Lerp(0.999f, 0.8f, ToleranceMultiplier);
 	const bool bCoincident = FVector::Coincident(Direction.GetSafeNormal(), CameraForward, Tolerance);
 
-#if WITH_EDITOR
+//#if WITH_EDITOR
 	if (bShowDebug)
 		DrawDebugSphere(GetWorld(), GetActorLocation(), 100, 12, bCoincident ? FColor::Green : FColor::Red, false, -1,
 		                0,
 		                1);
-#endif
+//#endif
 
 	return bCoincident;
 }
@@ -121,7 +125,11 @@ void ABWGrabPoint::Initialize()
 
 	Mesh->SetCollisionProfileName("BlockAllDynamic");
 	constexpr ECollisionChannel GrabPointsChannel = ECC_GameTraceChannel1;
+	constexpr ECollisionChannel PlayerChannel = ECC_GameTraceChannel3;
 	Mesh->SetCollisionResponseToChannel(GrabPointsChannel, ECR_Block);
+	Mesh->SetCollisionResponseToChannel(PlayerChannel, ECR_Overlap);
+	Mesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	Mesh->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
 
 	TraceParams = FCollisionQueryParams(FName(TEXT("Trace")), true, this);
 	TraceParams.bTraceComplex = false;

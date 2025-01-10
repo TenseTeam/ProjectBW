@@ -148,7 +148,12 @@ bool ABWCharacter::MoveInputActive() const
 
 bool ABWCharacter::IsRunning() const
 {
-	return bWantRunning && MoveInputActive();
+	return bIsRunning && bWantRunning && MoveInputActive();
+}
+
+void ABWCharacter::SetIsRunning(bool Value)
+{
+	bIsRunning = Value;
 }
 
 bool ABWCharacter::WantRunning() const
@@ -160,6 +165,7 @@ void ABWCharacter::SetWantRunning(bool Value)
 {
 	bWantRunning = Value;
 }
+
 
 bool ABWCharacter::IsShooting() const
 {
@@ -243,7 +249,7 @@ void ABWCharacter::SetCanDodge(bool Value)
 
 bool ABWCharacter::CanDodge() const
 {
-	return bCanDodge;
+	return bCanDodge && !DodgerComponent->IsCoolingDown();
 }
 
 void ABWCharacter::SetCanHook(bool Value)
@@ -290,11 +296,13 @@ void ABWCharacter::NotifyJumpApex()
 
 void ABWCharacter::StartHooking()
 {
+	SetIsHooking(true); // perdoname madre por mi vida loca
 	OnStartHook.Broadcast();
 }
 
 void ABWCharacter::StopHooking()
 {
+	SetIsHooking(false); // perdoname madre por mi vida loca
 	OnStopHook.Broadcast();
 }
 

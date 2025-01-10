@@ -8,26 +8,30 @@
 #include "Features/Generic/SaveSystem/Utility/SSUtility.h"
 #include "Kismet/GameplayStatics.h"
 
-USaveManager::USaveManager()
+USaveManager::USaveManager(): SaveGameClass(UDefaultSaveGame::StaticClass()),
+                              SharedSaveGameClass(UDefaultSaveGame::StaticClass()),
+                              SlotInfoItemClass(USlotInfoItem::StaticClass()),
+                              SharedSlotInfoItemClass(USlotInfoItem::StaticClass()),
+                              bIsAutoSaveEnabled(false),
+                              ElapsedTimePlayed(0),
+                              SlotSaveGameInstance(nullptr),
+                              SharedSaveGameInstance(nullptr),
+                              CurrentSlotInfos(nullptr),
+                              CurrentSlotInfoItem(nullptr),
+                              CurrentSharedSlotInfoItem(nullptr),
+                              CurrentInstigator(nullptr),
+                              bIsSharedSaving(false),
+                              bIsSharedLoading(false),
+                              bIsLoading(false),
+                              bIsSaving(false),
+                              bHasEverLoaded(false),
+                              bHasEverSaved(false),
+                              bHasEverSharedSaved(false),
+                              bHasEverSharedLoaded(false),
+                              PreviousSlotNameKey(NAME_None),
+                              bSaveAsNewGame(false),
+                              SaveMasterID(DEFAULT_MASTER_SAVE_ID)
 {
-	bIsAutoSaveEnabled = false;
-	CurrentInstigator = nullptr;
-	SlotSaveGameInstance = nullptr;
-	SharedSaveGameInstance = nullptr;
-	CurrentSlotInfos = nullptr;
-	CurrentSlotInfoItem = nullptr;
-	CurrentSharedSlotInfoItem = nullptr;
-	bIsLoading = false;
-	bIsSaving = false;
-	ElapsedTimePlayed = 0.f;
-	bSaveAsNewGame = false;
-	bHasEverLoaded = false;
-	bHasEverSaved = false;
-	bHasEverSharedSaved = false;
-	bHasEverSharedLoaded = false;
-	bIsSharedSaving = false;
-	bIsSharedLoading = false;
-	SaveMasterID = DEFAULT_MASTER_SAVE_ID;
 }
 
 void USaveManager::Init(const FSaveManagerData SaveManagerData)
@@ -62,7 +66,7 @@ void USaveManager::Init(const FSaveManagerData SaveManagerData)
 
 	USSUtility::Init(this);
 	USSSlotsUtility::Init(this);
-	
+
 	if (bIsAutoSaveEnabled)
 		UAutoSaveManager::Init(this);
 
@@ -79,14 +83,20 @@ UDefaultSaveGame* USaveManager::GetSharedSaveGameInstance() const
 	return SharedSaveGameInstance;
 }
 
-bool USaveManager::DeleteSlot(const FString& SlotName) const
+bool USaveManager::DeleteSlot(const FName SlotName)
 {
-	// Select the most recent slot after deleting the current one to avoid invalid selection
-	if (!USSSlotsUtility::DoesSlotFileExist(SlotName)) return false;
+	if (!UGameplayStatics::DeleteGameInSlot(SAVES_DIRECTORY + SlotName.ToString(), 0))
+		return false;
 
-	RemoveSlotInfo(FName(*SlotName));
-	USSSlotsUtility::TrySelectMostRecentSaveGame();
-	return UGameplayStatics::DeleteGameInSlot(SlotName, 0);
+	RemoveSlotInfo(SlotName);
+
+	if (SlotName == USSSlotsUtility::GetSelectedSlotName())
+	{
+		USSSlotsUtility::ClearSelectedSlotName();
+		USSSlotsUtility::TrySelectMostRecentSaveGame(); // Select the most recent slot if is the same slot
+	}
+
+	return true;
 }
 
 void USaveManager::DeleteAllSlots()
@@ -129,20 +139,26 @@ void USaveManager::SharedSave(UObject* Instigator)
 
 void USaveManager::ManualAndSharedSave(UObject* Instigator, const bool bOverrideCurrentSlot)
 {
-	OnPendingSharedSave.AddDynamic(this, &USaveManager::OnPendingSharedSaveCompleted);
+	OnPendingSharedSave.AddDynamic(this, &USaveManager::OnPendingSharedSaveEvent);
 	ManualSave(Instigator, bOverrideCurrentSlot);
 }
 
 void USaveManager::LoadSelectedSlotAndSharedSlot(UObject* Instigator)
 {
-	OnPendingSharedLoad.AddDynamic(this, &USaveManager::OnPendingSharedLoadCompleted);
+	if (!USSSlotsUtility::IsSelectedSlotValid())
+	{
+		USSUtility::LoadSharedSlot(Instigator);
+		return;
+	}
+
+	OnPendingSharedLoad.AddDynamic(this, &USaveManager::OnPendingSharedLoadEvent);
 	USSUtility::LoadSelectedSlot(Instigator);
 }
 
 void USaveManager::LoadSelectedSlot(UObject* Instigator)
 {
-	if (!USSSlotsUtility::DoesAnySlotFileExist()) return;
-	
+	if (!USSSlotsUtility::IsSelectedSlotValid()) return;
+
 	Load(USSSlotsUtility::GetSelectedSlotName(), Instigator);
 }
 
@@ -217,7 +233,7 @@ void USaveManager::Save(const FString& SaveName, UObject* Instigator, const bool
 	UDefaultSaveGame*& SaveGameInstance = bIsSharedSave ? SharedSaveGameInstance : SlotSaveGameInstance;
 
 	if (!USSSlotsUtility::IsSlotNameValid(SaveName) ||
-		!SaveGameInstance ||
+		!IsValid(SaveGameInstance) ||
 		bIsLoading || bIsSaving)
 		return;
 
@@ -230,16 +246,17 @@ void USaveManager::Save(const FString& SaveName, UObject* Instigator, const bool
 	const FName SlotFName = FName(*SaveName);
 	SaveGameInstance->SetSlotNameKey(SlotFName);
 
-	if (bIsSharedSave)
-		CurrentSharedSlotInfoItem = Cast<USlotInfoItem>(UGameplayStatics::CreateSaveGameObject(SharedSlotInfoItemClass));
-	else
-		CurrentSlotInfoItem = Cast<USlotInfoItem>(UGameplayStatics::CreateSaveGameObject(SlotInfoItemClass));
-
 	// Notify the game that it's going to save, so all the saver objects can push their data to the save game object
 	if (bIsSharedSaving)
+	{
+		CurrentSharedSlotInfoItem = Cast<USlotInfoItem>(UGameplayStatics::CreateSaveGameObject(SharedSlotInfoItemClass));
 		OnPrepareSharedSave.Broadcast(SaveGameInstance, CurrentSharedSlotInfoItem, Instigator);
+	}
 	else
+	{
+		CurrentSlotInfoItem = Cast<USlotInfoItem>(UGameplayStatics::CreateSaveGameObject(SlotInfoItemClass));
 		OnPrepareSave.Broadcast(SaveGameInstance, CurrentSlotInfoItem, Instigator);
+	}
 
 	bIsSaving = true;
 	FAsyncSaveGameToSlotDelegate AsyncSaveDelegate;
@@ -252,7 +269,7 @@ void USaveManager::Load(const FString& SaveName, UObject* Instigator, const bool
 	UDefaultSaveGame*& SaveGameInstance = bIsSharedLoad ? SharedSaveGameInstance : SlotSaveGameInstance;
 
 	if (!USSSlotsUtility::IsSlotNameValid(SaveName) ||
-		!SaveGameInstance ||
+		!IsValid(SaveGameInstance) ||
 		bIsLoading || bIsSaving)
 		return;
 
@@ -275,16 +292,10 @@ void USaveManager::Load(const FString& SaveName, UObject* Instigator, const bool
 
 void USaveManager::OnSaveCompleted(const FString& SlotFullPathName, int32 UserIndex, bool bSuccess)
 {
-	bIsSaving = false;
-
 	if (!bSuccess)
-	{
-		bIsSharedSaving = false;
 		UE_LOG(LogSaveSystem, Error, TEXT("Failed to save game."))
-	}
 	else
 	{
-		bHasEverSaved = true;
 		UDefaultSaveGame*& SaveGameInstance = bIsSharedSaving ? SharedSaveGameInstance : SlotSaveGameInstance;
 		const FString NewSaveSlotName = SaveGameInstance->SlotNameKey.ToString();
 		UpdateSlotInfo(FName(*NewSaveSlotName));
@@ -292,15 +303,20 @@ void USaveManager::OnSaveCompleted(const FString& SlotFullPathName, int32 UserIn
 
 		if (bIsSharedSaving)
 		{
-			bIsSharedSaving = false;
+			bHasEverSharedSaved = true;
 			OnSharedSaveGame.Broadcast(NewSaveSlotName, UserIndex, bSuccess, SaveGameInstance, CurrentInstigator);
 		}
 		else
+		{
+			bHasEverSaved = true;
 			OnSaveGame.Broadcast(NewSaveSlotName, UserIndex, bSuccess, SaveGameInstance, CurrentInstigator);
+		}
 
 		UE_LOG(LogSaveSystem, Display, TEXT("Game saved successfully."));
 	}
 
+	bIsSaving = false;
+	bIsSharedSaving = false;
 	bSaveAsNewGame = false;
 	OnPendingSharedSave.Broadcast(CurrentInstigator);
 }
@@ -314,38 +330,42 @@ void USaveManager::OnLoadCompleted(const FString& SlotFullPathName, int32 UserIn
 		UE_LOG(LogSaveSystem, Error, TEXT("Failed to load game."))
 	else
 	{
-		bHasEverLoaded = true;
 		UDefaultSaveGame*& SaveGameInstance = bIsSharedLoading ? SharedSaveGameInstance : SlotSaveGameInstance;
-		SaveGameInstance = Cast<UDefaultSaveGame>(SaveGame);
 
-		if (SaveGameInstance)
+		if (SaveGameInstance = Cast<UDefaultSaveGame>(SaveGame); !IsValid(SaveGameInstance))
+			UE_LOG(LogSaveSystem, Error, TEXT("Failed Cast: Loaded game is not of type %s"), *SaveGameClass->GetName())
+		else
 		{
 			const FString SlotInfoName = SaveGameInstance->SlotNameKey.ToString();
 
 			if (bIsSharedLoading)
+			{
+				bHasEverSharedLoaded = true;
 				OnSharedLoadGame.Broadcast(SlotInfoName, UserIndex, SaveGameInstance, CurrentInstigator);
+			}
 			else
+			{
+				bHasEverLoaded = true;
 				OnLoadGame.Broadcast(SlotInfoName, UserIndex, SaveGameInstance, CurrentInstigator);
+			}
 
 			UE_LOG(LogSaveSystem, Display, TEXT("Game loaded successfully."));
 		}
-		else
-			UE_LOG(LogSaveSystem, Error, TEXT("Failed Cast: Loaded game is not of type %s"), *SaveGameClass->GetName());
 	}
 
 	bIsSharedLoading = false;
 	OnPendingSharedLoad.Broadcast(CurrentInstigator);
 }
 
-void USaveManager::OnPendingSharedSaveCompleted(UObject* Instigator)
+void USaveManager::OnPendingSharedSaveEvent(UObject* Instigator)
 {
-	OnPendingSharedSave.RemoveDynamic(this, &USaveManager::OnPendingSharedSaveCompleted);
+	OnPendingSharedSave.RemoveDynamic(this, &USaveManager::OnPendingSharedSaveEvent);
 	SharedSave(Instigator);
 }
 
-void USaveManager::OnPendingSharedLoadCompleted(UObject* Instigator)
+void USaveManager::OnPendingSharedLoadEvent(UObject* Instigator)
 {
-	OnPendingSharedLoad.RemoveDynamic(this, &USaveManager::OnPendingSharedLoadCompleted);
+	OnPendingSharedLoad.RemoveDynamic(this, &USaveManager::OnPendingSharedLoadEvent);
 	USSUtility::LoadSharedSlot(Instigator);
 }
 
@@ -354,9 +374,8 @@ void USaveManager::UpdateSlotInfo(const FName NewSaveSlotNameKey)
 	if (!CurrentSlotInfos) return;
 
 	float CurrentPlayedTime = 0.f;
-	// bIsSharedSaving is used to determine if it's a shared slot or not
-	USlotInfoItem*& SlotInfoItem = bIsSharedSaving ? CurrentSharedSlotInfoItem : CurrentSlotInfoItem;
-	
+	USlotInfoItem*& SlotInfoItem = bIsSharedSaving ? CurrentSharedSlotInfoItem : CurrentSlotInfoItem; // Determine if it's a shared slot or not
+
 	if (!bSaveAsNewGame && CurrentSlotInfos->SlotInfos.Contains(PreviousSlotNameKey))
 		CurrentPlayedTime = CurrentSlotInfos->SlotInfos[PreviousSlotNameKey].TimePlayed;
 
@@ -375,7 +394,7 @@ void USaveManager::UpdateSlotInfo(const FName NewSaveSlotNameKey)
 	UGameplayStatics::SaveGameToSlot(SlotInfoItem, META_DIRECTORY + NewSaveSlotNameKey.ToString(), 0);
 }
 
-void USaveManager::RemoveSlotInfo(const FName& SlotNameKey) const
+void USaveManager::RemoveSlotInfo(const FName SlotNameKey) const
 {
 	CurrentSlotInfos->SlotInfos.Remove(SlotNameKey);
 	UGameplayStatics::DeleteGameInSlot(META_DIRECTORY + SlotNameKey.ToString(), 0);
@@ -415,6 +434,8 @@ void USaveManager::CreateNewSaveInstance()
 {
 	SlotSaveGameInstance = Cast<UDefaultSaveGame>(UGameplayStatics::CreateSaveGameObject(SaveGameClass));
 	SharedSaveGameInstance = Cast<UDefaultSaveGame>(UGameplayStatics::CreateSaveGameObject(SharedSaveGameClass));
+	bHasEverLoaded = false;
+	bHasEverSaved = false;
 }
 
 void USaveManager::CreateSaveInstances()

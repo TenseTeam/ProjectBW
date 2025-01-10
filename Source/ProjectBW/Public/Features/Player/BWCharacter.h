@@ -149,7 +149,9 @@ private:
 	
 	UPROPERTY()
 	AGameplayController* BWController;
-	
+
+	UPROPERTY()
+	bool bIsRunning;
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bWantRunning;
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -211,6 +213,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool IsRunning() const;
+	UFUNCTION(BlueprintCallable)
+	void SetIsRunning(bool Value);
 	UFUNCTION(BlueprintCallable)
 	bool WantRunning() const;
 	UFUNCTION(BlueprintCallable)

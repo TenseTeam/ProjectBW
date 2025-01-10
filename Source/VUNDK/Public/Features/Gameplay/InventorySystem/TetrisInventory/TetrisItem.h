@@ -26,9 +26,13 @@ public:
 	
 protected:
 	// Current position of the item's top-left corner in the inventory grid
+	UPROPERTY()
 	FIntPoint TopLeftCornerPosition;
+	UPROPERTY()
 	bool bIsRotated;
+	UPROPERTY()
 	FIntPoint CachedSize;
+	UPROPERTY()
 	bool bCachedRotation;
 
 public:
@@ -38,7 +42,7 @@ public:
 
 	FTetrisItemSaveData CreateTetrisSaveData() const;
 
-	void LoadTetrisSaveData(const FTetrisItemSaveData& TetrisSaveData, UTetrisInventory* Inventory);
+	void LoadTetrisSaveData(UInventoryBase* LoadingInventory, const FTetrisItemSaveData& TetrisSaveData);
 
 	UFUNCTION(BlueprintCallable)
 	void SetRotation(const bool bNewRotation);
@@ -70,4 +74,7 @@ public:
 	void SetCurrentPosition(const FIntPoint NewPosition);
 
 	void CacheCurrentRotation();
+
+protected:
+	virtual void OnEquip_Implementation() override;
 };

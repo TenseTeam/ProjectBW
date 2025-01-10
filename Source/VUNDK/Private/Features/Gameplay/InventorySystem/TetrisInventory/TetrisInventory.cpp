@@ -16,12 +16,12 @@ USaveData* UTetrisInventory::CreateSaveData()
 {
 	UTetrisInventorySaveData* TetrisInventorySaveData = NewObject<UTetrisInventorySaveData>();
 
-	for (UItemBase* Item : GetAllItems())
+	for (UItemBase* Item : GetItems())
 	{
 		const UTetrisItem* TetrisItem = Cast<UTetrisItem>(Item);
 		FTetrisItemSaveData ItemSaveData = TetrisItem->CreateTetrisSaveData();
-		
-		FName ItemID = Item->GetItemData()->GetItemDataID();
+
+		FName ItemID = Item->GetItemData()->ItemDataID;
 
 		if (!TetrisInventorySaveData->TetrisItems.Contains(ItemID))
 			TetrisInventorySaveData->TetrisItems.Add(ItemID, FTetrisItemsSaveArray());
@@ -38,15 +38,14 @@ void UTetrisInventory::LoadInventorySaveData_Implementation(UInventoryBaseSaveDa
 
 	for (const TPair<FName, FTetrisItemsSaveArray>& LoadedItem : TetrisInventorySaveData->TetrisItems)
 	{
-		const FName ItemID = LoadedItem.Key;
-		FTetrisItemsSaveArray ItemsArr = LoadedItem.Value;
+		auto [ItemID, ItemsSaveArray] = LoadedItem;
 
-		if (UItemDataBase* ItemData = GetItemDataByID(ItemID))
+		if (UItemDataBase* ItemData = GetItemDataFromRegistry(ItemID))
 		{
-			for (FTetrisItemSaveData& ItemSaveData : ItemsArr.Items)
+			for (FTetrisItemSaveData& ItemSaveData : ItemsSaveArray.Items)
 			{
 				UTetrisItem* CreatedItem = Cast<UTetrisItem>(UISFactory::CreateItem(ItemData));
-				CreatedItem->LoadTetrisSaveData(ItemSaveData, this);
+				CreatedItem->LoadTetrisSaveData(this, ItemSaveData);
 			}
 		}
 		else
@@ -81,21 +80,6 @@ bool UTetrisInventory::IsFull() const
 	}
 
 	return true;
-}
-
-void UTetrisInventory::ConstructGrid()
-{
-	InvMatrix = TArray<TArray<UTetrisSlot*>>();
-	InvMatrix.SetNum(GridSize.X);
-	for (int32 x = 0; x < GridSize.X; x++)
-	{
-		InvMatrix[x].SetNum(GridSize.Y);
-		for (int32 y = 0; y < GridSize.Y; y++)
-		{
-			InvMatrix[x][y] = NewObject<UTetrisSlot>(this);
-			InvMatrix[x][y]->Init(this, FIntPoint(x, y));
-		}
-	}
 }
 
 UTetrisSlot* UTetrisInventory::GetSlot(const FIntPoint SlotPosition) const
@@ -157,7 +141,7 @@ bool UTetrisInventory::TryAddItemAtSlots(UTetrisItem* Item, const FIntPoint Star
 
 bool UTetrisInventory::TryMoveItem(UTetrisItem* Item, const FIntPoint NewPosition)
 {
-	if (!Find(Item->GetItemData()) || !IsValidSlotPosition(NewPosition))
+	if (!IsValidSlotPosition(NewPosition))
 		return false;
 
 	const FIntPoint OldPosition = Item->GetCurrentPosition();
@@ -165,7 +149,8 @@ bool UTetrisInventory::TryMoveItem(UTetrisItem* Item, const FIntPoint NewPositio
 
 	if (!TryOccupySlotsWithItem(Item, NewPosition, false)) // Try to occupy the new slots
 	{
-		OccupySlotsWithItem(Item, OldPosition, false, false); // Re-occupy the old slots if failed
+		Item->ResetToCachedRotation();
+		OccupySlotsWithItem(Item, OldPosition, false); // Re-occupy the old slots if failed
 		return false;
 	}
 
@@ -181,12 +166,19 @@ void UTetrisInventory::BeginPlay()
 
 void UTetrisInventory::OnItemAdded_Implementation(UItemBase* Item)
 {
+	if (!IsValid(Item))
+	{
+		UE_LOG(LogInventorySystem, Warning, TEXT("OnItemAdded(), Item is null."));
+		return;
+	}
+
 	const UTetrisItemData* TetrisItemData = Cast<UTetrisItemData>(Item->GetItemData());
 	UTetrisItem* TetrisItem = Cast<UTetrisItem>(Item);
 
 	FIntPoint FoundSlot;
 	bool bNeedsToRotate;
-	FindAvailableSlots(TetrisItem->GetRelativeSize(), FoundSlot, bNeedsToRotate);
+	if (!FindAvailableSlots(TetrisItem->GetRelativeSize(), FoundSlot, bNeedsToRotate))
+		return;
 
 	if (bNeedsToRotate)
 		TetrisItem->Rotate();
@@ -214,6 +206,27 @@ void UTetrisInventory::OnClearedInventory_Implementation()
 	}
 }
 
+void UTetrisInventory::ConstructGrid()
+{
+	Capacity = GridSize.X * GridSize.Y;
+	InvMatrix = TArray<TArray<UTetrisSlot*>>();
+	InvMatrix.SetNum(GridSize.X);
+	for (int32 x = 0; x < GridSize.X; x++)
+	{
+		InvMatrix[x].SetNum(GridSize.Y);
+		for (int32 y = 0; y < GridSize.Y; y++)
+		{
+			InvMatrix[x][y] = NewObject<UTetrisSlot>(this);
+			InvMatrix[x][y]->Init(this, FIntPoint(x, y));
+		}
+	}
+}
+
+bool UTetrisInventory::IsValidSlotPosition(const FIntPoint SlotPosition) const
+{
+	return InvMatrix.IsValidIndex(SlotPosition.X) && InvMatrix[SlotPosition.X].IsValidIndex(SlotPosition.Y);
+}
+
 void UTetrisInventory::FreeSlots(const FIntPoint StartPosition, const FIntPoint Size)
 {
 	for (int32 x = StartPosition.X; x < StartPosition.X + Size.X; x++)
@@ -226,14 +239,9 @@ void UTetrisInventory::FreeSlots(const FIntPoint StartPosition, const FIntPoint 
 	}
 }
 
-bool UTetrisInventory::IsValidSlotPosition(const FIntPoint SlotPosition) const
+void UTetrisInventory::OccupySlotsWithItem(UTetrisItem* Item, const FIntPoint StartSlotPosition, const bool bAddItemToList)
 {
-	return InvMatrix.IsValidIndex(SlotPosition.X) && InvMatrix[SlotPosition.X].IsValidIndex(SlotPosition.Y);
-}
-
-void UTetrisInventory::OccupySlotsWithItem(UTetrisItem* Item, const FIntPoint StartSlotPosition, const bool bAddItemToList, const bool bUseRelativeSize)
-{
-	const FIntPoint ItemSize = bUseRelativeSize ? Item->GetRelativeSize() : Item->GetCachedSize();
+	const FIntPoint ItemSize = Item->GetRelativeSize();
 
 	for (int32 x = StartSlotPosition.X; x < StartSlotPosition.X + ItemSize.X; x++)
 	{
@@ -276,7 +284,7 @@ bool UTetrisInventory::FindAvailableSlots(const FIntPoint Size, FIntPoint& OutSt
 				}
 			}
 		}
-		
+
 		return false;
 	};
 

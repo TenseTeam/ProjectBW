@@ -9,12 +9,14 @@ USTRUCT(Blueprintable, BlueprintType)
 struct FItemSaveData
 {
 	GENERATED_BODY()
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Quantity;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 EquipSlotIndex;
 
-	FItemSaveData()
+	FItemSaveData(): Quantity(0),
+	                 EquipSlotIndex(-1)
 	{
-		EquipSlotIndex = -1;
 	}
 };

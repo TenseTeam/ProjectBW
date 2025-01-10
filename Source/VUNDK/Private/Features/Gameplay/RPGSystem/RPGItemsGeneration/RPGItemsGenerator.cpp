@@ -2,9 +2,10 @@
 
 #include "Features/Gameplay/RPGSystem/RPGItemsGeneration/RPGItemsGenerator.h"
 #include "Features/Gameplay/InventorySystem/Utility/ISInventoriesUtility.h"
+#include "Features/Gameplay/RPGSystem/Factories/RPGFactory.h"
 #include "Features/Gameplay/RPGSystem/RPGInventory/RPGInventoriesManager.h"
 
-bool URPGItemsGenerator::TryGenerateRPGItemBase(URPGItemBase* Item, const URPGItemBaseGenerationData* GenerationData)
+bool URPGItemsGenerator::TryGenerateRPGItem(URPGItem* Item, const URPGItemBaseGenerationData* GenerationData)
 {
 	if (GenerationData == nullptr) return false;
 
@@ -16,30 +17,13 @@ bool URPGItemsGenerator::TryGenerateRPGItemBase(URPGItemBase* Item, const URPGIt
 	return true;
 }
 
-bool URPGItemsGenerator::TryGenerateRPGWeaponItem(URPGWeaponItem* WeaponItem, const URPGItemBaseGenerationData* GenerationData)
-{
-	if (!TryGenerateRPGItemBase(WeaponItem, GenerationData)) return false;
-	
-	WeaponItem->WeaponDamageOperation = CreateWeaponDamageOperation(WeaponItem);
-
-	return true;
-}
-
 bool URPGItemsGenerator::TryGenerateRPGGearItem(URPGGearItem* GearItem, const URPGGearItemGenerationData* GenerationData)
 {
-	if (!TryGenerateRPGItemBase(GearItem, GenerationData)) return false;
+	if (!TryGenerateRPGItem(GearItem, GenerationData)) return false;
 	
-	GearItem->StatsModifiers = GenerateStatsModifiers(GearItem, GenerationData);
-	GearItem->MainStat = GetRandomMainStat(GenerationData->MainStatsPool);
+	GenerateItemStatsModifiers(GearItem, GenerationData);
 
 	return true;
-}
-
-UStatOperation* URPGItemsGenerator::CreateWeaponDamageOperation(URPGWeaponItem* WeaponItem)
-{
-	UStatOperation* WeaponDamageOperation = NewObject<UStatOperation>(GetTransientPackage(), WeaponItem->GetRPGWeaponData()->WeaponDamageOperation);
-	WeaponDamageOperation->Init(WeaponItem, WeaponItem->RarityLevel->RarityValue);
-	return WeaponDamageOperation;
 }
 
 FRPGItemVisualDetails URPGItemsGenerator::GenerateVisualDetails(const URPGItemVisualSetData* Set)
@@ -65,23 +49,10 @@ URPGRarityLevelData* URPGItemsGenerator::GenerateRarityLevel(const URPGItemsRari
 	return nullptr;
 }
 
-TMap<UCharacterBaseStatData*, int32> URPGItemsGenerator::GenerateStatsModifiers(URPGGearItem* Item, const URPGGearItemGenerationData* GenerationData)
+void URPGItemsGenerator::GenerateItemStatsModifiers(URPGGearItem* Item, const URPGGearItemGenerationData* GenerationData)
 {
-	TMap<UCharacterBaseStatData*, int32> StatsModifiers = TMap<UCharacterBaseStatData*, int32>();
+	TMap<UCoreStatData*, int32> StatsModifiers = TMap<UCoreStatData*, int32>();
 
 	for (const auto& StatModifier : GenerationData->StatsModifiers)
-	{
-		TSubclassOf<UStatOperation> StatOperationClass = StatModifier.Value;
-		UStatOperation* Operation = NewObject<UStatOperation>(Item, StatOperationClass);
-		Operation->Init(Item, Item->RarityLevel->RarityValue);
-		StatsModifiers.Add(StatModifier.Key, Operation->GetResultOperation());
-	}
-
-	return StatsModifiers;
-}
-
-UCharacterBaseStatData* URPGItemsGenerator::GetRandomMainStat(const URPGMainStatsData* MainStatsPool)
-{
-	const int32 RandomIndex = FMath::RandRange(0, MainStatsPool->MaintStatPool.Num() - 1);
-	return MainStatsPool->MaintStatPool.Array()[RandomIndex];
+		Item->AddItemStat(StatModifier.Key, StatModifier.Value);
 }

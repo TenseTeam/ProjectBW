@@ -36,6 +36,8 @@ public:
 protected:
 	UFUNCTION(BlueprintNativeEvent)
 	bool ApplyModifier(ACharacter* Context);
+	UFUNCTION(BlueprintNativeEvent)
+	void BeginPlay(ACharacter* Context);
 	
 private:
 	virtual bool ModifyCamera(float DeltaTime, struct FMinimalViewInfo& InOutPOV) override;

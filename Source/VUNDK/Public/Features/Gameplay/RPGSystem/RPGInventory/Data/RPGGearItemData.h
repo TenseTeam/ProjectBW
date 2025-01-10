@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RPGItemDataBase.h"
+#include "RPGItemData.h"
 #include "Features/Gameplay/RPGSystem/RPGInventory/Items/RPGGearItem.h"
-#include "Features/Gameplay/RPGSystem/CharacterStats/StatOperation.h"
-#include "Features/Gameplay/RPGSystem/CharacterStats/Data/CharacterBaseStatData.h"
+#include "VUNDK/Public/Features/Gameplay/RPGSystem/StatsSystem/StatOperation.h"
+#include "VUNDK/Public/Features/Gameplay/RPGSystem/StatsSystem/Data/CoreStatData.h"
 #include "RPGGearItemData.generated.h"
 
 UCLASS()
-class VUNDK_API URPGGearItemData : public URPGItemDataBase
+class VUNDK_API URPGGearItemData : public URPGItemData
 {
 	GENERATED_BODY()
 

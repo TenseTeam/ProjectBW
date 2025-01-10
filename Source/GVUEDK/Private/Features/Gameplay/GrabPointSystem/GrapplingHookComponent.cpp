@@ -18,6 +18,7 @@ UGrapplingHookComponent::UGrapplingHookComponent()
 	bIsHooking = false;
 	bMotionDataCalculated = false;
 	bOrientRotationToMovement = true;
+	bApplyMomentumDuringHookThrow = false;
 	bInitialized = false;
 	MaxDistance = 3000.f;
 	MinDistance = 0.f;
@@ -30,6 +31,7 @@ UGrapplingHookComponent::UGrapplingHookComponent()
 	StartHookDirection = FVector::ZeroVector;
 	SpeedCurve = nullptr;
 	TargetGrabPoint = nullptr;
+	OwnerCharacter = nullptr;
 }
 
 void UGrapplingHookComponent::BeginPlay()
