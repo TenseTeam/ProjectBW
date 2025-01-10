@@ -75,9 +75,9 @@ FText URPGItem::GetItemDescription() const
 	return VisualDetails.Description.IsEmpty() ? Super::GetItemDescription() : VisualDetails.Description;
 }
 
-TSubclassOf<AItemDropActor> URPGItem::GetItemDropActorClass() const
+UStaticMesh* URPGItem::GetItemMesh() const
 {
-	return VisualDetails.DropActorClass != nullptr ? VisualDetails.DropActorClass : Super::GetItemDropActorClass();
+	return VisualDetails.ItemMesh != nullptr ? VisualDetails.ItemMesh : Super::GetItemMesh();
 }
 
 URPGItemData* URPGItem::GetRPGItemData() const

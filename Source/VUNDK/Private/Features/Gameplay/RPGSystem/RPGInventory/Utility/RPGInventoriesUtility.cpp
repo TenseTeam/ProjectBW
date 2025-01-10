@@ -3,7 +3,7 @@
 #include "Features/Gameplay/RPGSystem/RPGInventory/Utility/RPGInventoriesUtility.h"
 #include "Features/Gameplay/InventorySystem/Utility/ISInventoriesUtility.h"
 
-UBaseStatData* URPGInventoriesUtility::GetStatByID(const FName StatID)
+UCoreStatData* URPGInventoriesUtility::GetStatByID(const FName StatID)
 {
 	return GetRPGInventoriesManager()->GetStatByID(StatID);
 }

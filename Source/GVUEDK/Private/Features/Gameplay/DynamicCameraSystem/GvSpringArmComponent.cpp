@@ -33,8 +33,5 @@ FVector UGvSpringArmComponent::BlendLocations(const FVector& DesiredArmLocation,
 	// const FVector LocalDesiredLocation = GetOwner()->GetTransform().InverseTransformPosition(DesiredArmLocation);
 	// const FVector NewLocalDesiredLocation = FVector(LocalHitLocation.X, LocalDesiredLocation.Y, LocalHitLocation.Z);
 	// const FVector NewWorldDesiredLocation = GetOwner()->GetTransform().TransformPosition(NewLocalDesiredLocation);
-	// GetOwner()->Get
-	//FGvDebug::Warning(DesiredArmLocation.ToString(), true);
-	//FGvDebug::Log(LocalDesiredLocation.ToString(), true);
-	//return bHitSomething ? NewWorldDesiredLocation : DesiredArmLocation;
+	// return bHitSomething ? NewWorldDesiredLocation : DesiredArmLocation;
 }

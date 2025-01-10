@@ -49,9 +49,9 @@ UItemStatOperation* URPGFactory::CreateItemStatOperation(const TSubclassOf<UItem
 	return Operation;
 }
 
-UStatOperation* URPGFactory::CreateBridgeStatOperation(UStatsBridgeBase* Bridge, USpecialStatData* SpecialStatData)
+UStatOperation* URPGFactory::CreateBridgeStatOperation(UStatsBridgeBase* Bridge, USpecialStatData* SpecialStatData, const TSubclassOf<UStatOperation>& OperationClass)
 {
-	UStatOperation* Operation = NewObject<UStatOperation>(Bridge, SpecialStatData->StatBaseValueOperationClass);
+	UStatOperation* Operation = NewObject<UStatOperation>(Bridge, OperationClass);
 
 	if (!IsValid(Bridge) || !IsValid(Bridge->SpecialStatsContainer))
 	{
@@ -59,6 +59,6 @@ UStatOperation* URPGFactory::CreateBridgeStatOperation(UStatsBridgeBase* Bridge,
 		return nullptr;
 	}
 	
-	Operation->Init(SpecialStatData, Bridge->SpecialStatsContainer->GetStatDefaultValue(SpecialStatData));
+	Operation->Init(SpecialStatData, Bridge->SpecialStatsContainer->GetValue(SpecialStatData));
 	return Operation;
 }

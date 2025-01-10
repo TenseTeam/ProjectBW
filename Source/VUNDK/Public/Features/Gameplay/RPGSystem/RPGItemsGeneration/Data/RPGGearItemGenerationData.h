@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "RPGItemBaseGenerationData.h"
-#include "Features/Gameplay/RPGSystem/StatsSystem/Data/BaseStatData.h"
+#include "Features/Gameplay/RPGSystem/StatsSystem/Data/CoreStatData.h"
 #include "Features/Gameplay/RPGSystem/RPGItemsGeneration/ItemStatOperation.h"
 #include "RPGGearItemGenerationData.generated.h"
 
@@ -15,5 +15,5 @@ class VUNDK_API URPGGearItemGenerationData : public URPGItemBaseGenerationData
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TMap<UBaseStatData*, TSubclassOf<UItemStatOperation>> StatsModifiers;
+	TMap<UCoreStatData*, TSubclassOf<UItemStatOperation>> StatsModifiers;
 };
