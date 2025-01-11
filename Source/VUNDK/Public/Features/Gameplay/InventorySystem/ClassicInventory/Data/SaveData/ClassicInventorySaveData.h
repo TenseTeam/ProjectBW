@@ -14,5 +14,5 @@ class VUNDK_API UClassicInventorySaveData : public UInventoryBaseSaveData
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TMap<FName, FClassicItemSaveData> SavedItems;
+	TMap<FGuid, FClassicItemSaveData> SavedItems;
 };

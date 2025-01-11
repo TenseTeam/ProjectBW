@@ -18,5 +18,5 @@ public:
 	void AddSpecialStats(TSet<USpecialStatData*> SpecialStats);
 
 	UFUNCTION(BlueprintPure)
-	TMap<USpecialStatData*, int32> GetSpecialStatsValues();
+	TMap<USpecialStatData*, float> GetSpecialStatsValues();
 };

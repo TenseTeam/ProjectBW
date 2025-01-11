@@ -6,15 +6,16 @@
 
 UCharacterStats::UCharacterStats(): Equipment(nullptr)
 {
-	PrimaryComponentTick.bCanEverTick = false;
 }
 
 void UCharacterStats::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-
-	if (Check())
-		Equipment->OnEquipChanged.RemoveDynamic(this, &UCharacterStats::CalculateFullStatsValues);
+	
+	if (!Check())
+		return;
+	
+	Equipment->OnEquipChanged.RemoveDynamic(this, &UCharacterStats::CalculateFullStatsValues);
 }
 
 void UCharacterStats::Init(UEquipment* InEquipment)
@@ -23,7 +24,7 @@ void UCharacterStats::Init(UEquipment* InEquipment)
 		return;
 	
 	Equipment = InEquipment;
-	CalculateFullStatsValues();
+	CalculateAllStatsValues();
 	Equipment->OnEquipChanged.AddDynamic(this, &UCharacterStats::CalculateFullStatsValues);
 }
 
@@ -36,10 +37,10 @@ void UCharacterStats::OnCalculateFullStatsValues_Implementation()
 	{
 		if (const URPGGearItem* RPGItem = Cast<URPGGearItem>(Item); RPGItem != nullptr)
 		{
-			for (const auto& Values : FullStatsContainer->GetValues())
+			for (const auto& Values : GetFullStatsValues())
 			{
 				UStatDataBase* Stat = Values.Key;
-				FullStatsContainer->TryModifyValue(Stat, RPGItem->GearStatsContainer->GetValue(Stat));
+				ModifyFullStatValue(Stat, RPGItem->GearStatsContainer->GetValueAsFloat(Stat));
 			}
 		}
 	}

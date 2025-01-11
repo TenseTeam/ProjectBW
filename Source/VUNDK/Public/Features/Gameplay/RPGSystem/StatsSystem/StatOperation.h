@@ -15,13 +15,13 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (ExposeOnSpawn = "true"))
 	UObject* Payload;
 	UPROPERTY(BlueprintReadOnly, meta = (ExposeOnSpawn = "true"))
-	int32 ModifierValue;
+	float ModifierValue;
 	
 public:
-	void Init(UObject* InPayload, const int32 InModifierValue);
+	void Init(UObject* InPayload, const float InModifierValue);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
-	int32 GetResultOperation() const;
+	float GetResultOperation() const;
 
 protected:
 	UFUNCTION(BlueprintNativeEvent)

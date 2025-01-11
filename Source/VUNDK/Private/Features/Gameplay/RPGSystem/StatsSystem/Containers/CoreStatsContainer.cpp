@@ -5,12 +5,12 @@
 void UCoreStatsContainer::AddCoreStats(TSet<UCoreStatData*> CoreStats)
 {
 	for (UCoreStatData* CoreStat : CoreStats)
-		AddStat(CoreStat, CoreStat->StatMinValue);
+		AddStat(CoreStat, CoreStat->StatDefaultValue);
 }
 
-TMap<UCoreStatData*, int32> UCoreStatsContainer::GetCoreStatsValues()
+TMap<UCoreStatData*, float> UCoreStatsContainer::GetCoreStatsValues()
 {
-	TMap<UCoreStatData*, int32> CoreStatsValues;
+	TMap<UCoreStatData*, float> CoreStatsValues;
 	
 	for (auto& Stat : Values)
 	{
@@ -19,4 +19,18 @@ TMap<UCoreStatData*, int32> UCoreStatsContainer::GetCoreStatsValues()
 	}
 	
 	return CoreStatsValues;
+}
+
+FString UCoreStatsContainer::GetValueAsString(const UStatDataBase* Stat) const
+{
+	FString Value = Super::GetValueAsString(Stat);
+	
+	if (Value.IsEmpty())
+		return Value;
+	
+	const UCoreStatData* CoreStat = Cast<UCoreStatData>(Stat);
+	if (!IsValid(CoreStat))
+		return Value;
+	
+	return Value + " " + CoreStat->MeasurementSymbol;
 }

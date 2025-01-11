@@ -6,7 +6,7 @@
 #include "Features/Gameplay/RPGSystem/RPGInventory/Items/RPGItem.h"
 #include "Features/Gameplay/RPGSystem/RPGItemsGeneration/RPGItemsGenerator.h"
 
-URPGItem* URPGFactory::CreateRPGItem(URPGItemData* Data, const URPGItemBaseGenerationData* GenerationData, const bool bBuildItem, const int32 Quantity)
+URPGItem* URPGFactory::CreateRPGGenericItem(URPGItemData* Data, const URPGItemBaseGenerationData* GenerationData, const bool bBuildItem, const int32 Quantity)
 {
 	if (Data == nullptr)
 		return nullptr;
@@ -42,9 +42,9 @@ URPGGearItem* URPGFactory::CreateRPGGearItem(URPGGearItemData* Data, const URPGG
 	return GearItem;
 }
 
-UItemStatOperation* URPGFactory::CreateItemStatOperation(const TSubclassOf<UItemStatOperation> OperationClass, URPGItem* Item)
+URPGItemStatOperation* URPGFactory::CreateItemStatOperation(const TSubclassOf<URPGItemStatOperation> OperationClass, URPGItem* Item)
 {
-	UItemStatOperation* Operation = NewObject<UItemStatOperation>(Item, OperationClass);
+	URPGItemStatOperation* Operation = NewObject<URPGItemStatOperation>(Item, OperationClass);
 	Operation->Init(Item, Item->RarityLevel->RarityValue);
 	return Operation;
 }
@@ -59,6 +59,6 @@ UStatOperation* URPGFactory::CreateBridgeStatOperation(UStatsBridgeBase* Bridge,
 		return nullptr;
 	}
 	
-	Operation->Init(SpecialStatData, Bridge->SpecialStatsContainer->GetValue(SpecialStatData));
+	Operation->Init(SpecialStatData, Bridge->SpecialStatsContainer->GetValueAsFloat(SpecialStatData));
 	return Operation;
 }

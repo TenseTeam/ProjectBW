@@ -131,10 +131,10 @@ public:
 	bool HasItemOfDataID(const UItemDataBase* ItemData) const;
 
 	UFUNCTION(BlueprintPure)
-	bool HasEnoughQuantity(const UItemDataBase* ItemData, const int32 Quantity) const;
+	bool HasEnoughQuantityToConsume(const UItemDataBase* ItemData, const int32 QuantityToConsume) const;
 
 	UFUNCTION(BlueprintCallable)
-	UItemDataBase* GetItemDataFromRegistry(const FName ItemDataID) const;
+	UItemDataBase* GetItemDataFromRegistry(const FGuid ItemDataID) const;
 
 	UFUNCTION(BlueprintPure)
 	TArray<UItemBase*> GetItems(const bool bIncludeEquippedItems = true);
