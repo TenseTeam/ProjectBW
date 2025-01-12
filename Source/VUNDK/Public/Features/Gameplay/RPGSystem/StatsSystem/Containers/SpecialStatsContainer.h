@@ -8,7 +8,7 @@
 #include "UObject/Object.h"
 #include "SpecialStatsContainer.generated.h"
 
-UCLASS(BlueprintType)
+UCLASS()
 class VUNDK_API USpecialStatsContainer : public UStatsContainer
 {
 	GENERATED_BODY()

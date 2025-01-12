@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ShootData.h"
 #include "Engine/DataAsset.h"
 #include "WeaponData.generated.h"
 
@@ -12,26 +13,12 @@ class VUNDK_API UWeaponData : public UPrimaryDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FName WeaponName;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float Damage;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float FireRate;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float Range;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float Recoil;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float ReloadTime;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 ClipSize;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 MaxAmmo;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float ZoomFOV;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float Zoom;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FShootData ShootData;
 };

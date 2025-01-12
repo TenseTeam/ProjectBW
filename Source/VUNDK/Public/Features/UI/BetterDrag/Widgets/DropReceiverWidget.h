@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Features/UI/BetterDrag/Interfaces/BetterDragDropReceiver.h"
+#include "Features/UI/BetterDrag/Interfaces/IBetterDragDropReceiver.h"
 #include "DropReceiverWidget.generated.h"
 
 UCLASS(BlueprintType, Blueprintable)
