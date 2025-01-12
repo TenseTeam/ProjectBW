@@ -59,6 +59,8 @@ void ABWCharacter::BeginPlay()
 	DodgerComponent->OnStartDodge.AddDynamic(this, &ABWCharacter::StartDodging);
 	DodgerComponent->OnDodge.AddDynamic(this, &ABWCharacter::Dodging);
 	DodgerComponent->OnStopDodge.AddDynamic(this, &ABWCharacter::StopDodging);
+
+	GetCharacterMovement()->MaxWalkSpeed = Data->WalkSpeed;
 }
 
 void ABWCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
