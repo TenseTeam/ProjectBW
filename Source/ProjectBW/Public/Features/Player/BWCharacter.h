@@ -285,4 +285,7 @@ private:
 	void Dodging();
 	UFUNCTION()
 	void StopDodging();
+
+	void InitStats();
+	void UpdateStats();
 };
