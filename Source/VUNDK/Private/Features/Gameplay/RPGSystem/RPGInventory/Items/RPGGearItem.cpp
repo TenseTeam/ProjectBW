@@ -40,15 +40,15 @@ void URPGGearItem::LoadRPGGearItemSaveData(URPGInventory* LoadingInventory, FRPG
 	LoadRPGItemSaveData(LoadingInventory, GearSaveData.RPGItemSaveData);
 }
 
-void URPGGearItem::AddItemStat(UCoreStatData* Stat, const TSubclassOf<UItemStatOperation> OperationClass)
+void URPGGearItem::AddItemStat(UCoreStatData* Stat, const TSubclassOf<URPGItemStatOperation> OperationClass)
 {
-	auto CalculateResult = [this](const UCoreStatData* LocalStat, const TSubclassOf<UItemStatOperation>& LocalOperationClass) -> int32
+	auto CalculateResult = [this](const UCoreStatData* LocalStat, const TSubclassOf<URPGItemStatOperation>& LocalOperationClass) -> float
 	{
 		const UStatOperation* Operation = URPGFactory::CreateItemStatOperation(LocalOperationClass, this);
 		return Operation->GetResultOperation();
 	};
 
-	if (const int32 Value = CalculateResult(Stat, OperationClass); Value != 0)
+	if (const float Value = CalculateResult(Stat, OperationClass); !FMath::IsWithinInclusive(Value, MinValidStatValue, MaxValidStatValue))
 		GearStatsContainer->AddStat(Stat, Value);
 }
 

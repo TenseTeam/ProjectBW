@@ -14,5 +14,5 @@ class VUNDK_API UTetrisInventorySaveData : public UInventoryBaseSaveData
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TMap<FName, FTetrisItemsSaveArray> TetrisItems;
+	TMap<FGuid, FTetrisItemsSaveArray> TetrisItems;
 };

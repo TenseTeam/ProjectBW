@@ -40,7 +40,7 @@ bool UISInventoriesUtility::IsItemInRegistry(const UItemDataBase* ItemData)
 	return InventoriesManager->IsItemInRegistry(ItemData);
 }
 
-UItemDataBase* UISInventoriesUtility::GetItemDataFromRegistry(const FName& ItemDataID)
+UItemDataBase* UISInventoriesUtility::GetItemDataFromRegistry(const FGuid& ItemDataID)
 {
 	if (!Check()) return nullptr;
 

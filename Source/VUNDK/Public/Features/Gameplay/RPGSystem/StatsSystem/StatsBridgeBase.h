@@ -8,18 +8,19 @@
 #include "Containers/CoreStatsContainer.h"
 #include "Containers/SpecialStatsContainer.h"
 #include "Data/SpecialStatData.h"
-#include "Features/Generic/SaveSystem/Interfaces/Saveable.h"
+#include "Features/Generic/SaveSystem/Interfaces/ISaveable.h"
 #include "StatsBridgeBase.generated.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogStatsSystem, Log, All);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(
-	FOnCalculatedCoreStatsValues
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
+	FOnCalculatedCoreStatsValues,
+	UStatsBridgeBase*, StatsBridge
 );
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
 	FOnCalculatedFullStatsValues,
-	UCoreStatsContainer*, FullStatsContainer
+	UStatsBridgeBase*, StatsBridge
 );
 
 UCLASS(Abstract, Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -41,26 +42,43 @@ public:
 	USpecialStatsContainer* SpecialStatsContainer;
 	UPROPERTY(BlueprintReadOnly)
 	UCoreStatsContainer* CoreStatsContainer;
-	UPROPERTY(BlueprintReadOnly)
+	
+private:
+	UPROPERTY()
 	UCoreStatsContainer* FullStatsContainer;
 	
 public:
 	UStatsBridgeBase();
 
-	virtual void BeginPlay() override;
-
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-	
 	UFUNCTION(BlueprintPure)
 	virtual USaveData* CreateSaveData() override;
 	
 	UFUNCTION(BlueprintCallable)
 	virtual bool LoadSaveData(USaveData* SavedData) override;
 	
-	UCoreStatData* GetCoreStatByID(const FName& BaseStatID) const;
-	
-	USpecialStatData* GetSpecialStatByID(const FName& SpecialStatID) const;
+	virtual void BeginPlay() override;
 
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	
+	USpecialStatData* GetSpecialStatByID(const FGuid SpecialStatID) const;
+
+	UCoreStatData* GetCoreStatByID(const FGuid CoreStatID) const;
+
+	UFUNCTION(BlueprintPure)
+	TMap<UCoreStatData*, float> GetFullStatsValues() const;
+
+	UFUNCTION(BlueprintPure)
+	float GetFullStatValueAsFloat(const UStatDataBase* Stat) const;
+
+	UFUNCTION(BlueprintPure)
+	int32 GetFullStatValueAsInt(const UStatDataBase* Stat) const;
+
+	UFUNCTION(BlueprintPure)
+	FString GetFullStatValueAsString(const UStatDataBase* Stat) const;
+
+	UFUNCTION(BlueprintPure)
+	int32 GetFullStatsLength() const;
+	
 	UFUNCTION(BlueprintCallable)
 	void CalculateCoreStatValueWithSpecialStat(USpecialStatData* SpecialStatData, UCoreStatData* CoreStatData, const TSubclassOf<UStatOperation> OperationClass);
 
@@ -68,6 +86,12 @@ public:
 	void CalculateAllStatsValues();
 	
 protected:
+	UFUNCTION(BlueprintCallable)
+	void SetFullStatValue(UStatDataBase* Stat, float Value) const;
+
+	UFUNCTION(BlueprintCallable)
+	void ModifyFullStatValue(UStatDataBase* Stat, float Value) const;
+	
 	UFUNCTION()
 	void CalculateCoreStatsValues();
 

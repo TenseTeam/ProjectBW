@@ -1,18 +1,16 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright VUNDK, Inc. All Rights Reserved.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Features/Generic/SaveSystem/Data/SaveData.h"
 #include "UObject/Object.h"
-#include "Saveable.generated.h"
+#include "ISaveable.generated.h"
 
 UINTERFACE(BlueprintType)
 class VUNDK_API USaveable : public UInterface
 {
 	GENERATED_BODY()
-
-	
 };
 
 class ISaveable

@@ -12,8 +12,8 @@ class VUNDK_API URPGRarityLevelData : public UPrimaryDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, AdvancedDisplay)
-	FName RarityID;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, AdvancedDisplay)
+	FGuid RarityID;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText RarityName;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -21,20 +21,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = 0.0f, ClampMax = 1.0f))
 	float Probability;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int32 RarityValue;
+	float RarityValue;
 
 public:
-	URPGRarityLevelData() : RarityID(FName("NotGeneratedID")),
+	URPGRarityLevelData() : RarityID(FGuid::NewGuid()),
 	                        RarityName(FText::GetEmpty()),
 	                        RarityColor(FLinearColor::White),
-	                        Probability(0.0f),
-	                        RarityValue(0)
+	                        Probability(0.f),
+	                        RarityValue(0.f)
 	{
-	}
-	
-	FORCEINLINE virtual void PostInitProperties() override
-	{
-		Super::PostInitProperties();
-		RarityID = FName(FGuid::NewGuid().ToString());
 	}
 };
