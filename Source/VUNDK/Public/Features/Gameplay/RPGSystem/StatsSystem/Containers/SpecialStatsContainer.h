@@ -8,7 +8,7 @@
 #include "UObject/Object.h"
 #include "SpecialStatsContainer.generated.h"
 
-UCLASS(BlueprintType)
+UCLASS()
 class VUNDK_API USpecialStatsContainer : public UStatsContainer
 {
 	GENERATED_BODY()
@@ -18,5 +18,5 @@ public:
 	void AddSpecialStats(TSet<USpecialStatData*> SpecialStats);
 
 	UFUNCTION(BlueprintPure)
-	TMap<USpecialStatData*, int32> GetSpecialStatsValues();
+	TMap<USpecialStatData*, float> GetSpecialStatsValues();
 };

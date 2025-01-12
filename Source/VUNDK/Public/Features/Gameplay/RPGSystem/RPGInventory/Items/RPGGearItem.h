@@ -9,8 +9,11 @@
 #include "Features/Gameplay/RPGSystem/StatsSystem/Containers/CoreStatsContainer.h"
 #include "RPGGearItem.generated.h"
 
-class UItemStatOperation;
+class URPGItemStatOperation;
 class URPGGearItemData;
+
+constexpr int32 MinValidStatValue = -0.05f;
+constexpr int32 MaxValidStatValue = 0.05f;
 
 UCLASS()
 class VUNDK_API URPGGearItem : public URPGItem
@@ -31,7 +34,7 @@ public:
 	void LoadRPGGearItemSaveData(URPGInventory* LoadingInventory, FRPGGearItemSaveData& GearSaveData);
 	
 	UFUNCTION(BlueprintCallable, meta = (HidePin = "bOverrideIfExist"))
-	void AddItemStat(UCoreStatData* Stat, TSubclassOf<UItemStatOperation> OperationClass);
+	void AddItemStat(UCoreStatData* Stat, TSubclassOf<URPGItemStatOperation> OperationClass);
 	
 	UFUNCTION(BlueprintPure)
 	URPGGearItemData* GetRPGGearItemData() const;

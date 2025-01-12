@@ -22,14 +22,14 @@ public:
 	
 protected:
 	UPROPERTY(BlueprintReadOnly)
-	TMap<UStatDataBase*, int32> Values;
+	TMap<UStatDataBase*, float> Values;
 
 public:
 	UFUNCTION(BlueprintCallable)
 	void AddStats(TSet<UStatDataBase*> Stats);
 	
 	UFUNCTION(BlueprintCallable)
-	void AddStat(UStatDataBase* Stat, const int32 Value);
+	void AddStat(UStatDataBase* Stat, const float Value);
 
 	UFUNCTION(BlueprintCallable)
 	void ClearStats();
@@ -44,14 +44,26 @@ public:
 	bool AreStatsEqual(UStatsContainer* StatsContainer) const;
 	
 	UFUNCTION(BlueprintPure)
-	int32 GetValue(const UStatDataBase* Stat) const;
+	int32 GetValueAsInt(const UStatDataBase* Stat) const;
 
-	UFUNCTION(BlueprintCallable)
-	bool TrySetValue(UStatDataBase* Stat, const int32 Value);
+	UFUNCTION(BlueprintPure)
+	float GetValueAsFloat(const UStatDataBase* Stat) const;
+
+	UFUNCTION(BlueprintPure)
+	virtual FString GetValueAsString(const UStatDataBase* Stat) const;
+
+	UFUNCTION(BlueprintPure)
+	int32 GetStatsLength() const;
+
+	UFUNCTION(BlueprintCallable, meta = (HidePin = "bNotifyEvent"))
+	bool TrySetValue(UStatDataBase* Stat, const float Value, const bool bNotifyEvent = true);
 	
 	UFUNCTION(BlueprintCallable)
-	bool TryModifyValue(UStatDataBase* Stat, const int32 SumValue);
+	bool TryModifyValue(UStatDataBase* Stat, const float SumValue, const bool bNotifyEvent = true);
 	
 	UFUNCTION(BlueprintPure)
-	TMap<UStatDataBase*, int32> const& GetValues() const;
+	TMap<UStatDataBase*, float> const& GetValues() const;
+
+private:
+	static float ValidateStatValue(const float Value, const FFloatRange& Range);
 };

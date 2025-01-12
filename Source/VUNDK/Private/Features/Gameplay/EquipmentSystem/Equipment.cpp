@@ -23,7 +23,7 @@ void UEquipment::BeginPlay()
 		for (int32 i = 0; i < SlotLimit.Value; i++)
 			IndexedItems.Add(i, nullptr);
 		
-		EquipSlots.Add(SlotLimit.Key->EquipSlotKeyID, IndexedItems);
+		EquipSlots.Add(SlotLimit.Key->EquipSlotKey, IndexedItems);
 	}
 }
 
@@ -54,7 +54,7 @@ bool UEquipment::TryUnequipItem(UItemBase* Item)
 	
 	UEquipSlotKey* ItemSlotKey = Item->GetItemData()->EquipSlotKey;
 
-	if (!EquipSlots.Contains(ItemSlotKey->EquipSlotKeyID) || EquipSlots[ItemSlotKey->EquipSlotKeyID].FindKey(Item) == nullptr)
+	if (!EquipSlots.Contains(ItemSlotKey->EquipSlotKey) || EquipSlots[ItemSlotKey->EquipSlotKey].FindKey(Item) == nullptr)
 		return false;
 
 	UnequipItem(Item, ItemSlotKey);
@@ -90,10 +90,10 @@ void UEquipment::ClearEquipment()
 
 bool UEquipment::CanEquipItem(const UItemBase* Item, const UEquipSlotKey* TargetSlotKey, const int32 SlotIndex) const
 {
-	if (Item->GetItemData()->EquipSlotKey != TargetSlotKey || !EquipSlots.Contains(TargetSlotKey->EquipSlotKeyID))
+	if (Item->GetItemData()->EquipSlotKey != TargetSlotKey || !EquipSlots.Contains(TargetSlotKey->EquipSlotKey))
 		return false;
 
-	TMap<int32, UItemBase*> SlotItems = EquipSlots[TargetSlotKey->EquipSlotKeyID];
+	TMap<int32, UItemBase*> SlotItems = EquipSlots[TargetSlotKey->EquipSlotKey];
 	
 	const bool bIsSlotIndexValid = SlotIndex >= 0 && SlotIndex < SlotLimits[TargetSlotKey];
 	const bool bIsSlotEmpty = SlotItems.Contains(SlotIndex) && SlotItems[SlotIndex] == nullptr;
@@ -123,7 +123,7 @@ void UEquipment::EquipItem(UItemBase* Item, UEquipSlotKey* EquipSlotKey, const i
 
 void UEquipment::UnequipItem(UItemBase* Item, UEquipSlotKey* EquipSlotKey)
 {
-	const TMap<int32, UItemBase*> SlotItems = EquipSlots[EquipSlotKey->EquipSlotKeyID];
+	const TMap<int32, UItemBase*> SlotItems = EquipSlots[EquipSlotKey->EquipSlotKey];
 	const int32 Index = *(SlotItems.FindKey(Item));
 
 	RemoveItemFromEquipSlot(Item, EquipSlotKey, Index);
@@ -134,19 +134,19 @@ void UEquipment::UnequipItem(UItemBase* Item, UEquipSlotKey* EquipSlotKey)
 
 void UEquipment::AddItemInEquipSlot(UItemBase* Item, const UEquipSlotKey* EquipSlotKey, const int32 NewSlotIndex)
 {
-	EquipSlots[EquipSlotKey->EquipSlotKeyID][NewSlotIndex] = Item;
+	EquipSlots[EquipSlotKey->EquipSlotKey][NewSlotIndex] = Item;
 	Item->SetEquipSlot(this, NewSlotIndex);
 }
 
 void UEquipment::RemoveItemFromEquipSlot(UItemBase* Item, const UEquipSlotKey* EquipSlotKey, const int32 SlotIndex)
 {
-	EquipSlots[EquipSlotKey->EquipSlotKeyID][SlotIndex] = nullptr;
+	EquipSlots[EquipSlotKey->EquipSlotKey][SlotIndex] = nullptr;
 	Item->ClearEquipSlot();
 }
 
 void UEquipment::ChangeItemEquipSlot(UItemBase* Item, UEquipSlotKey* EquipSlotKey, const int32 NewSlotIndex)
 {
-	const TMap<int32, UItemBase*> SlotItems = EquipSlots[EquipSlotKey->EquipSlotKeyID];
+	const TMap<int32, UItemBase*> SlotItems = EquipSlots[EquipSlotKey->EquipSlotKey];
 	const int32* OldSlotKeyRef = SlotItems.FindKey(Item);
 	
 	if (OldSlotKeyRef == nullptr) // Safe check to prevent crashes

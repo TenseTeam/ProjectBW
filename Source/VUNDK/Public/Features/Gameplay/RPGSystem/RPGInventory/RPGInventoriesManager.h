@@ -25,8 +25,8 @@ public:
 	URPGInventoriesManager();
 
 	UFUNCTION(BlueprintPure)
-	URPGRarityLevelData* GetRarityByID(const FName RarityID) const;
+	URPGRarityLevelData* GetRarityByID(const FGuid RarityID) const;
 
 	UFUNCTION(BlueprintPure)
-	UCoreStatData* GetStatByID(const FName StatID) const;
+	UCoreStatData* GetStatByID(const FGuid StatID) const;
 };
