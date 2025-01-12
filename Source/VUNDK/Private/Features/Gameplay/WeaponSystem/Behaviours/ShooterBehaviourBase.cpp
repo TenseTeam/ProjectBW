@@ -90,7 +90,7 @@ bool UShooterBehaviourBase::CanShoot() const
 {
 	if (!Check())
 	{
-		UE_LOG(LogShooter, Error, TEXT("Trying to shoot with invalid ShootData in %s."), *GetName());
+		UE_LOG(LogShooter, Error, TEXT("Trying to shoot with invalid Shooter in %s."), *GetName());
 		return false;
 	}
 	
