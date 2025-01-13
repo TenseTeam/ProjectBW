@@ -7,7 +7,7 @@ void UShooterBehaviourBase::Init(UShooter* InShooter, const FShootData InShootDa
 {
 	if (InShooter == nullptr)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Shooter in %s is null"), *GetName());
+		UE_LOG(LogShooter, Error, TEXT("Shooter in %s is null"), *GetName());
 		return;
 	}
 	
@@ -25,15 +25,27 @@ bool UShooterBehaviourBase::Shoot()
 	
 	if (!CanShoot())
 	{
-		OnShootFail();
+		ShootFail();
 		OnBehaviourShootFail.Broadcast();
 		return false;
 	}
 
-	OnShootSuccess();
+	if (!bHasInfiniteAmmo)
+		ModifyCurrentAmmo(-1);
+	
+	ShootSuccess();
 	OnBehaviourShootSuccess.Broadcast();
-	ModifyCurrentAmmo(-1);
 	return true;
+}
+
+void UShooterBehaviourBase::ShootSuccess()
+{
+	OnShootSuccess();
+}
+
+void UShooterBehaviourBase::ShootFail()
+{
+	OnShootFail();
 }
 
 int32 UShooterBehaviourBase::Refill(const int32 Ammo)

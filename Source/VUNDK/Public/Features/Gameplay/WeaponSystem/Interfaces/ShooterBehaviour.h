@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
-#include "IShooterBehaviour.generated.h"
+#include "ShooterBehaviour.generated.h"
 
 UINTERFACE(BlueprintType)
 class VUNDK_API UShooterBehaviour : public UInterface

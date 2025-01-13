@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Features/Gameplay/WeaponSystem/Data/ShootData.h"
-#include "Features/Gameplay/WeaponSystem/Interfaces/IShooterBehaviour.h"
+#include "Features/Gameplay/WeaponSystem/Interfaces/ShooterBehaviour.h"
 #include "UObject/Object.h"
 #include "ShooterBehaviourBase.generated.h"
 
@@ -48,11 +48,15 @@ private:
 	bool bIsInCooldown;
 
 public:
-	void Init(UShooter* InShooter, FShootData InShootData);
+	virtual void Init(UShooter* InShooter, const FShootData InShootData);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
 	virtual bool Shoot() override;
 
+	virtual void ShootSuccess();
+
+	virtual void ShootFail();
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
 	virtual int32 Refill(const int32 Ammo) override;
 
