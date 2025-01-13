@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/Decorators/BTDecorator_BlackboardBase.h"
-#include "BTDecoratorCanSeeTarget.generated.h"
+#include "BTDecorator_CanSeeTarget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class LGUEDK_API UBTDecoratorCanSeeTarget : public UBTDecorator_BlackboardBase
+class LGUEDK_API UBTDecorator_CanSeeTarget : public UBTDecorator_BlackboardBase
 {
 	GENERATED_BODY()
 
 protected:
-	explicit UBTDecoratorCanSeeTarget(FObjectInitializer const& ObjectInitializer);
+	explicit UBTDecorator_CanSeeTarget(FObjectInitializer const& ObjectInitializer);
 	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
 
 private:

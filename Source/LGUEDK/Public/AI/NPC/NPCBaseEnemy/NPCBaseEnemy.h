@@ -39,7 +39,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|State")
 	EEnemyState CurrentState = EEnemyState::Patrolling;
-	
+
 	virtual void BeginPlay() override;
 
 };

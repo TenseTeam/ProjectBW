@@ -1,17 +1,17 @@
 // Copyright Villains, Inc. All Rights Reserved.
 
 
-#include "BTDecoratorEnemyState.h"
+#include "BTDecorator_EnemyState.h"
 #include "AIController.h"
 #include "AI/NPC/NPCBaseEnemy/NPCBaseEnemy.h"
 #include "LGUEDK/Public/AI/NPC/NPCBase/NPCBase.h"
 
-UBTDecoratorEnemyState::UBTDecoratorEnemyState(FObjectInitializer const& ObjectInitializer)
+UBTDecorator_EnemyState::UBTDecorator_EnemyState(FObjectInitializer const& ObjectInitializer)
 {
 	NodeName = "Enemy State";
 }
 
-bool UBTDecoratorEnemyState::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
+bool UBTDecorator_EnemyState::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {
 	const AAIController* AIController = OwnerComp.GetAIOwner();
 	if (!AIController)

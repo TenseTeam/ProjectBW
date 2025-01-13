@@ -23,7 +23,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
 	FBlackboardKeySelector AttackTargetKey;
 	
+	UPROPERTY()
 	AActor* CachedPlayerActor;
+	UPROPERTY()
 	class UHealthBaseComponent* CachedHealthComponent;
 	
 	UPROPERTY(EditAnywhere, Category = "Settings")

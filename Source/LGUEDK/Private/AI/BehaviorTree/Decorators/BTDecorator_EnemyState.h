@@ -3,25 +3,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AI/Enumerators/EnemyState.h"
 #include "BehaviorTree/Decorators/BTDecorator_BlackboardBase.h"
-#include "BTDecoratorCheckBool.generated.h"
+#include "BTDecorator_EnemyState.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class LGUEDK_API UBTDecoratorCheckBool : public UBTDecorator_BlackboardBase
+class LGUEDK_API UBTDecorator_EnemyState : public UBTDecorator_BlackboardBase
 {
 	GENERATED_BODY()
 	
 protected:
-	explicit UBTDecoratorCheckBool(FObjectInitializer const& ObjectInitializer);
+	explicit UBTDecorator_EnemyState(FObjectInitializer const& ObjectInitializer);
 	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
 	
 
 public:
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="AI", meta=(AllowPrivateAccess = "true"))
-	FBlackboardKeySelector BoolKey;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+	EEnemyState RequiredState;
 };

@@ -5,11 +5,12 @@
 
 #include "AI/Interfaces/AITargetInterface.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Components/HealtComponent/HealthBaseComponent.h"
 
 
 ABWNPCbaseEnemyController::ABWNPCbaseEnemyController()
 {
-	
+	BWControlledPawn = nullptr;
 }
 
 void ABWNPCbaseEnemyController::BeginPlay()
@@ -37,7 +38,10 @@ void ABWNPCbaseEnemyController::InitializeBlackboardValues()
 	Blackboard->SetValueAsObject(TEXT("AttackTarget"), nullptr);
 	Blackboard->SetValueAsFloat(TEXT("TimeBeforeInvestigating"), BWControlledPawn->GetTimeBeforeInvestigating());
 	Blackboard->SetValueAsFloat(TEXT("RandomInvestigatingTimeDeviation"), BWControlledPawn->GetRandomInvestigatingTimeDeviation());
-
+	Blackboard->SetValueAsFloat(TEXT("AttackRadius"), BWControlledPawn->GetRandomRadius());
+	Blackboard->SetValueAsFloat(TEXT("StrafeRadius"), BWControlledPawn->GetRandomStrafeRadius());
+	Blackboard->SetValueAsFloat(TEXT("JumpHeight"), BWControlledPawn->GetJumpHeight());
+	
 	LGDebug::Log("InitializeBlackboardValues",true);
 }
 
@@ -82,12 +86,13 @@ void ABWNPCbaseEnemyController::SetStateAsAttacking(AActor* Actor)
 		BlackboardComp->SetValueAsObject(TEXT("AttackTarget"),Actor);
 		LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)EEnemyState::Attacking).ToString(),true);
 	}
-
+	
 	if (BWControlledPawn)
 	{
 		BWControlledPawn->SetEnemyState(EEnemyState::Attacking);
-		BWControlledPawn->AttackTarget = Actor;
+		BWControlledPawn->SetAttackTarget(Actor);
 	}
+	
 }
 
 void ABWNPCbaseEnemyController::SetStateAsInvestigating()
@@ -158,7 +163,7 @@ void ABWNPCbaseEnemyController::HandleHear(AActor* Actor, FAIStimulus Stimulus)
 			GetBlackboardComponent()->SetValueAsBool("HasBeenInvestigating",true);
 		}
 			
-		GetBlackboardComponent()->SetValueAsVector("TargetLocation",RandomPosition(Stimulus.StimulusLocation));
+		GetBlackboardComponent()->SetValueAsVector("TargetLocation",BWControlledPawn->RandomPosition(Stimulus.StimulusLocation));
 			
 		SetStateAsPassive();
 		SetStateAsInvestigating();
@@ -201,23 +206,6 @@ void ABWNPCbaseEnemyController::OnLostDamage()
 	LGDebug::Log(" LOST DAMAGE PLAYER ",true);
 }
 
-
-FVector ABWNPCbaseEnemyController::RandomPosition(FVector Position)
-{
-	const float MinRadius = BWControlledPawn->GetMinInvestigatingRadius();
-	const float MaxRadius = BWControlledPawn->GetMaxInvestigatingRadius();
-	
-	float RandomRadius = FMath::FRandRange(MinRadius, MaxRadius);
-	
-	float RandomAngle = FMath::FRandRange(0.0f, 2.0f * PI);
-	
-	float OffsetX = RandomRadius * FMath::Cos(RandomAngle);
-	float OffsetY = RandomRadius * FMath::Sin(RandomAngle);
-	
-	FVector RandomPoint = Position + FVector(OffsetX, OffsetY, 0.0f);
-
-	return RandomPoint;
-}
 
 
 

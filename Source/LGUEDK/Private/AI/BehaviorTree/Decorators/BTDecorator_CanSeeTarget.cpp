@@ -1,17 +1,17 @@
 // Copyright Villains, Inc. All Rights Reserved.
 
 
-#include "BTDecoratorCanSeeTarget.h"
+#include "BTDecorator_CanSeeTarget.h"
 
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
-UBTDecoratorCanSeeTarget::UBTDecoratorCanSeeTarget(FObjectInitializer const& ObjectInitializer)
+UBTDecorator_CanSeeTarget::UBTDecorator_CanSeeTarget(FObjectInitializer const& ObjectInitializer)
 {
 	NodeName = "Can See Target";
 }
 
-bool UBTDecoratorCanSeeTarget::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
+bool UBTDecorator_CanSeeTarget::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {
 	AAIController* AIController = OwnerComp.GetAIOwner();
 	if (!AIController)

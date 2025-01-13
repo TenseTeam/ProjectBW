@@ -14,14 +14,24 @@ class LGUEDK_API ABWNPCBaseEnemy : public ANPCBaseEnemy
 public:
 
 	ABWNPCBaseEnemy();
+		
+	UFUNCTION(BlueprintCallable)
+	FVector RandomPosition(FVector Position);
 	
 	int GetMinInvestigatingRadius() const { return MinInvestigatingRadius; }
 	int GetMaxInvestigatingRadius() const { return MaxInvestigatingRadius; }
 	float GetTimeBeforeInvestigating() const { return TimeBeforeInvestigating; }
 	float GetRandomInvestigatingTimeDeviation() const { return RandomInvestigatingTimeDeviation; }
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Target")
-	AActor* AttackTarget;
+	
+	UFUNCTION()
+	virtual float GetRandomRadius() {return 0; }
+	UFUNCTION()
+	virtual float GetRandomStrafeRadius() {return 0; }
+	UFUNCTION()
+	float GetJumpHeight() const {return MaxJumpingHeight; }
+	
+	void SetAttackTarget(AActor* Target) { AttackTarget = Target; }
+	AActor* GetAttackTarget() const { return AttackTarget; }
 	
 protected:
 	
@@ -39,6 +49,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Investigating", meta = (ClampMin = "0", ClampMax = "10", UIMin = "0", UIMax = "10"))
 	float RandomInvestigatingTimeDeviation = 2.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Jumping", meta = (ClampMin = "0", ClampMax = "10", UIMin = "0", UIMax = "10"))
+	float MaxJumpingHeight = 500.f;
 	
+	UPROPERTY()
+	AActor* AttackTarget;
 	
 };

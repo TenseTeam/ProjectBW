@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTDecorator.h"
-#include "BTDecoratorCustomLoop.generated.h"
+#include "BTDecorator_CustomLoop.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class LGUEDK_API UBTDecoratorCustomLoop : public UBTDecorator
+class LGUEDK_API UBTDecorator_CustomLoop : public UBTDecorator
 {
 	GENERATED_UCLASS_BODY()
  

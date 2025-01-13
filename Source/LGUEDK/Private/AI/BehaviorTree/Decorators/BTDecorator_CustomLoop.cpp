@@ -1,13 +1,13 @@
 // Copyright Villains, Inc. All Rights Reserved.
 
 
-#include "BTDecoratorCustomLoop.h"
+#include "BTDecorator_CustomLoop.h"
 
 #include "BehaviorTree/BTCompositeNode.h"
 #include "BehaviorTree/Composites/BTComposite_SimpleParallel.h"
 #include "BehaviorTree/Decorators/BTDecorator_Loop.h"
 
-UBTDecoratorCustomLoop::UBTDecoratorCustomLoop(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+UBTDecorator_CustomLoop::UBTDecorator_CustomLoop(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	NodeName = "RandomLoop";
 	NumLoopsMin = 1;
@@ -20,7 +20,7 @@ UBTDecoratorCustomLoop::UBTDecoratorCustomLoop(const FObjectInitializer& ObjectI
 	
 }
  
-void UBTDecoratorCustomLoop::OnNodeActivation(FBehaviorTreeSearchData& SearchData)
+void UBTDecorator_CustomLoop::OnNodeActivation(FBehaviorTreeSearchData& SearchData)
 {
 	FBTLoopDecoratorMemory* DecoratorMemory = GetNodeMemory<FBTLoopDecoratorMemory>(SearchData);
 	FBTCompositeMemory* ParentMemory = GetParentNode()->GetNodeMemory<FBTCompositeMemory>(SearchData);
@@ -48,12 +48,12 @@ void UBTDecoratorCustomLoop::OnNodeActivation(FBehaviorTreeSearchData& SearchDat
 	}
 }
  
-FString UBTDecoratorCustomLoop::GetStaticDescription() const
+FString UBTDecorator_CustomLoop::GetStaticDescription() const
 {
 	return FString::Printf(TEXT("%s: %d-%d loops"), *Super::GetStaticDescription(), NumLoopsMin, NumLoopsMax);
 }
  
-void UBTDecoratorCustomLoop::DescribeRuntimeValues(const UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTDescriptionVerbosity::Type Verbosity, TArray<FString>& Values) const
+void UBTDecorator_CustomLoop::DescribeRuntimeValues(const UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTDescriptionVerbosity::Type Verbosity, TArray<FString>& Values) const
 {
 	Super::DescribeRuntimeValues(OwnerComp, NodeMemory, Verbosity, Values);
  
@@ -61,24 +61,24 @@ void UBTDecoratorCustomLoop::DescribeRuntimeValues(const UBehaviorTreeComponent&
 	Values.Add(FString::Printf(TEXT("loops remaining: %d"), DecoratorMemory->RemainingExecutions));
 }
  
-uint16 UBTDecoratorCustomLoop::GetInstanceMemorySize() const
+uint16 UBTDecorator_CustomLoop::GetInstanceMemorySize() const
 {
 	return sizeof(FBTLoopDecoratorMemory);
 }
  
-void UBTDecoratorCustomLoop::InitializeMemory(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTMemoryInit::Type InitType) const
+void UBTDecorator_CustomLoop::InitializeMemory(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTMemoryInit::Type InitType) const
 {
 	InitializeNodeMemory<FBTLoopDecoratorMemory>(NodeMemory, InitType);
 }
  
-void UBTDecoratorCustomLoop::CleanupMemory(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTMemoryClear::Type CleanupType) const
+void UBTDecorator_CustomLoop::CleanupMemory(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTMemoryClear::Type CleanupType) const
 {
 	CleanupNodeMemory<FBTLoopDecoratorMemory>(NodeMemory, CleanupType);
 }
  
 #if WITH_EDITOR
  
-FName UBTDecoratorCustomLoop::GetNodeIconName() const
+FName UBTDecorator_CustomLoop::GetNodeIconName() const
 {
 	return FName("BTEditor.Graph.BTNode.Decorator.Loop.Icon");
 }

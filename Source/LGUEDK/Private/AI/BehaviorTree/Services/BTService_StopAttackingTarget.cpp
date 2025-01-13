@@ -13,11 +13,11 @@ UBTService_StopAttackingTarget::UBTService_StopAttackingTarget(FObjectInitialize
 {
 	NodeName = "Stop Attacking Target";
 
-	bNotifyBecomeRelevant = true;	// necessarily!!!
-	bNotifyCeaseRelevant = false;	// necessarily!!!
+	bNotifyBecomeRelevant = true;	
+	bNotifyCeaseRelevant = false;	
 	
-	bNotifyTick = true;           // Call TickNode
-	Interval = TickInterval; 	// Tick Interval
+	bNotifyTick = true;           
+	Interval = TickInterval; 	
 	
 	CachedPlayerActor = nullptr;
 	CachedHealthComponent = nullptr;
