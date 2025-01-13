@@ -5,6 +5,7 @@
 
 #include <string>
 
+#include "Features/Gameplay/InteractionSystem/Components/InteractableDetectorComponent.h"
 #include "Features/Player/States/Base/CharacterState.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "UGameFramework/Controllers/GameplayController.h"
@@ -34,6 +35,8 @@ ABWCharacter::ABWCharacter()
 
 	DodgerComponent = CreateDefaultSubobject<UDodgerComponent>("DodgerComponent");
 
+	InteractableDetector = CreateDefaultSubobject<UInteractableDetectorComponent>("InteractableDetector");
+	
 	bCanMove = true;
 	bCanLook = true;
 	bCanRun = true;
@@ -73,6 +76,8 @@ void ABWCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void ABWCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	//IInteractable* Interactable = nullptr;
+	//InteractableDetector->TryGetInteractable(Interactable);
 }
 
 void ABWCharacter::HandleMotionInput(const EInputActionType InputAction, const FInputActionValue& Value) const
