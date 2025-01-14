@@ -3,6 +3,8 @@
 
 #include "AI/NPC/BWNPCBaseEnemy/BWNPCbaseEnemyController.h"
 
+#include <string>
+
 #include "AI/Interfaces/AITargetInterface.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Components/HealtComponent/HealthBaseComponent.h"
@@ -38,11 +40,14 @@ void ABWNPCbaseEnemyController::InitializeBlackboardValues()
 	Blackboard->SetValueAsObject(TEXT("AttackTarget"), nullptr);
 	Blackboard->SetValueAsFloat(TEXT("TimeBeforeInvestigating"), BWControlledPawn->GetTimeBeforeInvestigating());
 	Blackboard->SetValueAsFloat(TEXT("RandomInvestigatingTimeDeviation"), BWControlledPawn->GetRandomInvestigatingTimeDeviation());
-	Blackboard->SetValueAsFloat(TEXT("AttackRadius"), BWControlledPawn->GetRandomRadius());
+	Blackboard->SetValueAsFloat(TEXT("MaxAttackRadius"), BWControlledPawn->GetRandomRadius());
+	Blackboard->SetValueAsFloat(TEXT("MinAttackRadius"), BWControlledPawn->GetMinRadius());
 	Blackboard->SetValueAsFloat(TEXT("StrafeRadius"), BWControlledPawn->GetRandomStrafeRadius());
 	Blackboard->SetValueAsFloat(TEXT("JumpHeight"), BWControlledPawn->GetJumpHeight());
 	
-	LGDebug::Log("InitializeBlackboardValues",true);
+	// LGDebug::Log("InitializeBlackboardValues",true);
+	// LGDebug::Log(FString::SanitizeFloat(BWControlledPawn->GetRandomRadius()), true);
+	// LGDebug::Log(FString::SanitizeFloat(BWControlledPawn->GetMinRadius()), true);
 }
 
 void ABWNPCbaseEnemyController::SetStateAsPassive()
@@ -119,6 +124,12 @@ void ABWNPCbaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 
 		if (Actor->Implements<UAITargetInterface>())
 		{
+			if (GetWorld()->GetTimerManager().IsTimerActive(LostSightTimerHandle))
+			{
+				GetWorld()->GetTimerManager().ClearTimer(LostSightTimerHandle);
+				LGDebug::Log("TIMER PERSO ANNULLATO", true);
+			}
+			
 			SetStateAsAttacking(Actor);
 			LGDebug::Log("SEE PLAYER ",true);
 		}

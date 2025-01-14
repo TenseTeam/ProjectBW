@@ -24,7 +24,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
 	FBlackboardKeySelector BoolKey;
 	
-	UPROPERTY(EditAnywhere, Category = "Task")
+	UPROPERTY(EditAnywhere, Category = "Blackboard")
 	bool bNewValue;
 	
 };

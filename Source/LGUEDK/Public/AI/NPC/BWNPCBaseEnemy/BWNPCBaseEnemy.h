@@ -22,7 +22,8 @@ public:
 	int GetMaxInvestigatingRadius() const { return MaxInvestigatingRadius; }
 	float GetTimeBeforeInvestigating() const { return TimeBeforeInvestigating; }
 	float GetRandomInvestigatingTimeDeviation() const { return RandomInvestigatingTimeDeviation; }
-	
+	UFUNCTION()
+	virtual float GetMinRadius() const {return 0; }
 	UFUNCTION()
 	virtual float GetRandomRadius() {return 0; }
 	UFUNCTION()
@@ -31,6 +32,7 @@ public:
 	float GetJumpHeight() const {return MaxJumpingHeight; }
 	
 	void SetAttackTarget(AActor* Target) { AttackTarget = Target; }
+	UFUNCTION(BlueprintPure)
 	AActor* GetAttackTarget() const { return AttackTarget; }
 	
 protected:
