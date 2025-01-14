@@ -47,6 +47,8 @@ FVector UGvSpringArmComponent::BlendLocations(const FVector& DesiredArmLocation,
 	if (!bHasValidOwner|| !bApplyCustomBlendLocation) return Super::BlendLocations(DesiredArmLocation, TraceHitLocation, bHitSomething, DeltaTime);
 	if (!bHitSomething) return DesiredArmLocation;
 
+	OnSpringArmHitSomething.Broadcast();
+
 	// convert the desired and hit location to local space
 	const FVector LocalDesiredLocation = GetOwner()->GetTransform().InverseTransformPosition(DesiredArmLocation);
 	const FVector LocalHitLocation = GetOwner()->GetTransform().InverseTransformPosition(TraceHitLocation);
@@ -57,10 +59,10 @@ FVector UGvSpringArmComponent::BlendLocations(const FVector& DesiredArmLocation,
 	const FVector AlignedLocalHitLocation = LocalHitLocation.RotateAngleAxis(DeltaRotation, FVector::UpVector);
 
 	// Create a new local desired location maintaining the local hit location's X and Z, and updating the Y to match the local desired location
-	const FVector AlignedLocalNewDesiredLocation = FVector(AlignedLocalHitLocation.X, AlignedLocalDesiredLocation.Y, AlignedLocalHitLocation.Z);
+	const FVector NewAlignedLocalDesiredLocation = FVector(AlignedLocalHitLocation.X, AlignedLocalDesiredLocation.Y, AlignedLocalHitLocation.Z);
 
 	// Rotate the new local desired location back to the original rotation
-	const FVector NewLocalDesiredLocation = AlignedLocalNewDesiredLocation.RotateAngleAxis(-DeltaRotation, FVector::UpVector);
+	const FVector NewLocalDesiredLocation = NewAlignedLocalDesiredLocation.RotateAngleAxis(-DeltaRotation, FVector::UpVector);
 	
 	// Convert the new local desired location to world space
 	const FVector NewDesiredLocation = GetOwner()->GetTransform().TransformPosition(NewLocalDesiredLocation);
@@ -70,16 +72,15 @@ FVector UGvSpringArmComponent::BlendLocations(const FVector& DesiredArmLocation,
 	{
 		DrawDebugSphere(GetWorld(), GetOwner()->GetTransform().TransformPosition(AlignedLocalDesiredLocation), 10, 12, FColor::Blue, false, -1);
 		DrawDebugSphere(GetWorld(), GetOwner()->GetTransform().TransformPosition(AlignedLocalHitLocation), 10, 12, FColor::Red, false, -1);
-		DrawDebugSphere(GetWorld(), GetOwner()->GetTransform().TransformPosition(AlignedLocalNewDesiredLocation), 10, 12, FColor::Purple, false, -1);
+		DrawDebugSphere(GetWorld(), GetOwner()->GetTransform().TransformPosition(NewAlignedLocalDesiredLocation), 10, 12, FColor::Purple, false, -1);
 		DrawDebugSphere(GetWorld(), NewDesiredLocation, 10, 12, FColor::Green, false, -1);
 	}
 #endif
 
+	// Perform a sweep to check if the new desired location is penetrating something
 	FCollisionQueryParams QueryParams(SCENE_QUERY_STAT(SpringArm), false, GetOwner());
 	FHitResult Result;
 	GetWorld()->SweepSingleByChannel(Result, GetComponentLocation(), NewDesiredLocation, FQuat::Identity, ProbeChannel, FCollisionShape::MakeSphere(ProbeSize), QueryParams);
-	
-	OnSpringArmHitSomething.Broadcast();
 	
 	return Result.bBlockingHit ? Result.Location : NewDesiredLocation;
 }

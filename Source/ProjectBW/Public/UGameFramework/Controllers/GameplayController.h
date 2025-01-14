@@ -18,8 +18,6 @@ class PROJECTBW_API AGameplayController : public ABWControllerBase
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UInputMappingContext* MappingContext;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
@@ -50,8 +48,6 @@ public:
 private:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
-
-	void AddMappingContext() const;
 	
 	void Look(const FInputActionValue& Value);
 	void Walk(const FInputActionValue& Value);

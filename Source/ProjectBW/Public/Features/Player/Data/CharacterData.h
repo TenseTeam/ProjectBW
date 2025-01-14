@@ -16,8 +16,23 @@ class PROJECTBW_API UCharacterData : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Running")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Stats")
+	float MaxHealth;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Stats")
+	float MaxStamina;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Stats")
+	float MaxArmor;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Stats")
+	float StaminaRegenRate;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Stats")
 	float RunSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Stats")
+	float WalkSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Stats")
+	float CrouchSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Stats")
+	float SwapWeaponSpeed;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Running")
 	float RunAcceleration;
 
@@ -31,5 +46,5 @@ public:
 	float HookEndNormalizedDistance;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Shooting")
-	float RotationSpeedAiming;
+	float AimingRotationSpeed;
 };
