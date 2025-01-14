@@ -21,16 +21,16 @@ protected:
 
 	virtual void BeginPlay() override;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Ranges")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Attack Ranges")
 	float MinAttackRadius = 500.f;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Ranges")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Attack Ranges")
 	float MaxAttackRadius = 1000.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Ranges")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Attack Ranges")
 	float MinStrafeRadius = 1000.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Ranges")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Attack Ranges")
 	float MaxStrafeRadius = 1000.f;
 	
 };

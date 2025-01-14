@@ -44,6 +44,8 @@ void ABWNPCbaseEnemyController::InitializeBlackboardValues()
 	Blackboard->SetValueAsFloat(TEXT("MinAttackRadius"), BWControlledPawn->GetMinRadius());
 	Blackboard->SetValueAsFloat(TEXT("StrafeRadius"), BWControlledPawn->GetRandomStrafeRadius());
 	Blackboard->SetValueAsFloat(TEXT("JumpHeight"), BWControlledPawn->GetJumpHeight());
+	Blackboard->SetValueAsFloat(TEXT("JumpDistance"), BWControlledPawn->GetJumpDistance());
+	Blackboard->SetValueAsFloat(TEXT("JumpForce"), BWControlledPawn->GetJumpForce());
 	
 	// LGDebug::Log("InitializeBlackboardValues",true);
 	// LGDebug::Log(FString::SanitizeFloat(BWControlledPawn->GetRandomRadius()), true);

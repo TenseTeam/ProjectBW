@@ -22,6 +22,7 @@ public:
 	int GetMaxInvestigatingRadius() const { return MaxInvestigatingRadius; }
 	float GetTimeBeforeInvestigating() const { return TimeBeforeInvestigating; }
 	float GetRandomInvestigatingTimeDeviation() const { return RandomInvestigatingTimeDeviation; }
+	
 	UFUNCTION()
 	virtual float GetMinRadius() const {return 0; }
 	UFUNCTION()
@@ -30,6 +31,10 @@ public:
 	virtual float GetRandomStrafeRadius() {return 0; }
 	UFUNCTION()
 	float GetJumpHeight() const {return MaxJumpingHeight; }
+	UFUNCTION()
+	float GetJumpDistance() const {return MinJumpingDistance; }
+	UFUNCTION()
+	float GetJumpForce() const {return MaxJumpingForce; }
 	
 	void SetAttackTarget(AActor* Target) { AttackTarget = Target; }
 	UFUNCTION(BlueprintPure)
@@ -51,8 +56,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Investigating", meta = (ClampMin = "0", ClampMax = "10", UIMin = "0", UIMax = "10"))
 	float RandomInvestigatingTimeDeviation = 2.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Jumping", meta = (ClampMin = "0", ClampMax = "10", UIMin = "0", UIMax = "10"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Jumping")
 	float MaxJumpingHeight = 500.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Jumping")
+	float MinJumpingDistance = 500.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Jumping")
+	float MaxJumpingForce = 500.f;
 	
 	UPROPERTY()
 	AActor* AttackTarget;
