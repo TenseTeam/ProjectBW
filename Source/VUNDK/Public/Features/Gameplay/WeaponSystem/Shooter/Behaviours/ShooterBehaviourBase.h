@@ -3,12 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Features/Gameplay/WeaponSystem/Data/ShootData.h"
-#include "Features/Gameplay/WeaponSystem/Interfaces/ShooterBehaviour.h"
+#include "Features/Gameplay/WeaponSystem/Shooter/ShootPoint.h"
+#include "Features/Gameplay/WeaponSystem/Shooter/Data/ShootData.h"
+#include "Features/Gameplay/WeaponSystem/Shooter/Interfaces/ShooterBehaviour.h"
 #include "UObject/Object.h"
 #include "ShooterBehaviourBase.generated.h"
 
 class UShooter;
+enum class EShootType : uint8;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(
 	FOnShootSuccess
@@ -35,7 +37,7 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnRefill OnBehaviourRefill;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bHasInfiniteAmmo = false;
 
 protected:
@@ -43,28 +45,33 @@ protected:
 	UShooter* Shooter;
 
 private:
+	UPROPERTY()
+	TArray<UShootPoint*> ShootPoints;
 	FShootData ShootData;
 	int32 CurrentAmmo;
 	bool bIsInCooldown;
+	int32 CurrentShootPointIndex;
 
 public:
-	virtual void Init(UShooter* InShooter, const FShootData InShootData);
+	virtual void Init(UShooter* InShooter, const FShootData InShootData, const TArray<UShootPoint*> InShootPoints);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
-	virtual bool Shoot() override;
+	virtual bool Shoot(const EShootType ShootType = EShootType::Simultaneous) override;
 
-	virtual void ShootSuccess();
-
-	virtual void ShootFail();
-	
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
 	virtual int32 Refill(const int32 Ammo) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
 	virtual void RefillAllMagazine() override;
 
+	UFUNCTION(BlueprintCallable)
+	void SetDamage(const float NewDamage);
+
 	UFUNCTION(BlueprintPure)
 	virtual int32 GetCurrentAmmo() const override;
+
+	UFUNCTION(BlueprintPure)
+	TEnumAsByte<ECollisionChannel> GetDamageChannel() const;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
 	float GetDamage() const;
@@ -78,29 +85,56 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
 	int32 GetMagSize() const;
 
-	bool CanShoot() const;
+	UFUNCTION(BlueprintPure)
+	UWorld* GetWorld() const;
 
 protected:
+	void ShootSuccess(const FVector& ShootPointLocation, const FVector& ShootPointDirection);
+
+	void ShootFail();
+	
 	UFUNCTION(BlueprintNativeEvent)
 	void OnInit();
 	
+	/**
+	 * @brief Called when the shoot is successful.
+	 * @param ShootPointLocation By default, the start point of the shoot point.
+	 * @param ShootPointDirection By default, the direction of the shoot point.
+	 */
 	UFUNCTION(BlueprintNativeEvent)
-	void OnShootSuccess();
+	void OnShootSuccess(const FVector& ShootPointLocation, const FVector& ShootPointDirection);
 
+	/**
+	 * @brief Called when the shoot is failed.
+	 */
 	UFUNCTION(BlueprintNativeEvent)
 	void OnShootFail();
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnRefill();
 
+	UFUNCTION(BlueprintCallable)
+	bool TryGetCameraPoints(FVector& OutStartPoint, FVector& OutEndPoint, FVector& OutHitPoint) const;
+
+	UFUNCTION(BlueprintPure)
+	bool IsInLineOfSight(const FVector& StartPoint, const FVector& TargetPoint, const float Tolerance = 1.0f) const;
+
 private:
+	bool HandleSimultaneousShoot();
+
+	bool HandleSequentialShoot();
+
+	bool CanShoot(const int32 DesiredAmmoToConsume) const;
+
+	int32 NextShootPointIndex();
+
 	void SetCurrentAmmo(const int32 NewAmmoValue);
 
 	void ModifyCurrentAmmo(const int32 AmmoValue);
-	
+
 	void StartShootCooldown();
 
 	void EndShootCooldown();
-	
+
 	bool Check() const;
 };

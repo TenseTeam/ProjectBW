@@ -1,6 +1,6 @@
 // Copyright VUNDK, Inc. All Rights Reserved.
 
-#include "Features/Gameplay/WeaponSystem/Shooter.h"
+#include "Features/Gameplay/WeaponSystem/Shooter/Shooter.h"
 
 UShooter::UShooter(): ShooterBehaviour(nullptr),
                       ShootData()
@@ -8,12 +8,20 @@ UShooter::UShooter(): ShooterBehaviour(nullptr),
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-bool UShooter::Shoot() const
+void UShooter::Init(const TArray<UShootPoint*> InShootPoints)
+{
+	ShootPoints = InShootPoints;
+	
+	if (Check())
+		ShooterBehaviour->Init(this, ShootData, ShootPoints);
+}
+
+bool UShooter::Shoot(const EShootType ShootType) const
 {
 	if (!Check())
 		return false;
 	
-	return ShooterBehaviour->Shoot();
+	return ShooterBehaviour->Shoot(ShootType);
 }
 
 int32 UShooter::Refill(const int32 Ammo) const
@@ -32,18 +40,20 @@ void UShooter::RefillAllMagazine() const
 	return ShooterBehaviour->RefillAllMagazine();
 }
 
+void UShooter::SetShooterDamage(const float NewDamage) const
+{
+	if (!Check())
+		return;
+	
+	ShooterBehaviour->SetDamage(NewDamage);
+}
+
 int32 UShooter::GetCurrentAmmo() const
 {
 	if (!Check())
 		return -1;
 	
 	return ShooterBehaviour->GetCurrentAmmo();
-}
-
-void UShooter::BeginPlay()
-{
-	Super::BeginPlay();
-	ShooterBehaviour->Init(this, ShootData);
 }
 
 bool UShooter::Check() const

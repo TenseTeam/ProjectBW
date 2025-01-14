@@ -26,7 +26,7 @@ private:
 	TSubclassOf<AActor> ActorClass;
 	UPROPERTY()
 	TArray<AActor*> AvailableActors;
-
+	
 public:
 	UActorPool();
 
@@ -57,6 +57,6 @@ private:
 	bool Check() const;
 
 	void SetActorEnabled(AActor* Actor, bool bEnabled) const;
-	
+
 	static void ClearActor(AActor* Actor);
 };
