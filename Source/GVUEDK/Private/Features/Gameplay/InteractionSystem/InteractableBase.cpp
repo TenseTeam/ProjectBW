@@ -11,16 +11,32 @@ AInteractableBase::AInteractableBase()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
+void AInteractableBase::Interact_Implementation()
+{
+	CheckSingleUse();
+}
+
 bool AInteractableBase::CanBeInteracted_Implementation(AActor* Caller) const
 {
 	if (!bCanBeInteracted) return false;
 	if (bObstacleInBetweenAllowed) return true;
-	return true;
-	
+	FHitResult HitResult;
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
+	CollisionParams.AddIgnoredActor(Caller);
+	GetWorld()->LineTraceSingleByChannel(HitResult, GetActorLocation(), Caller->GetActorLocation(), ECC_Visibility, CollisionParams);
+	return !HitResult.bBlockingHit;
 }
 
 FVector AInteractableBase::GetInteractableLocation_Implementation() const
 {
-	return IInteractable::GetInteractableLocation_Implementation();
+	return GetActorLocation();
 }
 
+void AInteractableBase::CheckSingleUse() const
+{
+	if (bSingleUse)
+	{
+		bCanBeInteracted = false;
+	}
+}

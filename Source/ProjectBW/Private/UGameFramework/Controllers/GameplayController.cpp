@@ -42,6 +42,7 @@ void AGameplayController::SetupInputComponent()
 		enhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Completed, this, &AGameplayController::StopShoot);
 		enhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &AGameplayController::Aim);
 		enhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &AGameplayController::StopAim);
+		enhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AGameplayController::Interact);
 		EnhancedInputComponent = enhancedInputComponent;
 	}
 }
@@ -120,5 +121,11 @@ void AGameplayController::Aim(const FInputActionValue& Value)
 void AGameplayController::StopAim(const FInputActionValue& Value)
 {
 	BWCharacter->SetWantAiming(false);
+}
+
+void AGameplayController::Interact(const FInputActionValue& Value)
+{
+	if (!BWCharacter->CanInteract()) return;
+	BWCharacter->HandleActionInput(EInputActionType::Interact, Value);
 }
 

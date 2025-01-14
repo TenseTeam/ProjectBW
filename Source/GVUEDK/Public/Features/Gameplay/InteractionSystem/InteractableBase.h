@@ -15,13 +15,17 @@ class GVUEDK_API AInteractableBase : public AActor, public IInteractable
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bObstacleInBetweenAllowed = false;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	bool bCanBeInteracted = true;
+	mutable bool bCanBeInteracted = true;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bSingleUse = false;
 	
 
 public:
 	AInteractableBase();
+	virtual void Interact_Implementation() override;
 	virtual bool CanBeInteracted_Implementation(AActor* Caller) const override;
 	virtual FVector GetInteractableLocation_Implementation() const override;
+
+private:
+	void CheckSingleUse() const;
 };
