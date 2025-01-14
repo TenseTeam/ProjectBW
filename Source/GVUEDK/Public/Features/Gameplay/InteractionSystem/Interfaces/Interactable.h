@@ -37,5 +37,5 @@ public:
 	bool CanBeInteracted(AActor* Caller) const;
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	FVector GetInteractableLocation();
+	FVector GetInteractableLocation() const;
 };

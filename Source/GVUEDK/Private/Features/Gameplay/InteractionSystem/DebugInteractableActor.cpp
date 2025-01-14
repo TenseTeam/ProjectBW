@@ -9,8 +9,8 @@ ADebugInteractableActor::ADebugInteractableActor()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-void ADebugInteractableActor::Interact_Implementation()
-{
-	FGvDebug::Warning("Cpp Interact", true);
-}
+// void ADebugInteractableActor::Interact_Implementation()
+// {
+// 	FGvDebug::Warning("Cpp Interact", true);
+// }
 

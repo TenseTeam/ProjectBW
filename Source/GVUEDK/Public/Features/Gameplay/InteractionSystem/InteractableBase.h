@@ -1,0 +1,27 @@
+// Copyright Villains, Inc. All Rights Reserved.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "Interfaces/Interactable.h"
+#include "InteractableBase.generated.h"
+
+UCLASS()
+class GVUEDK_API AInteractableBase : public AActor, public IInteractable
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	bool bObstacleInBetweenAllowed = false;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	bool bCanBeInteracted = true;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	bool bSingleUse = false;
+	
+
+public:
+	AInteractableBase();
+	virtual bool CanBeInteracted_Implementation(AActor* Caller) const override;
+	virtual FVector GetInteractableLocation_Implementation() const override;
+};

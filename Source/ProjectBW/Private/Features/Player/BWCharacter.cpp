@@ -142,6 +142,11 @@ UDodgerComponent* ABWCharacter::GetDodgerComponent() const
 	return DodgerComponent;
 }
 
+UCameraComponent* ABWCharacter::GetFollowCamera() const
+{
+	return FollowCamera;
+}
+
 float ABWCharacter::GetGroundDistance() const
 {
 	const float Distance = GroundCheckComponent->CheckGroundDistance();

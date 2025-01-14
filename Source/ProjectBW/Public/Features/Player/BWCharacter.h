@@ -208,6 +208,7 @@ public:
 	UGvSpringArmComponent* GetSpringArm() const;
 	UFUNCTION(BlueprintCallable)
 	UDodgerComponent* GetDodgerComponent() const;
+	UCameraComponent* GetFollowCamera() const;
 
 	UFUNCTION(BlueprintCallable)
 	float GetGroundDistance() const;

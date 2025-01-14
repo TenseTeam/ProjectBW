@@ -16,5 +16,5 @@ class GVUEDK_API ADebugInteractableActor : public AActor, public IInteractable
 public:
 	ADebugInteractableActor();
 	
-	virtual void Interact_Implementation() override;
+	//virtual void Interact_Implementation() override;
 };

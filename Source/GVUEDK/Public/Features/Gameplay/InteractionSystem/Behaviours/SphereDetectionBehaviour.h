@@ -20,6 +20,8 @@ class GVUEDK_API USphereDetectionBehaviour : public UInteractableDetectorBehavio
 	TEnumAsByte<ECollisionChannel> TraceChannel = ECC_Visibility;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	bool bShowDebug = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", EditCondition = "bShowDebug"))
+	float InteractableSphereRadius = 50.f;
 
 public:
 	UFUNCTION(BlueprintCallable)
