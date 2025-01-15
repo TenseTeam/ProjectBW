@@ -22,12 +22,13 @@ private:
 	float Damage;
 	float LifeSpan;
 	float HitRadius;
-	TEnumAsByte<ECollisionChannel> DamageChannel;
+	TEnumAsByte<ECollisionChannel> BlockingChannel;
+	FTimerHandle LifeSpanTimerHandle;
 	
 public:
 	AProjectileBase();
 
-	void Init(AActor* InInstigator, const float InDamage, const float InLifeSpan, const float InHitRadius, TEnumAsByte<ECollisionChannel> InDamageChannel, const FVector& InVelocity);
+	void Init(AActor* InInstigator, const float InDamage, const float InLifeSpan, const float InHitRadius, TEnumAsByte<ECollisionChannel> InBlockingChannel, const FVector& InVelocity);
 	
 	UFUNCTION(BlueprintCallable)
 	void SetVelocity(const FVector NewVelocity) const;
@@ -39,7 +40,10 @@ public:
 	float GetHitRadius() const;
 
 	UFUNCTION(BlueprintCallable)
-	void RadialDamage() const;
+	bool RadialDamage();
+
+	UFUNCTION(BlueprintCallable)
+	void DisposeProjectile();
 	
 	virtual void ClearPooledActor_Implementation() override;
 

@@ -1,8 +1,6 @@
 // Copyright VUNDK, Inc. All Rights Reserved.
 
 #include "Features/Gameplay/WeaponSystem/Shooter/Projectiles/ProjectileBase.h"
-
-#include "Engine/DamageEvents.h"
 #include "Features/Gameplay/WeaponSystem/Shooter/Shooter.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -11,17 +9,16 @@ AProjectileBase::AProjectileBase()
 	PrimaryActorTick.bCanEverTick = true;
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMesh"));
 	SetRootComponent(MeshComponent);
-	MeshComponent->SetCollisionProfileName(TEXT("BlockAll"));
 	MeshComponent->SetSimulatePhysics(true);
 }
 
-void AProjectileBase::Init(AActor* InInstigator, const float InDamage, const float InLifeSpan, const float InHitRadius, TEnumAsByte<ECollisionChannel> InDamageChannel, const FVector& InVelocity)
+void AProjectileBase::Init(AActor* InInstigator, const float InDamage, const float InLifeSpan, const float InHitRadius, TEnumAsByte<ECollisionChannel> InBlockingChannel, const FVector& InVelocity)
 {
 	ProjectileInstigator = InInstigator;
 	Damage = InDamage;
 	LifeSpan = InLifeSpan;
 	HitRadius = InHitRadius;
-	DamageChannel = InDamageChannel;
+	BlockingChannel = InBlockingChannel;
 	SetVelocity(InVelocity);
 	SetProjectileLifeSpan(LifeSpan);
 }
@@ -41,18 +38,28 @@ float AProjectileBase::GetHitRadius() const
 	return HitRadius;
 }
 
-void AProjectileBase::RadialDamage() const
+bool AProjectileBase::RadialDamage()
 {
 	const UWorld* World = GetWorld();
 	
+	TArray<AActor*> IgnoredActors;
+	IgnoredActors.Add(this);
+	IgnoredActors.Add(ProjectileInstigator);
+	return UGameplayStatics::ApplyRadialDamage(World, GetDamage(), GetActorLocation(), GetHitRadius(), UDamageType::StaticClass(), IgnoredActors, ProjectileInstigator, ProjectileInstigator->GetInstigatorController(), true, BlockingChannel);
+}
+
+void AProjectileBase::DisposeProjectile()
+{
+	const UWorld* World = GetWorld();
+
 	if (!IsValid(World))
 	{
-		UE_LOG(LogShooter, Error, TEXT("SphereCastDamage(), World is invalid in %s."), *GetName());
+		UE_LOG(LogShooter, Error, TEXT("ProjectileBase DisposeProjectile(), World is invalid."));
 		return;
 	}
-
-	DrawDebugSphere(World, GetActorLocation(), GetHitRadius(), 32, FColor::Red, false, 5.f, 0, 5.f);
-	UGameplayStatics::ApplyRadialDamage(World, GetDamage(), GetActorLocation(), GetHitRadius(), UDamageType::StaticClass(), TArray<AActor*>(), ProjectileInstigator, ProjectileInstigator->GetInstigatorController(), true, DamageChannel);
+	
+	World->GetTimerManager().ClearTimer(LifeSpanTimerHandle);
+	IPooledActor::Execute_ReleasePooledActor(this);
 }
 
 void AProjectileBase::ClearPooledActor_Implementation()
@@ -66,15 +73,14 @@ void AProjectileBase::SetProjectileLifeSpan(float InLifeSpan)
 
 	if (!IsValid(World))
 	{
-		UE_LOG(LogShooter, Error, TEXT("SetProjectileLifeSpan(), World is invalid in %s."), *GetName());
+		UE_LOG(LogShooter, Error, TEXT("ProjectileBase SetProjectileLifeSpan(), World is invalid."));
 		return;
 	}
-
-	FTimerHandle LifeSpanTimerHandle;
+	
 	World->GetTimerManager().SetTimer(LifeSpanTimerHandle, this, &AProjectileBase::OnProjectileLifeSpanEnd, LifeSpan, false);
 }
 
 void AProjectileBase::OnProjectileLifeSpanEnd_Implementation()
 {
-	IPooledActor::Execute_ReleasePooledActor(this);
+	DisposeProjectile();
 }

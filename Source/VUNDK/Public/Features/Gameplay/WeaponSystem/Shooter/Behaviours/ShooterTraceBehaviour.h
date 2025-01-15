@@ -15,6 +15,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "1", UIMin = "1"))
 	int32 MaxPenetration = 1;
 	
+#if WITH_EDITORONLY_DATA
+	UPROPERTY(EditDefaultsOnly)
+	bool bDrawDebugTraceLines = false;
+#endif
+	
 protected:
 	virtual void OnShootSuccess_Implementation(const FVector& ShootPointLocation, const FVector& ShootPointDirection, const FVector& ShooterTargetLocation, const FVector& ShootPointDirectionToTarget) const override;
 
