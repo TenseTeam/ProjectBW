@@ -28,7 +28,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void Init(const TArray<UShootPoint*> InShootPoints);
-	
+
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
 	bool Shoot(const EShootType ShootType = EShootType::Simultaneous) const;
 

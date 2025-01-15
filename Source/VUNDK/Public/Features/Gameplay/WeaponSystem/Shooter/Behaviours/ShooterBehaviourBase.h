@@ -12,16 +12,18 @@
 class UShooter;
 enum class EShootType : uint8;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(
-	FOnShootSuccess
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
+	FOnShootSuccess,
+	UShootPoint*, ShootPoint
 );
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(
 	FOnShootFail
 );
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(
-	FOnRefill
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
+	FOnRefill,
+	int32, CurrentAmmo
 );
 
 UCLASS(Abstract, Blueprintable, BlueprintType, EditInlineNew)
@@ -91,7 +93,7 @@ public:
 	UWorld* GetWorld() const;
 
 protected:
-	void ShootSuccess(const FVector& ShootPointLocation, const FVector& ShootPointDirection) const;
+	void ShootSuccess(UShootPoint* ShootPoint) const;
 
 	void ShootFail();
 	
@@ -99,7 +101,7 @@ protected:
 	void OnInit();
 	
 	UFUNCTION(BlueprintNativeEvent)
-	void OnShootSuccess(const FVector& ShootPointLocation, const FVector& ShootPointDirection, const FVector& ShooterTargetLocation, const FVector& ShootPointDirectionToTarget) const;
+	void OnShootSuccess(UShootPoint* ShootPoint, const FVector& ShooterTargetLocation, const FVector& ShootPointDirectionToTarget) const;
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void OnShootFail();

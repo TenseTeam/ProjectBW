@@ -4,7 +4,7 @@
 #include "Engine/DamageEvents.h"
 #include "Features/Gameplay/WeaponSystem/Shooter/Shooter.h"
 
-void UShooterTraceBehaviour::OnShootSuccess_Implementation(const FVector& ShootPointLocation, const FVector& ShootPointDirection, const FVector& ShooterTargetLocation, const FVector& ShootPointDirectionToTarget) const
+void UShooterTraceBehaviour::OnShootSuccess_Implementation(UShootPoint* ShootPoint, const FVector& ShooterTargetLocation, const FVector& ShootPointDirectionToTarget) const
 {
 	const UWorld* World = GetWorld();
 
@@ -15,6 +15,7 @@ void UShooterTraceBehaviour::OnShootSuccess_Implementation(const FVector& ShootP
 		return;
 	}
 
+	const FVector ShootPointLocation = ShootPoint->GetShootPointLocation();
 	if (bUseCameraTargetLocation)
 		TraceFromCamera(World, ShootPointLocation);
 	else
@@ -67,7 +68,10 @@ void UShooterTraceBehaviour::LineTraceDamage(const UWorld* World, const FVector&
 		DrawDebugLine(World, TraceStartPoint, TraceEndPoint, FColor::Purple, false, 5.0f, 0, 1.0f);
 #endif
 
-	if (TArray<FHitResult> HitResults; World->LineTraceMultiByChannel(HitResults, TraceStartPoint, TraceEndPoint, GetDamageChannel(), CollisionQueryParams))
+	TArray<FHitResult> HitResults;
+	World->LineTraceMultiByChannel(HitResults, TraceStartPoint, TraceEndPoint, GetDamageChannel(), CollisionQueryParams);
+
+	if (HitResults.Num() > 0)
 	{
 		int32 PenetrationCount = 0;
 
