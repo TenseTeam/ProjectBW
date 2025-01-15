@@ -1,19 +1,19 @@
 // Copyright Villains, Inc. All Rights Reserved.
 
 
-#include "AI/NPC/BWNPCBaseEnemy/BWNPCBaseEnemy.h"
+#include "AI/NPC/NPCBaseStateEnemy/NPCBaseStateEnemy.h"
 
 #include "AI/NPC/BWNPCBaseEnemy/BWNPCbaseEnemyController.h"
 #include "Kismet/GameplayStatics.h"
 
 
 
-ABWNPCBaseEnemy::ABWNPCBaseEnemy()
+ANPCBaseStateEnemy::ANPCBaseStateEnemy()
 {
 	AttackTarget = nullptr;
 }
 
-FVector ABWNPCBaseEnemy::RandomPosition(FVector Position)
+FVector ANPCBaseStateEnemy::RandomPosition(FVector Position)
 {
 	
 	const float MinRadius = GetMinInvestigatingRadius();
@@ -31,7 +31,7 @@ FVector ABWNPCBaseEnemy::RandomPosition(FVector Position)
 	return RandomPoint;
 }
 
-void ABWNPCBaseEnemy::BeginPlay()
+void ANPCBaseStateEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 	

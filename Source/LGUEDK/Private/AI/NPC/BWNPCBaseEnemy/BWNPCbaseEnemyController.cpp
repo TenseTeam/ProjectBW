@@ -6,6 +6,7 @@
 #include <string>
 
 #include "AI/Interfaces/AITargetInterface.h"
+#include "AI/NPC/NPCBaseStateEnemy/NPCBaseStateEnemy.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Components/HealtComponent/HealthBaseComponent.h"
 
@@ -17,7 +18,7 @@ ABWNPCbaseEnemyController::ABWNPCbaseEnemyController()
 
 void ABWNPCbaseEnemyController::BeginPlay()
 {
-	BWControlledPawn = Cast<ABWNPCBaseEnemy>(GetControlledPawn());
+	BWControlledPawn = Cast<ANPCBaseStateEnemy>(GetControlledPawn());
 	Super::BeginPlay();
 	
 }

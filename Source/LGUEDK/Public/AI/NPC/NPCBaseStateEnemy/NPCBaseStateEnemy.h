@@ -4,35 +4,40 @@
 
 #include "CoreMinimal.h"
 #include "AI/NPC/NPCBaseEnemy/NPCBaseEnemy.h"
-#include "BWNPCBaseEnemy.generated.h"
+#include "NPCBaseStateEnemy.generated.h"
 
 UCLASS()
-class LGUEDK_API ABWNPCBaseEnemy : public ANPCBaseEnemy
+class LGUEDK_API ANPCBaseStateEnemy : public ANPCBaseEnemy
 {
 	GENERATED_BODY()
 
 public:
 
-	ABWNPCBaseEnemy();
+	ANPCBaseStateEnemy();
 		
 	UFUNCTION(BlueprintCallable)
 	FVector RandomPosition(FVector Position);
 	
-	int GetMinInvestigatingRadius() const { return MinInvestigatingRadius; }
-	int GetMaxInvestigatingRadius() const { return MaxInvestigatingRadius; }
-	float GetTimeBeforeInvestigating() const { return TimeBeforeInvestigating; }
-	float GetRandomInvestigatingTimeDeviation() const { return RandomInvestigatingTimeDeviation; }
+	UFUNCTION()
+	virtual int GetMinInvestigatingRadius() const { return MinInvestigatingRadius; }
+	UFUNCTION()
+	virtual int GetMaxInvestigatingRadius() const { return MaxInvestigatingRadius; }
+	UFUNCTION()
+	virtual float GetTimeBeforeInvestigating() const { return TimeBeforeInvestigating; }
+	UFUNCTION()
+	virtual float GetRandomInvestigatingTimeDeviation() const { return RandomInvestigatingTimeDeviation; }
 	
 	UFUNCTION()
-	virtual float GetMinRadius() const {return 0; }
+	virtual float GetMinRadius() const {return MinAttackRadius; }
 	UFUNCTION()
-	virtual float GetMaxRadius() {return 0; }
+	virtual float GetMaxRadius() {return MaxAttackRadius; }
 	UFUNCTION()
-	virtual float GetRandomStrafeRadius() {return 0; }
+	virtual float GetRandomStrafeRadius() {return FMath::RandRange(MinStrafeRadius, MaxStrafeRadius); }
+	
 	UFUNCTION()
-	float GetJumpHeight() const {return MaxJumpingHeight; }
+	virtual float GetJumpHeight() const {return MaxJumpingHeight; }
 	UFUNCTION()
-	float GetJumpDistance() const {return MinJumpingDistance; }
+	virtual float GetJumpDistance() const {return MinJumpingDistance; }
 	
 	void SetAttackTarget(AActor* Target) { AttackTarget = Target; }
 	UFUNCTION(BlueprintPure)
@@ -59,6 +64,18 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Jumping")
 	float MinJumpingDistance = 500.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Attack Ranges")
+	float MinAttackRadius = 500.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Attack Ranges")
+	float MaxAttackRadius = 1000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Attack Ranges")
+	float MinStrafeRadius = 1000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Attack Ranges")
+	float MaxStrafeRadius = 1000.f;
 	
 	UPROPERTY()
 	AActor* AttackTarget;

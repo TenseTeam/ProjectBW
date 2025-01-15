@@ -4,8 +4,8 @@
 #include "AI/Custom Navigation/CustomNavLinkProxy.h"
 
 #include "AIController.h"
-#include "AI/NPC/BWNPCBaseEnemy/BWNPCBaseEnemy.h"
 #include "AI/NPC/BWNPCBaseEnemy/BWNPCbaseEnemyController.h"
+#include "AI/NPC/NPCBaseStateEnemy/NPCBaseStateEnemy.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Utility/LGDebug.h"
@@ -118,7 +118,7 @@ FVector ACustomNavLinkProxy::FindValidDestination(const FVector& OriginalDestina
 
 bool ACustomNavLinkProxy::CheckJumpHeightRequired(AActor* Pawn) const
 {
-	ABWNPCBaseEnemy* NPC = Cast<ABWNPCBaseEnemy>(Pawn);
+	ANPCBaseStateEnemy* NPC = Cast<ANPCBaseStateEnemy>(Pawn);
 	if (!NPC)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Pawn is not an NPC"));

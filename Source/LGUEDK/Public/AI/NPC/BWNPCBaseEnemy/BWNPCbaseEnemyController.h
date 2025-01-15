@@ -3,14 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BWNPCBaseEnemy.h"
-#include "AI/NPC/NPCBaseStateEnemy/NPCBaseEnemyController.h"
+#include "AI/NPC/NPCBaseStateEnemy/NPCBaseStateEnemyController.h"
 #include "BWNPCbaseEnemyController.generated.h"
 
-class ABWNPCBaseEnemy;
+class ANPCBaseStateEnemy;
 
 UCLASS()
-class LGUEDK_API ABWNPCbaseEnemyController : public ANPCBaseEnemyController
+class LGUEDK_API ABWNPCbaseEnemyController : public ANPCBaseStateEnemyController
 {
 	GENERATED_BODY()
 
@@ -45,6 +44,6 @@ protected:
 private:
 	
 	UPROPERTY()
-	ABWNPCBaseEnemy* BWControlledPawn;
+	ANPCBaseStateEnemy* BWControlledPawn;
 
 };

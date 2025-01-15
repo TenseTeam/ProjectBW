@@ -3,19 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "NPCBaseStateEnemy.h"
 #include "AI/NPC/NPCBaseEnemy/NPCPerceptionSystemController.h"
-#include "NPCBaseEnemyController.generated.h"
+#include "NPCBaseStateEnemyController.generated.h"
 
-class ANPCBaseEnemy;
+class ANPCBaseStateEnemy;
 
 UCLASS()
-class LGUEDK_API ANPCBaseEnemyController : public ANPCPerceptionSystemController
+class LGUEDK_API ANPCBaseStateEnemyController : public ANPCPerceptionSystemController
 {
 	GENERATED_BODY()
 
 public:
 	
-	ANPCBaseEnemyController();
+	ANPCBaseStateEnemyController();
 		
 	UFUNCTION()
 	virtual void SetStateAsPassive() {};
@@ -48,7 +49,7 @@ protected:
 private:
 	
 	UPROPERTY()
-	ANPCBaseEnemy* MyControlledPawn;
+	ANPCBaseStateEnemy* MyControlledPawn;
 	
 	
 };
