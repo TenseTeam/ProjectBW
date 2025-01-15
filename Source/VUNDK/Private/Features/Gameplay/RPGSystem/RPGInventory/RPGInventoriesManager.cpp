@@ -7,25 +7,25 @@ URPGInventoriesManager::URPGInventoriesManager(): ItemsStats(nullptr),
 {
 }
 
-URPGRarityLevelData* URPGInventoriesManager::GetRarityByID(const FName RarityID) const
+URPGRarityLevelData* URPGInventoriesManager::GetRarityByID(const FGuid RarityID) const
 {
 	for (URPGRarityLevelData* RarityLevel : ItemsRarities->RarityLevels)
 	{
-		if (RarityLevel->RarityID.IsEqual(RarityID))
+		if (RarityLevel->RarityID == RarityID)
 			return RarityLevel;
 	}
 
 	return nullptr;
 }
 
-UBaseStatData* URPGInventoriesManager::GetStatByID(const FName StatID) const
+UCoreStatData* URPGInventoriesManager::GetStatByID(const FGuid StatID) const
 {
 	if (!ItemsStats)
 		return nullptr;
 	
-	for (UBaseStatData* Stat : ItemsStats->Stats)
+	for (UCoreStatData* Stat : ItemsStats->Stats)
 	{
-		if (Stat->StatID.IsEqual(StatID))
+		if (Stat->StatID == StatID)
 			return Stat;
 	}
 	

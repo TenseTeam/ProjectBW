@@ -156,7 +156,7 @@ void UInventoryBase::ConsumeItem(UItemDataBase* ItemData, const int32 AmountToCo
 		return;
 	}
 
-	if (HasEnoughQuantity(ItemData, AmountToConsume))
+	if (HasEnoughQuantityToConsume(ItemData, AmountToConsume))
 		ConsumeIteratively(ItemData, AmountToConsume);
 }
 
@@ -251,12 +251,12 @@ bool UInventoryBase::HasItemOfDataID(const UItemDataBase* ItemData) const
 	return false;
 }
 
-bool UInventoryBase::HasEnoughQuantity(const UItemDataBase* ItemData, const int32 Quantity) const
+bool UInventoryBase::HasEnoughQuantityToConsume(const UItemDataBase* ItemData, const int32 QuantityToConsume) const
 {
 	if (!IsValid(ItemData))
 		return false;
 
-	if (Quantity <= 0)
+	if (QuantityToConsume <= 0)
 		return true;
 
 	int32 FoundQuantity = 0;
@@ -267,10 +267,10 @@ bool UInventoryBase::HasEnoughQuantity(const UItemDataBase* ItemData, const int3
 			FoundQuantity += Item->GetCurrentQuantity();
 	}
 
-	return FoundQuantity >= Quantity;
+	return FoundQuantity >= QuantityToConsume;
 }
 
-UItemDataBase* UInventoryBase::GetItemDataFromRegistry(const FName ItemDataID) const
+UItemDataBase* UInventoryBase::GetItemDataFromRegistry(const FGuid ItemDataID) const
 {
 	return UISInventoriesUtility::GetItemDataFromRegistry(ItemDataID);
 }

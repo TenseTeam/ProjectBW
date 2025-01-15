@@ -29,7 +29,7 @@ void UShoot::Enter(AActor* Context)
 	Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 	Character->GetCharacterMovement()->bUseControllerDesiredRotation = true;
 	
-	RotationSpeed = Character->Data->RotationSpeedAiming;
+	RotationSpeed = Character->Data->AimingRotationSpeed;
 	TargetRotation = FRotator(0.f, Controller->GetControlRotation().Yaw, 0.f);
 	CurrentRotation = Character->GetActorRotation();
 	

@@ -15,6 +15,8 @@ class VUNDK_API AItemDropActor : public AActor
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	UItemBase* RelatedItem;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UStaticMeshComponent* Mesh;
 	
 public:
 	AItemDropActor();

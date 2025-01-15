@@ -4,43 +4,37 @@
 
 #include "CoreMinimal.h"
 #include "RPGItem.h"
-#include "VUNDK/Public/Features/Gameplay/RPGSystem/StatsSystem/Data/BaseStatData.h"
+#include "VUNDK/Public/Features/Gameplay/RPGSystem/StatsSystem/Data/CoreStatData.h"
 #include "Features/Gameplay/RPGSystem/RPGInventory/Data/SaveData/RPGGearItemSaveData.h"
+#include "Features/Gameplay/RPGSystem/StatsSystem/Containers/CoreStatsContainer.h"
 #include "RPGGearItem.generated.h"
 
-class UItemStatOperation;
+class URPGItemStatOperation;
 class URPGGearItemData;
+
+constexpr int32 MinValidStatValue = -0.05f;
+constexpr int32 MaxValidStatValue = 0.05f;
 
 UCLASS()
 class VUNDK_API URPGGearItem : public URPGItem
 {
 	GENERATED_BODY()
 
-protected:
+public:
 	UPROPERTY(BlueprintReadOnly)
-	TMap<UBaseStatData*, int32> GearStats;
-
+	UCoreStatsContainer* GearStatsContainer;
+	
 public:
 	URPGGearItem();
+
+	virtual void Init(UItemDataBase* Data) override;
 	
 	FRPGGearItemSaveData CreateRPGGearItemSaveData() const;
 	
 	void LoadRPGGearItemSaveData(URPGInventory* LoadingInventory, FRPGGearItemSaveData& GearSaveData);
-
-	UFUNCTION(BlueprintPure)
-	int32 GetItemStatValue(const UBaseStatData* Stat) const;
 	
 	UFUNCTION(BlueprintCallable, meta = (HidePin = "bOverrideIfExist"))
-	void AddItemStat(UBaseStatData* Stat, TSubclassOf<UItemStatOperation> OperationClass, bool bOverrideIfExist = false);
-
-	UFUNCTION(BlueprintCallable)
-	void RemoveItemStat(UBaseStatData* Stat);
-	
-	UFUNCTION(BlueprintCallable)
-	void SetItemStat(UBaseStatData* Stat, int32 Value);
-
-	UFUNCTION(BlueprintCallable) 
-	void ModifyItemStat(UBaseStatData* Stat, int32 SumValue);
+	void AddItemStat(UCoreStatData* Stat, TSubclassOf<URPGItemStatOperation> OperationClass);
 	
 	UFUNCTION(BlueprintPure)
 	URPGGearItemData* GetRPGGearItemData() const;

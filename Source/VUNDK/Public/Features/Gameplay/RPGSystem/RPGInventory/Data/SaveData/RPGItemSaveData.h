@@ -15,7 +15,7 @@ struct FRPGItemSaveData
 	UPROPERTY(BlueprintReadWrite)
 	FTetrisItemSaveData TetrisItemSaveData;
 	UPROPERTY(BlueprintReadWrite)
-	FName RarityID;
+	FGuid RarityID;
 	UPROPERTY(BlueprintReadWrite)
 	FRPGItemVisualDetails VisualDetails;
 };

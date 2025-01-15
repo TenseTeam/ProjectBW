@@ -13,6 +13,7 @@
 #include "Patterns/State/StateMachineComponent.h"
 #include "BWCharacter.generated.h"
 
+class UInteractableDetectorComponent;
 class UCharacterState;
 class AGameplayController;
 
@@ -146,6 +147,8 @@ private:
 	UCameraComponent* FollowCamera;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UDodgerComponent* DodgerComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UInteractableDetectorComponent* InteractableDetector;
 	
 	UPROPERTY()
 	AGameplayController* BWController;
@@ -205,6 +208,7 @@ public:
 	UGvSpringArmComponent* GetSpringArm() const;
 	UFUNCTION(BlueprintCallable)
 	UDodgerComponent* GetDodgerComponent() const;
+	UCameraComponent* GetFollowCamera() const;
 
 	UFUNCTION(BlueprintCallable)
 	float GetGroundDistance() const;
@@ -285,4 +289,7 @@ private:
 	void Dodging();
 	UFUNCTION()
 	void StopDodging();
+
+	void InitStats();
+	void UpdateStats();
 };

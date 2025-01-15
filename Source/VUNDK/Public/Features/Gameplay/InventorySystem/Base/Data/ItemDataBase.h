@@ -15,14 +15,16 @@ class VUNDK_API UItemDataBase : public UPrimaryDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, AdvancedDisplay)
-	FName ItemDataID;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, AdvancedDisplay)
+	FGuid ItemDataID;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, AdvancedDisplay)
 	FString ItemTypeID;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UItemBase> ItemClass;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSubclassOf<AItemDropActor> ItemDropClass;
+	TSubclassOf<AItemDropActor> ItemDropActorClass;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UStaticMesh* ItemMesh;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UEquipSlotKey* EquipSlotKey;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -41,10 +43,11 @@ public:
 	bool bConsumeUponUse;
 
 public:
-	UItemDataBase(): ItemDataID(FName("NotGeneratedID")),
-	                 ItemTypeID(FGuid::NewGuid().ToString()),
+	UItemDataBase(): ItemDataID(FGuid::NewGuid()),
+	                 ItemTypeID("TypeID"),
 	                 ItemClass(UItemBase::StaticClass()),
-	                 ItemDropClass(nullptr),
+	                 ItemDropActorClass(nullptr),
+	                 ItemMesh(nullptr),
 	                 EquipSlotKey(nullptr),
 	                 MaxStackSize(1),
 	                 bIsUnique(false),
@@ -56,6 +59,6 @@ public:
 	FORCEINLINE virtual void PostInitProperties() override
 	{
 		Super::PostInitProperties();
-		ItemDataID = FName(FGuid::NewGuid().ToString());
+		ItemTypeID = "Type_" + FGuid::NewGuid().ToString().Left(8);
 	}
 };

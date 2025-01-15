@@ -20,7 +20,8 @@ void AGameplayController::BeginPlay()
 		FGvDebug::Warning(GetName() + " Has Invalid Character, input will not work", true);
 		return;
 	}
-	AddMappingContext();
+	//AddMappingContext();
+	ContextsManager->SetGameplayMappingContext();
 	
 }
 
@@ -42,21 +43,6 @@ void AGameplayController::SetupInputComponent()
 		enhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &AGameplayController::Aim);
 		enhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &AGameplayController::StopAim);
 		EnhancedInputComponent = enhancedInputComponent;
-	}
-}
-
-void AGameplayController::AddMappingContext() const
-{
-	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
-	{
-		if (MappingContext)
-		{
-			Subsystem->AddMappingContext(MappingContext, 0);
-		}
-		else
-		{
-			FGvDebug::Error(GetName() + " Has Invalid Mapping Context, input will not work", true);
-		}
 	}
 }
 

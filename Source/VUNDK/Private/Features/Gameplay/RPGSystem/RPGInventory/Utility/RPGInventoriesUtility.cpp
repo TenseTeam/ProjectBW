@@ -3,12 +3,12 @@
 #include "Features/Gameplay/RPGSystem/RPGInventory/Utility/RPGInventoriesUtility.h"
 #include "Features/Gameplay/InventorySystem/Utility/ISInventoriesUtility.h"
 
-UBaseStatData* URPGInventoriesUtility::GetStatByID(const FName StatID)
+UCoreStatData* URPGInventoriesUtility::GetStatByID(const FGuid StatID)
 {
 	return GetRPGInventoriesManager()->GetStatByID(StatID);
 }
 
-URPGRarityLevelData* URPGInventoriesUtility::GetRarityByID(const FName RarityID)
+URPGRarityLevelData* URPGInventoriesUtility::GetRarityByID(const FGuid RarityID)
 {
 	return GetRPGInventoriesManager()->GetRarityByID(RarityID);
 }

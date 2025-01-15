@@ -3,20 +3,23 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BaseStatsContainer.h"
-#include "SpecialStatsContainer.h"
+#include "StatOperation.h"
 #include "Components/ActorComponent.h"
+#include "Containers/CoreStatsContainer.h"
+#include "Containers/SpecialStatsContainer.h"
+#include "Data/SpecialStatData.h"
 #include "Features/Generic/SaveSystem/Interfaces/Saveable.h"
 #include "StatsBridgeBase.generated.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogStatsSystem, Log, All);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(
-	FOnBaseStatsValuesChanged
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
+	FOnCalculatedCoreStatsValues,
+	UStatsBridgeBase*, StatsBridge
 );
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
-	FOnFullStatsValuesChanged,
+	FOnCalculatedFullStatsValues,
 	UStatsBridgeBase*, StatsBridge
 );
 
@@ -27,60 +30,80 @@ class VUNDK_API UStatsBridgeBase : public UActorComponent, public ISaveable
 
 public:
 	UPROPERTY(BlueprintAssignable)
-	FOnBaseStatsValuesChanged OnBaseStatsValuesChanged;
+	FOnCalculatedCoreStatsValues OnCalculatedCoreStatsValues;
 	UPROPERTY(BlueprintAssignable)
-	FOnFullStatsValuesChanged OnFullStatsValuesChanged;
+	FOnCalculatedFullStatsValues OnCalculatedFullStatsValues;
 	
-	UPROPERTY(EditDefaultsOnly, Instanced, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSet<USpecialStatData*> SpecialStats;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSet<UCoreStatData*> CoreStats;
+	UPROPERTY(BlueprintReadOnly)
 	USpecialStatsContainer* SpecialStatsContainer;
-	UPROPERTY(EditDefaultsOnly, Instanced, BlueprintReadOnly)
-	UBaseStatsContainer* BaseStatsContainer;
-
+	UPROPERTY(BlueprintReadOnly)
+	UCoreStatsContainer* CoreStatsContainer;
+	
 private:
 	UPROPERTY()
-	TMap<UBaseStatData*, int32> FullStatsValues;
+	UCoreStatsContainer* FullStatsContainer;
 	
 public:
 	UStatsBridgeBase();
 
-	virtual void BeginPlay() override;
-
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-	
 	UFUNCTION(BlueprintPure)
 	virtual USaveData* CreateSaveData() override;
 	
 	UFUNCTION(BlueprintCallable)
 	virtual bool LoadSaveData(USaveData* SavedData) override;
+	
+	virtual void BeginPlay() override;
+
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	
+	USpecialStatData* GetSpecialStatByID(const FGuid SpecialStatID) const;
+
+	UCoreStatData* GetCoreStatByID(const FGuid CoreStatID) const;
 
 	UFUNCTION(BlueprintPure)
-	TMap<UBaseStatData*, int32> const& GetFullStatsValues() const;
+	TMap<UCoreStatData*, float> GetFullStatsValues() const;
+
+	UFUNCTION(BlueprintPure)
+	float GetFullStatValueAsFloat(const UStatDataBase* Stat) const;
+
+	UFUNCTION(BlueprintPure)
+	int32 GetFullStatValueAsInt(const UStatDataBase* Stat) const;
+
+	UFUNCTION(BlueprintPure)
+	FString GetFullStatValueAsString(const UStatDataBase* Stat) const;
+
+	UFUNCTION(BlueprintPure)
+	int32 GetFullStatsLength() const;
 	
 	UFUNCTION(BlueprintCallable)
-	void SetStatBaseValueBySpecialStat(USpecialStatData* SpecialStatData, UBaseStatData* BaseStatData);
+	void CalculateCoreStatValueWithSpecialStat(USpecialStatData* SpecialStatData, UCoreStatData* CoreStatData, const TSubclassOf<UStatOperation> OperationClass);
 
 	UFUNCTION(BlueprintCallable)
 	void CalculateAllStatsValues();
 	
 protected:
 	UFUNCTION(BlueprintCallable)
-	void ClearFullStatsValues();
-	
-	UFUNCTION(BlueprintCallable)
-	void SetFullStatValue(UBaseStatData* BaseStatData, int32 Value);
+	void SetFullStatValue(UStatDataBase* Stat, float Value) const;
 
 	UFUNCTION(BlueprintCallable)
-	void ModifyFullStatValue(UBaseStatData* BaseStatData, int32 Value);
+	void ModifyFullStatValue(UStatDataBase* Stat, float Value) const;
 	
 	UFUNCTION()
-	void CalculateBaseStatsValues();
+	void CalculateCoreStatsValues();
 
 	UFUNCTION()
 	void CalculateFullStatsValues();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void OnCalculateBaseStatsValues();
+	void OnCalculateCoreStatsValues();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void OnCalculateFullStatsValues();
+
+private:
+	void CreateStatsContainers();
 };

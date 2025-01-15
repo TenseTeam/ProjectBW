@@ -133,7 +133,7 @@ public:
 	virtual FText GetItemDescription() const;
 
 	UFUNCTION(BlueprintPure)
-	virtual TSubclassOf<AItemDropActor> GetItemDropActorClass() const;
+	virtual UStaticMesh* GetItemMesh() const;
 	
 	int32 GetEquipSlotIndex() const;
 

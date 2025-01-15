@@ -21,7 +21,7 @@ USaveData* UTetrisInventory::CreateSaveData()
 		const UTetrisItem* TetrisItem = Cast<UTetrisItem>(Item);
 		FTetrisItemSaveData ItemSaveData = TetrisItem->CreateTetrisSaveData();
 
-		FName ItemID = Item->GetItemData()->ItemDataID;
+		FGuid ItemID = Item->GetItemData()->ItemDataID;
 
 		if (!TetrisInventorySaveData->TetrisItems.Contains(ItemID))
 			TetrisInventorySaveData->TetrisItems.Add(ItemID, FTetrisItemsSaveArray());
@@ -36,7 +36,7 @@ void UTetrisInventory::LoadInventorySaveData_Implementation(UInventoryBaseSaveDa
 {
 	UTetrisInventorySaveData* TetrisInventorySaveData = Cast<UTetrisInventorySaveData>(InventorySaveData);
 
-	for (const TPair<FName, FTetrisItemsSaveArray>& LoadedItem : TetrisInventorySaveData->TetrisItems)
+	for (const auto& LoadedItem : TetrisInventorySaveData->TetrisItems)
 	{
 		auto [ItemID, ItemsSaveArray] = LoadedItem;
 
