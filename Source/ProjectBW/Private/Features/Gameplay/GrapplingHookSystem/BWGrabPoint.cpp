@@ -73,7 +73,7 @@ bool ABWGrabPoint::CanBeGrabbed(const ACharacter* Character) const
 	const bool bCoincident = FVector::Coincident(Direction.GetSafeNormal(), CameraForward, Tolerance);
 
 #if WITH_EDITOR && !UE_BUILD_SHIPPING
-	if (bShowDebug)
+	if (bShowDebug && bCoincident)
 		DrawDebugSphere(GetWorld(), GetActorLocation(), 100, 12, bCoincident ? FColor::Green : FColor::Red, false, -1,
 		                0,
 		                1);
