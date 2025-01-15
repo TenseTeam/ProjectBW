@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "IBetterDragDropReceiver.generated.h"
+#include "BetterDragDropReceiver.generated.h"
 
 class UBetterDragDropOperation;
 

@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ShootData.h"
 #include "Engine/DataAsset.h"
+#include "Features/Gameplay/WeaponSystem/Shooter/Data/ShootData.h"
 #include "WeaponData.generated.h"
 
 UCLASS()
@@ -19,6 +19,8 @@ public:
 	float Recoil;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float ReloadTime;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float Damage;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FShootData ShootData;
 };

@@ -8,7 +8,7 @@
 #include "Containers/CoreStatsContainer.h"
 #include "Containers/SpecialStatsContainer.h"
 #include "Data/SpecialStatData.h"
-#include "Features/Generic/SaveSystem/Interfaces/ISaveable.h"
+#include "Features/Generic/SaveSystem/Interfaces/Saveable.h"
 #include "StatsBridgeBase.generated.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogStatsSystem, Log, All);
