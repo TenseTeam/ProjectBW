@@ -11,6 +11,10 @@
 UBTDecorator_IsWithInRange::UBTDecorator_IsWithInRange(FObjectInitializer const& ObjectInitializer)
 {
 	NodeName = "Is With In Range";
+
+	bAllowAbortNone = true;
+	bAllowAbortLowerPri = true;
+	bAllowAbortChildNodes = true;
 }
 
 bool UBTDecorator_IsWithInRange::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const

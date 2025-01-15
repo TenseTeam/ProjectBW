@@ -26,15 +26,13 @@ public:
 	UFUNCTION()
 	virtual float GetMinRadius() const {return 0; }
 	UFUNCTION()
-	virtual float GetRandomRadius() {return 0; }
+	virtual float GetMaxRadius() {return 0; }
 	UFUNCTION()
 	virtual float GetRandomStrafeRadius() {return 0; }
 	UFUNCTION()
 	float GetJumpHeight() const {return MaxJumpingHeight; }
 	UFUNCTION()
 	float GetJumpDistance() const {return MinJumpingDistance; }
-	UFUNCTION()
-	float GetJumpForce() const {return MaxJumpingForce; }
 	
 	void SetAttackTarget(AActor* Target) { AttackTarget = Target; }
 	UFUNCTION(BlueprintPure)
@@ -58,12 +56,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Jumping")
 	float MaxJumpingHeight = 500.f;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Jumping")
 	float MinJumpingDistance = 500.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Jumping")
-	float MaxJumpingForce = 500.f;
 	
 	UPROPERTY()
 	AActor* AttackTarget;

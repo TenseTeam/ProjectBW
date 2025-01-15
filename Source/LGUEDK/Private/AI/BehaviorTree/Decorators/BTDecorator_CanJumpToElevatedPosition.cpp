@@ -11,6 +11,10 @@
 UBTDecorator_CanJumpToElevatedPosition::UBTDecorator_CanJumpToElevatedPosition(FObjectInitializer const& ObjectInitializer)
 {
 	NodeName = "Can Jump to Elevated Position";
+	
+	bAllowAbortNone = true;
+	bAllowAbortLowerPri = true;
+	bAllowAbortChildNodes = true;
 }
 
 bool UBTDecorator_CanJumpToElevatedPosition::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp,uint8* NodeMemory) const

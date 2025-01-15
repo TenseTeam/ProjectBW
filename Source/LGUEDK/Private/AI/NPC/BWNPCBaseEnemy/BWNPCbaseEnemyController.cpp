@@ -40,12 +40,11 @@ void ABWNPCbaseEnemyController::InitializeBlackboardValues()
 	Blackboard->SetValueAsObject(TEXT("AttackTarget"), nullptr);
 	Blackboard->SetValueAsFloat(TEXT("TimeBeforeInvestigating"), BWControlledPawn->GetTimeBeforeInvestigating());
 	Blackboard->SetValueAsFloat(TEXT("RandomInvestigatingTimeDeviation"), BWControlledPawn->GetRandomInvestigatingTimeDeviation());
-	Blackboard->SetValueAsFloat(TEXT("MaxAttackRadius"), BWControlledPawn->GetRandomRadius());
+	Blackboard->SetValueAsFloat(TEXT("MaxAttackRadius"), BWControlledPawn->GetMaxRadius());
 	Blackboard->SetValueAsFloat(TEXT("MinAttackRadius"), BWControlledPawn->GetMinRadius());
 	Blackboard->SetValueAsFloat(TEXT("StrafeRadius"), BWControlledPawn->GetRandomStrafeRadius());
 	Blackboard->SetValueAsFloat(TEXT("JumpHeight"), BWControlledPawn->GetJumpHeight());
 	Blackboard->SetValueAsFloat(TEXT("JumpDistance"), BWControlledPawn->GetJumpDistance());
-	Blackboard->SetValueAsFloat(TEXT("JumpForce"), BWControlledPawn->GetJumpForce());
 	
 	// LGDebug::Log("InitializeBlackboardValues",true);
 	// LGDebug::Log(FString::SanitizeFloat(BWControlledPawn->GetRandomRadius()), true);
@@ -148,6 +147,8 @@ void ABWNPCbaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 			false
 		);
 		LGDebug::Log("LOST SIGHT PLAYER", true);
+		
+		ClearFocus(EAIFocusPriority::Gameplay);
 	}		
 	
 }
