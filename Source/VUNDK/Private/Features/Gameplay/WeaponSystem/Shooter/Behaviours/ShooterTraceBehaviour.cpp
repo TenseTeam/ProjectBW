@@ -40,8 +40,10 @@ void UShooterTraceBehaviour::TraceFromCamera(const UWorld* World, const FVector&
 		TraceEndPoint = CameraHitPoint;
 	}
 
-	DrawDebugLine(World, InShootPointLocation, CameraHitPoint, bIsInLine ? FColor::Green : FColor::Red, false, 5.0f, 0, 1.0f);
-	DrawDebugLine(World, TraceStartPoint, TraceEndPoint, FColor::Purple, false, 5.0f, 0, 1.0f);
+#if WITH_EDITORONLY_DATA
+	if (bDrawDebugTraceLines)
+		DrawDebugLine(World, InShootPointLocation, CameraHitPoint, bIsInLine ? FColor::Green : FColor::Red, false, 5.0f, 0, 1.0f);
+#endif
 
 	LineTraceDamage(World, TraceStartPoint, TraceEndPoint);
 }
@@ -51,7 +53,6 @@ void UShooterTraceBehaviour::TraceFromShootPoint(const UWorld* World, const FVec
 	const FVector TraceStartPoint = InShootPointLocation;
 	const FVector TraceEndPoint = InShootPointLocation + ShootPointDirectionToTarget * GetRange();
 
-	DrawDebugLine(World, TraceStartPoint, TraceEndPoint, FColor::Purple, false, 5.0f, 0, 1.0f);
 	LineTraceDamage(World, TraceStartPoint, TraceEndPoint);
 }
 
@@ -60,11 +61,14 @@ void UShooterTraceBehaviour::LineTraceDamage(const UWorld* World, const FVector&
 	FCollisionQueryParams CollisionQueryParams;
 	CollisionQueryParams.AddIgnoredActor(Shooter->GetOwner());
 	CollisionQueryParams.bTraceComplex = false;
-	
-	if (TArray<FHitResult> HitResults; World->LineTraceMultiByChannel(HitResults, TraceStartPoint, TraceEndPoint, GetDamageChannel(), CollisionQueryParams))
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("UShooterTraceBehaviour::OnShootSuccess_Implementation: HitResult: %d"), HitResults.Num()));
 
+#if WITH_EDITORONLY_DATA
+	if (bDrawDebugTraceLines)
+		DrawDebugLine(World, TraceStartPoint, TraceEndPoint, FColor::Purple, false, 5.0f, 0, 1.0f);
+#endif
+
+	if (TArray<FHitResult> HitResults; World->LineTraceMultiByProfile(HitResults, TraceStartPoint, TraceEndPoint, TraceProfile.Name, CollisionQueryParams))
+	{
 		int32 PenetrationCount = 0;
 
 		for (const FHitResult& HitResult : HitResults)
@@ -79,6 +83,11 @@ void UShooterTraceBehaviour::LineTraceDamage(const UWorld* World, const FVector&
 			FDamageEvent DamageEvent;
 			DamageEvent.DamageTypeClass = UDamageType::StaticClass();
 			HitResult.GetActor()->TakeDamage(GetDamage(), DamageEvent, Shooter->GetOwner()->GetInstigatorController(), Shooter->GetOwner());
+
+#if WITH_EDITORONLY_DATA
+			if (bDrawDebugTraceLines)
+				DrawDebugBox(World, HitResult.ImpactPoint, FVector(5.0f), FColor::Red, false, 5.0f, 0, 1.0f);
+#endif
 		}
 	}
 }

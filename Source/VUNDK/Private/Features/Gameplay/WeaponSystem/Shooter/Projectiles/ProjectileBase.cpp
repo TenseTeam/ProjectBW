@@ -15,13 +15,13 @@ AProjectileBase::AProjectileBase()
 	MeshComponent->SetSimulatePhysics(true);
 }
 
-void AProjectileBase::Init(AActor* InInstigator, const float InDamage, const float InLifeSpan, const float InHitRadius, TEnumAsByte<ECollisionChannel> InDamageChannel, const FVector& InVelocity)
+void AProjectileBase::Init(AActor* InInstigator, const float InDamage, const float InLifeSpan, const float InHitRadius, TEnumAsByte<ECollisionChannel> InBlockingChannel, const FVector& InVelocity)
 {
 	ProjectileInstigator = InInstigator;
 	Damage = InDamage;
 	LifeSpan = InLifeSpan;
 	HitRadius = InHitRadius;
-	DamageChannel = InDamageChannel;
+	BlockingChannel = InBlockingChannel;
 	SetVelocity(InVelocity);
 	SetProjectileLifeSpan(LifeSpan);
 }
@@ -41,18 +41,27 @@ float AProjectileBase::GetHitRadius() const
 	return HitRadius;
 }
 
-void AProjectileBase::RadialDamage() const
+bool AProjectileBase::RadialDamage()
 {
 	const UWorld* World = GetWorld();
 	
 	if (!IsValid(World))
 	{
 		UE_LOG(LogShooter, Error, TEXT("SphereCastDamage(), World is invalid in %s."), *GetName());
-		return;
+		return false;
 	}
 
-	DrawDebugSphere(World, GetActorLocation(), GetHitRadius(), 32, FColor::Red, false, 5.f, 0, 5.f);
-	UGameplayStatics::ApplyRadialDamage(World, GetDamage(), GetActorLocation(), GetHitRadius(), UDamageType::StaticClass(), TArray<AActor*>(), ProjectileInstigator, ProjectileInstigator->GetInstigatorController(), true, DamageChannel);
+	// DrawDebugSphere(World, GetActorLocation(), GetHitRadius(), 32, FColor::Red, false, 5.f, 0, 5.f);
+	TArray<AActor*> IgnoredActors;
+	IgnoredActors.Add(this);
+	IgnoredActors.Add(ProjectileInstigator);
+	return UGameplayStatics::ApplyRadialDamage(World, GetDamage(), GetActorLocation(), GetHitRadius(), UDamageType::StaticClass(), TArray<AActor*>(), ProjectileInstigator, ProjectileInstigator->GetInstigatorController(), true, BlockingChannel);
+}
+
+void AProjectileBase::DisposeProjectile()
+{
+	LifeSpanTimerHandle.Invalidate();
+	IPooledActor::Execute_ReleasePooledActor(this);
 }
 
 void AProjectileBase::ClearPooledActor_Implementation()
@@ -69,12 +78,11 @@ void AProjectileBase::SetProjectileLifeSpan(float InLifeSpan)
 		UE_LOG(LogShooter, Error, TEXT("SetProjectileLifeSpan(), World is invalid in %s."), *GetName());
 		return;
 	}
-
-	FTimerHandle LifeSpanTimerHandle;
+	
 	World->GetTimerManager().SetTimer(LifeSpanTimerHandle, this, &AProjectileBase::OnProjectileLifeSpanEnd, LifeSpan, false);
 }
 
 void AProjectileBase::OnProjectileLifeSpanEnd_Implementation()
 {
-	IPooledActor::Execute_ReleasePooledActor(this);
+	DisposeProjectile();
 }

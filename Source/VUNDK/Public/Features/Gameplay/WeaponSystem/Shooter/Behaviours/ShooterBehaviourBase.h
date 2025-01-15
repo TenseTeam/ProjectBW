@@ -72,9 +72,6 @@ public:
 	UFUNCTION(BlueprintPure)
 	virtual int32 GetCurrentAmmo() const override;
 
-	UFUNCTION(BlueprintPure)
-	TEnumAsByte<ECollisionChannel> GetDamageChannel() const;
-
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
 	float GetDamage() const;
 

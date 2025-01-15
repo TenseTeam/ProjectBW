@@ -82,14 +82,6 @@ int32 UShooterBehaviourBase::GetCurrentAmmo() const
 	return CurrentAmmo;
 }
 
-TEnumAsByte<ECollisionChannel> UShooterBehaviourBase::GetDamageChannel() const
-{
-	if (!Check())
-		return ECollisionChannel::ECC_Visibility;
-
-	return ShootData.CollisionChannel;
-}
-
 float UShooterBehaviourBase::GetRange_Implementation() const
 {
 	if (!Check())
@@ -226,8 +218,7 @@ bool UShooterBehaviourBase::IsInLineOfSight(const FVector& StartPoint, const FVe
 		return false;
 	}
 
-	FHitResult HitResult;
-	if (World->LineTraceSingleByChannel(HitResult, StartPoint, TargetPoint, ECC_Visibility))
+	if (FHitResult HitResult; World->LineTraceSingleByChannel(HitResult, StartPoint, TargetPoint, ECC_Visibility))
 		return HitResult.ImpactPoint.Equals(TargetPoint, Tolerance);
 
 	return true;

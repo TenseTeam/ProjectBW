@@ -21,6 +21,8 @@ public:
 	float ProjectileLifeTime = 5.0f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0.0", UIMin = "0.0"))
 	float ProjectileSpeed = 100.0f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TEnumAsByte<ECollisionChannel> BlockingChannel = ECollisionChannel::ECC_Visibility;
 
 public:
 	UShooterPhysicProjectileBehaviour();
