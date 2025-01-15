@@ -82,14 +82,6 @@ int32 UShooterBehaviourBase::GetCurrentAmmo() const
 	return CurrentAmmo;
 }
 
-TEnumAsByte<ECollisionChannel> UShooterBehaviourBase::GetDamageChannel() const
-{
-	if (!Check())
-		return ECollisionChannel::ECC_Visibility;
-
-	return ShootData.CollisionChannel;
-}
-
 float UShooterBehaviourBase::GetRange_Implementation() const
 {
 	if (!Check())
@@ -120,6 +112,14 @@ int32 UShooterBehaviourBase::GetMagSize_Implementation() const
 		return 0;
 
 	return ShootData.MagSize;
+}
+
+TEnumAsByte<ECollisionChannel> UShooterBehaviourBase::GetDamageChannel() const
+{
+	if (!Check())
+		return ECollisionChannel::ECC_Visibility;
+	
+	return ShootData.DamageChannel;
 }
 
 UWorld* UShooterBehaviourBase::GetWorld() const
@@ -226,8 +226,7 @@ bool UShooterBehaviourBase::IsInLineOfSight(const FVector& StartPoint, const FVe
 		return false;
 	}
 
-	FHitResult HitResult;
-	if (World->LineTraceSingleByChannel(HitResult, StartPoint, TargetPoint, ECC_Visibility))
+	if (FHitResult HitResult; World->LineTraceSingleByChannel(HitResult, StartPoint, TargetPoint, ECC_Visibility))
 		return HitResult.ImpactPoint.Equals(TargetPoint, Tolerance);
 
 	return true;
@@ -235,7 +234,7 @@ bool UShooterBehaviourBase::IsInLineOfSight(const FVector& StartPoint, const FVe
 
 bool UShooterBehaviourBase::HandleSimultaneousShoot()
 {
-	if (!CanShoot(ShootPoints.Num()))
+	if (!HasEnoughAmmoToShoot(ShootPoints.Num()))
 	{
 		ShootFail();
 		return false;
@@ -250,7 +249,7 @@ bool UShooterBehaviourBase::HandleSimultaneousShoot()
 
 bool UShooterBehaviourBase::HandleSequentialShoot()
 {
-	if (!CanShoot(1))
+	if (!HasEnoughAmmoToShoot(1))
 	{
 		ShootFail();
 		return false;
@@ -263,7 +262,7 @@ bool UShooterBehaviourBase::HandleSequentialShoot()
 	return true;
 }
 
-bool UShooterBehaviourBase::CanShoot(const int32 DesiredAmmoToConsume) const
+bool UShooterBehaviourBase::HasEnoughAmmoToShoot(const int32 DesiredAmmoToConsume) const
 {
 	if (!Check())
 	{
