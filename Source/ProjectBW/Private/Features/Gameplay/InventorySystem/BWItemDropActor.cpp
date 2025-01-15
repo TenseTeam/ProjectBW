@@ -18,8 +18,8 @@ void ABWItemDropActor::Interact_Implementation()
 {
 	if (IsValid(PlayerInventory))
 	{
-		PlayerInventory->TryAddItem(RelatedItem);
-		Destroy();
+		if (PlayerInventory->TryAddItem(RelatedItem))
+			Destroy();
 	}
 }
 
