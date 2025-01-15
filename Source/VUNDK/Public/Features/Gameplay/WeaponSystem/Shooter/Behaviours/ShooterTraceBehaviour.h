@@ -21,7 +21,7 @@ public:
 #endif
 	
 protected:
-	virtual void OnShootSuccess_Implementation(const FVector& ShootPointLocation, const FVector& ShootPointDirection, const FVector& ShooterTargetLocation, const FVector& ShootPointDirectionToTarget) const override;
+	virtual void OnShootSuccess_Implementation(UShootPoint* ShootPoint, const FVector& ShooterTargetLocation, const FVector& ShootPointDirectionToTarget) const override;
 
 private:
 	void TraceFromCamera(const UWorld* World, const FVector& InShootPointLocation) const;
