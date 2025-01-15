@@ -28,5 +28,5 @@ void UShooterPhysicProjectileBehaviour::OnShootSuccess_Implementation(const FVec
 	
 	AProjectileBase* Projectile = Cast<AProjectileBase>(ActorPrj);
 	Projectile->SetActorLocation(ShootPointLocation);
-	Projectile->Init(Shooter->GetOwner(), GetDamage(), ProjectileLifeTime, HitRadius, BlockingChannel, ShootPointDirectionToTarget * ProjectileSpeed);
+	Projectile->Init(Shooter->GetOwner(), GetDamage(), ProjectileLifeTime, HitRadius, GetDamageChannel(), ShootPointDirectionToTarget * ProjectileSpeed);
 }

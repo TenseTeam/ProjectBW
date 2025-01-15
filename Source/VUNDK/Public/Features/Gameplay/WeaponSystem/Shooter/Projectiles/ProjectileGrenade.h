@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "ProjectileBase.h"
-#include "GrenadeProjectile.generated.h"
+#include "ProjectileGrenade.generated.h"
 
 UCLASS()
-class VUNDK_API AGrenadeProjectile : public AProjectileBase
+class VUNDK_API AProjectileGrenade : public AProjectileBase
 {
 	GENERATED_BODY()
 
 public:
-	AGrenadeProjectile();
+	AProjectileGrenade();
 
 	virtual void OnPooledActorBeginPlay_Implementation() override;
 

@@ -14,8 +14,6 @@ class VUNDK_API UShooterTraceBehaviour : public UShooterBehaviourBase
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "1", UIMin = "1"))
 	int32 MaxPenetration = 1;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FCollisionProfileName TraceProfile;
 	
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(EditDefaultsOnly)

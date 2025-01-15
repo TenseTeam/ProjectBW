@@ -85,6 +85,9 @@ public:
 	int32 GetMagSize() const;
 
 	UFUNCTION(BlueprintPure)
+	TEnumAsByte<ECollisionChannel> GetDamageChannel() const;
+
+	UFUNCTION(BlueprintPure)
 	UWorld* GetWorld() const;
 
 protected:
@@ -97,10 +100,7 @@ protected:
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void OnShootSuccess(const FVector& ShootPointLocation, const FVector& ShootPointDirection, const FVector& ShooterTargetLocation, const FVector& ShootPointDirectionToTarget) const;
-
-	/**
-	 * @brief Called when the shoot is failed.
-	 */
+	
 	UFUNCTION(BlueprintNativeEvent)
 	void OnShootFail();
 
@@ -124,7 +124,7 @@ private:
 
 	bool HandleSequentialShoot();
 
-	bool CanShoot(const int32 DesiredAmmoToConsume) const;
+	bool HasEnoughAmmoToShoot(const int32 DesiredAmmoToConsume) const;
 
 	int32 NextShootPointIndex();
 

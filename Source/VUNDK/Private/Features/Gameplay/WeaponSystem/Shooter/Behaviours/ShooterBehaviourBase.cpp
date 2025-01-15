@@ -114,6 +114,14 @@ int32 UShooterBehaviourBase::GetMagSize_Implementation() const
 	return ShootData.MagSize;
 }
 
+TEnumAsByte<ECollisionChannel> UShooterBehaviourBase::GetDamageChannel() const
+{
+	if (!Check())
+		return ECollisionChannel::ECC_Visibility;
+	
+	return ShootData.DamageChannel;
+}
+
 UWorld* UShooterBehaviourBase::GetWorld() const
 {
 	if (!Check())
@@ -226,7 +234,7 @@ bool UShooterBehaviourBase::IsInLineOfSight(const FVector& StartPoint, const FVe
 
 bool UShooterBehaviourBase::HandleSimultaneousShoot()
 {
-	if (!CanShoot(ShootPoints.Num()))
+	if (!HasEnoughAmmoToShoot(ShootPoints.Num()))
 	{
 		ShootFail();
 		return false;
@@ -241,7 +249,7 @@ bool UShooterBehaviourBase::HandleSimultaneousShoot()
 
 bool UShooterBehaviourBase::HandleSequentialShoot()
 {
-	if (!CanShoot(1))
+	if (!HasEnoughAmmoToShoot(1))
 	{
 		ShootFail();
 		return false;
@@ -254,7 +262,7 @@ bool UShooterBehaviourBase::HandleSequentialShoot()
 	return true;
 }
 
-bool UShooterBehaviourBase::CanShoot(const int32 DesiredAmmoToConsume) const
+bool UShooterBehaviourBase::HasEnoughAmmoToShoot(const int32 DesiredAmmoToConsume) const
 {
 	if (!Check())
 	{

@@ -19,4 +19,6 @@ struct VUNDK_API FShootData
 	float Range;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0", UIMin = "0"))
 	int32 MagSize;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TEnumAsByte<ECollisionChannel> DamageChannel = ECollisionChannel::ECC_Visibility;
 };

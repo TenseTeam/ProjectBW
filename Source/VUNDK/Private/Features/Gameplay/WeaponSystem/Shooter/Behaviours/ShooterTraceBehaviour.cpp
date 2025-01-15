@@ -67,7 +67,7 @@ void UShooterTraceBehaviour::LineTraceDamage(const UWorld* World, const FVector&
 		DrawDebugLine(World, TraceStartPoint, TraceEndPoint, FColor::Purple, false, 5.0f, 0, 1.0f);
 #endif
 
-	if (TArray<FHitResult> HitResults; World->LineTraceMultiByProfile(HitResults, TraceStartPoint, TraceEndPoint, TraceProfile.Name, CollisionQueryParams))
+	if (TArray<FHitResult> HitResults; World->LineTraceMultiByChannel(HitResults, TraceStartPoint, TraceEndPoint, GetDamageChannel(), CollisionQueryParams))
 	{
 		int32 PenetrationCount = 0;
 
