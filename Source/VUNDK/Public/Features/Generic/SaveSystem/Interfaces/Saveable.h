@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Features/Generic/SaveSystem/Data/SaveData.h"
 #include "UObject/Object.h"
-#include "ISaveable.generated.h"
+#include "Saveable.generated.h"
 
 UINTERFACE(BlueprintType)
 class VUNDK_API USaveable : public UInterface

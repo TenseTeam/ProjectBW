@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "Data/SaveData/InventoryBaseSaveData.h"
 #include "Features/Gameplay/EquipmentSystem/Equipment.h"
-#include "Features/Generic/SaveSystem/Interfaces/ISaveable.h"
+#include "Features/Generic/SaveSystem/Interfaces/Saveable.h"
 #include "InventoryBase.generated.h"
 
 struct FItemSaveData;

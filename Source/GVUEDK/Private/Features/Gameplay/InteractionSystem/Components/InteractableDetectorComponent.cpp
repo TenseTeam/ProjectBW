@@ -23,9 +23,34 @@ void UInteractableDetectorComponent::BeginPlay()
 	DetectorBehaviour->Initialize(GetOwner());
 }
 
+void UInteractableDetectorComponent::TickComponent(float DeltaTime, enum ELevelTick TickType,
+                                                   FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	CheckInteractablesInRange();
+}
+
 bool UInteractableDetectorComponent::TryGetInteractable(TScriptInterface<IInteractable>& OutInteractable) const
 {
 	return DetectorBehaviour->TryGetInteractable(OutInteractable);
+}
+
+void UInteractableDetectorComponent::CheckInteractablesInRange()
+{
+	TScriptInterface<IInteractable> OutInteractable = nullptr;
+	if (TryGetInteractable(OutInteractable))
+	{
+		if (OutInteractable.GetObject() != LastDetectedInteractable.GetObject())
+		{
+			LastDetectedInteractable = OutInteractable;
+			OnInteractableDetected.Broadcast(OutInteractable);
+		}
+	}
+	else if (LastDetectedInteractable.GetObject() != nullptr)
+	{
+		LastDetectedInteractable = nullptr;
+		OnInteractableLost.Broadcast();
+	}
 }
 
 

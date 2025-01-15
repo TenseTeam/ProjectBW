@@ -1,8 +1,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Features/Gameplay/WeaponSystem/Shooter/Data/ShootType.h"
 #include "UObject/Object.h"
-#include "IShooterBehaviour.generated.h"
+#include "ShooterBehaviour.generated.h"
 
 UINTERFACE(BlueprintType)
 class VUNDK_API UShooterBehaviour : public UInterface
@@ -16,10 +17,10 @@ class VUNDK_API IShooterBehaviour
 
 public:
 	/**
-	 * @brief Starts the shoot behaviour.
+	 * @brief Starts the shooter behaviour.
 	 * @return True if the shoot was successful, false otherwise.
 	 */
-	virtual bool Shoot() = 0;
+	virtual bool Shoot(EShootType ShootType) = 0;
 
 	/**
 	 * @brief Refills an amount of ammo.
