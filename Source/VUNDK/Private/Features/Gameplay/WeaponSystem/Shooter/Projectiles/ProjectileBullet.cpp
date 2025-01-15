@@ -4,18 +4,10 @@
 
 AProjectileBullet::AProjectileBullet()
 {
-	PrimaryActorTick.bCanEverTick = true;
 }
 
-void AProjectileBullet::BeginPlay()
+void AProjectileBullet::OnProjectileHit_Implementation(const FHitResult& ImpactResult, const FVector& ImpactVelocity)
 {
-	Super::BeginPlay();
-}
-
-void AProjectileBullet::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	if (RadialDamage())
-		DisposeProjectile();
+	Super::OnProjectileHit_Implementation(ImpactResult, ImpactVelocity);
+	DisposeProjectile();
 }

@@ -243,7 +243,15 @@ bool UShooterBehaviourBase::HandleSimultaneousShoot()
 
 	ModifyCurrentAmmo(-ShootPoints.Num());
 	for (UShootPoint* ShootPoint : ShootPoints)
+	{
+		if (!IsValid(ShootPoint))
+		{
+			UE_LOG(LogShooter, Error, TEXT("HandleSimultaneousShoot(), Invalid ShootPoint in %s."), *GetName());
+			continue;
+		}
+		
 		ShootSuccess(ShootPoint);
+	}
 
 	return true;
 }
@@ -258,6 +266,13 @@ bool UShooterBehaviourBase::HandleSequentialShoot()
 
 	ModifyCurrentAmmo(-1);
 	NextShootPointIndex();
+
+	if (!IsValid(ShootPoints[CurrentShootPointIndex]))
+	{
+		UE_LOG(LogShooter, Error, TEXT("HandleSequentialShoot(), Invalid ShootPoint in %s."), *GetName());
+		return false;
+	}
+	
 	ShootSuccess(ShootPoints[CurrentShootPointIndex]);
 
 	return true;

@@ -14,9 +14,5 @@ class VUNDK_API AProjectileBullet : public AProjectileBase
 public:
 	AProjectileBullet();
 
-protected:
-	virtual void BeginPlay() override;
-
-public:
-	virtual void Tick(float DeltaTime) override;
+	virtual void OnProjectileHit_Implementation(const FHitResult& ImpactResult, const FVector& ImpactVelocity) override;
 };

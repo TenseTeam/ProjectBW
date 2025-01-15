@@ -9,23 +9,24 @@ AProjectileBase::AProjectileBase()
 	PrimaryActorTick.bCanEverTick = true;
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMesh"));
 	SetRootComponent(MeshComponent);
-	MeshComponent->SetSimulatePhysics(true);
+	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
+	ProjectileMovementComponent->SetUpdatedComponent(MeshComponent);
+	ProjectileMovementComponent->bRotationFollowsVelocity = true;
 }
 
-void AProjectileBase::Init(AActor* InInstigator, const float InDamage, const float InLifeSpan, const float InHitRadius, TEnumAsByte<ECollisionChannel> InBlockingChannel, const FVector& InVelocity)
+void AProjectileBase::Init(AActor* InInstigator, const float InDamage, const float InLifeSpan, const FVector& InVelocity)
 {
 	ProjectileInstigator = InInstigator;
 	Damage = InDamage;
 	LifeSpan = InLifeSpan;
-	HitRadius = InHitRadius;
-	BlockingChannel = InBlockingChannel;
-	SetVelocity(InVelocity);
 	SetProjectileLifeSpan(LifeSpan);
+	SetVelocity(InVelocity);
 }
 
 void AProjectileBase::SetVelocity(const FVector NewVelocity) const
 {
-	MeshComponent->SetPhysicsLinearVelocity(NewVelocity);
+	ProjectileMovementComponent->bShouldBounce = true;
+	ProjectileMovementComponent->Velocity = NewVelocity;
 }
 
 float AProjectileBase::GetDamage() const
@@ -33,19 +34,15 @@ float AProjectileBase::GetDamage() const
 	return Damage;
 }
 
-float AProjectileBase::GetHitRadius() const
-{
-	return HitRadius;
-}
-
-bool AProjectileBase::RadialDamage()
+void AProjectileBase::ApplyProjectileDamage(AActor* TargetActor)
 {
 	const UWorld* World = GetWorld();
-	
+
 	TArray<AActor*> IgnoredActors;
 	IgnoredActors.Add(this);
 	IgnoredActors.Add(ProjectileInstigator);
-	return UGameplayStatics::ApplyRadialDamage(World, GetDamage(), GetActorLocation(), GetHitRadius(), UDamageType::StaticClass(), IgnoredActors, ProjectileInstigator, ProjectileInstigator->GetInstigatorController(), true, BlockingChannel);
+
+	UGameplayStatics::ApplyDamage(TargetActor, GetDamage(), ProjectileInstigator->GetInstigatorController(), ProjectileInstigator, UDamageType::StaticClass());
 }
 
 void AProjectileBase::DisposeProjectile()
@@ -57,14 +54,42 @@ void AProjectileBase::DisposeProjectile()
 		UE_LOG(LogShooter, Error, TEXT("ProjectileBase DisposeProjectile(), World is invalid."));
 		return;
 	}
-	
+
 	World->GetTimerManager().ClearTimer(LifeSpanTimerHandle);
 	IPooledActor::Execute_ReleasePooledActor(this);
 }
 
 void AProjectileBase::ClearPooledActor_Implementation()
 {
-	SetVelocity(FVector::ZeroVector);
+	ProjectileMovementComponent->Velocity = FVector::ZeroVector;
+}
+
+void AProjectileBase::BeginPlay()
+{
+	Super::BeginPlay();
+	ProjectileMovementComponent->OnProjectileBounce.AddDynamic(this, &AProjectileBase::OnProjectileHit);
+}
+
+void AProjectileBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	ProjectileMovementComponent->OnProjectileBounce.RemoveDynamic(this, &AProjectileBase::OnProjectileHit);
+}
+
+void AProjectileBase::OnProjectileHit_Implementation(const FHitResult& ImpactResult, const FVector& ImpactVelocity)
+{
+	ApplyProjectileDamage(ImpactResult.GetActor());
+}
+
+void AProjectileBase::OnProjectileLifeSpanEnd_Implementation()
+{
+	DisposeProjectile();
+}
+
+void AProjectileBase::ProjectileHit(const FHitResult& ImpactResult, const FVector& ImpactVelocity)
+{
+	OnProjectileHit(ImpactResult, ImpactVelocity);
+	OnProjectileHitEvent.Broadcast(ImpactResult);
 }
 
 void AProjectileBase::SetProjectileLifeSpan(float InLifeSpan)
@@ -76,11 +101,6 @@ void AProjectileBase::SetProjectileLifeSpan(float InLifeSpan)
 		UE_LOG(LogShooter, Error, TEXT("ProjectileBase SetProjectileLifeSpan(), World is invalid."));
 		return;
 	}
-	
-	World->GetTimerManager().SetTimer(LifeSpanTimerHandle, this, &AProjectileBase::OnProjectileLifeSpanEnd, LifeSpan, false);
-}
 
-void AProjectileBase::OnProjectileLifeSpanEnd_Implementation()
-{
-	DisposeProjectile();
+	World->GetTimerManager().SetTimer(LifeSpanTimerHandle, this, &AProjectileBase::OnProjectileLifeSpanEnd, LifeSpan, false);
 }
