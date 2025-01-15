@@ -16,29 +16,31 @@ public:
 	ACustomNavLinkProxy();
 	
 	virtual void BeginPlay() override;
-	// // Check if the Nav Link is available (not occupied)
-	// UFUNCTION(BlueprintCallable, Category = "NavLink")
-	// bool IsAvailable() const;
-	//
-	// // Mark the Nav Link as occupied (used by an agent)
-	// void MarkAsOccupied(float OccupyDuration);
-	//
-	// // Release the Nav Link (make it available again)
-	// void Release();
-	//
-	// // Get the jump height required for this Nav Link (difference in Z coordinate)
-	// float GetJumpHeightRequired() const;
+
+	
+	UFUNCTION(BlueprintPure, Category =  "Custom Nav Link")
+	bool IsAvailable() const;
+	
+	UFUNCTION(BlueprintCallable, Category =  "Custom Nav Link")
+	void MarkAsOccupied(float OccupyDuration = 1.5f);
+	
+	UFUNCTION(BlueprintCallable, Category = "Custom Nav Link")
+	FVector FindValidDestination(const FVector& OriginalDestination, int32 MaxAttempts,bool bDebug);
 	
 private:
 	UPROPERTY(EditAnywhere, Category = "Custom Nav Link")
 	TEnumAsByte<ENavLinkDirection::Type> AINavLinkDirection;
+	
+	bool bIsOccupied;
+	
+	
+	FTimerHandle OccupyTimerHandle;
 
-	// void OnMySmartLinkReached(AActor* Agent, const FVector& Destination);
-	//
-	// bool bIsOccupied;
-	//
-	// FTimerHandle OccupyTimerHandle;
-	//
-	// float JumpHeightRequired;
+	float JumpHeightRequired;
+	
+	UFUNCTION(BlueprintCallable, Category = "Custom Nav Link")
+	bool CheckJumpHeightRequired(AActor* Pawn) const;
+	
+	void Release();
 
 };

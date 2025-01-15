@@ -5,7 +5,9 @@
 
 #include "AIController.h"
 #include "AI/NPC/BWNPCBaseEnemy/BWNPCBaseEnemy.h"
+#include "AI/NPC/BWNPCBaseEnemy/BWNPCbaseEnemyController.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Utility/LGDebug.h"
 
 
@@ -14,13 +16,14 @@ ACustomNavLinkProxy::ACustomNavLinkProxy()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	bSmartLinkIsRelevant = true;
+	bIsOccupied = false;
+	
 }
 
 void ACustomNavLinkProxy::BeginPlay()
 {
 	Super::BeginPlay();
-
-	//OnSmartLinkReached.AddDynamic(this, &ACustomNavLinkProxy::OnMySmartLinkReached);
+	OccupyTimerHandle.Invalidate();
 	
 	UNavLinkCustomComponent* NavLinkCustomComponent =  GetSmartLinkComp();
 	FVector LeftPt = FVector(70, 0, 0);
@@ -30,78 +33,106 @@ void ACustomNavLinkProxy::BeginPlay()
 	Direction = AINavLinkDirection;
 	NavLinkCustomComponent->SetLinkData(LeftPt, RightPt, Direction);
 
-	//JumpHeightRequired = FMath::Abs(LeftPt.Z - RightPt.Z); 
+	JumpHeightRequired = FMath::Abs(LeftPt.Z - RightPt.Z);
 }
-//
-// bool ACustomNavLinkProxy::IsAvailable() const
-// {
-//     return !bIsOccupied;
-// }
-//
-// void ACustomNavLinkProxy::MarkAsOccupied(float OccupyDuration)
-// {
-//     if (bIsOccupied)
-//     {
-//         return; // If already occupied, do nothing
-//     }
-//
-//     // Mark the link as occupied
-//     bIsOccupied = true;
-//
-//     // Set a timer to release the Nav Link after a given duration
-//     GetWorldTimerManager().SetTimer(
-//         OccupyTimerHandle,
-//         this,
-//         &ACustomNavLinkProxy::Release,
-//         OccupyDuration,
-//         false
-//     );
-// }
-//
-// void ACustomNavLinkProxy::Release()
-// {
-//     // Release the Nav Link (make it available again)
-//     bIsOccupied = false;
-//     GetWorldTimerManager().ClearTimer(OccupyTimerHandle);
-// }
-//
-// float ACustomNavLinkProxy::GetJumpHeightRequired() const
-// {
-//     return JumpHeightRequired;
-// }
-//
-// void ACustomNavLinkProxy::OnMySmartLinkReached(AActor* Agent, const FVector& Destination)
-// {
-//     // Log message when an agent reaches the smart link (you can replace this with custom logic)
-//     UE_LOG(LogTemp, Warning, TEXT("Smart Link Reached"));
-//
-//     // Example: Check if the agent can jump or if it's available
-//     if (IsAvailable())
-//     {
-//             AActor* ControlledPawn = Agent->GetOwner();
-//             ABWNPCBaseEnemy* NPC = Cast<ABWNPCBaseEnemy>(ControlledPawn);
-//             if (ControlledPawn)
-//             {
-//                 // Calculate jump height and check if the agent can jump over the NavLink
-//                 if (JumpHeightRequired <= NPC->GetJumpHeight())
-//                 {
-//                     // If the jump height is enough, perform the jump
-//                     FVector JumpDirection = (Destination - Agent->GetActorLocation()).GetSafeNormal();
-//                     FVector LaunchVelocity = JumpDirection * 600.0f; 
-//                     LaunchVelocity.Z = FMath::Sqrt(2 * JumpHeightRequired * FMath::Abs(GetWorld()->GetGravityZ())); // Calculate vertical speed
-//
-//                     if (ACharacter* Character = Cast<ACharacter>(ControlledPawn))
-//                     {
-//                         Character->LaunchCharacter(LaunchVelocity, true, true);
-//                     }
-//                 }
-//                 else
-//                 {
-//                     // If jump height is insufficient, let the agent continue path following
-//                     ResumePathFollowing(Agent);
-//                 }
-//             }
-//         }
-//            
-//     
-// }
+
+bool ACustomNavLinkProxy::IsAvailable() const
+{
+	return !bIsOccupied;
+}
+
+void ACustomNavLinkProxy::MarkAsOccupied(float OccupyDuration)
+{
+	if (bIsOccupied)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Nav Link is already occupied!"));
+		return;
+	}
+	
+	bIsOccupied = true;
+	
+	GetWorldTimerManager().SetTimer(
+		OccupyTimerHandle, 
+		this, 
+		&ACustomNavLinkProxy::Release, 
+		OccupyDuration, 
+		false
+	);
+
+	UE_LOG(LogTemp, Log, TEXT("Nav Link marked as occupied for %.2f seconds"), OccupyDuration);
+}
+
+FVector ACustomNavLinkProxy::FindValidDestination(const FVector& OriginalDestination,int32 MaxAttempts,bool bDebug)
+{
+	FVector CurrentDestination = OriginalDestination;
+	FVector Direction = (CurrentDestination - GetActorLocation()).GetSafeNormal();
+	float const Radius = 100.0f;
+		
+	for (int32 Attempt = 0; Attempt < MaxAttempts; ++Attempt)
+	{
+		FHitResult HitResult;
+		bool bHit = GetWorld()->SweepSingleByChannel(HitResult,GetActorLocation(),CurrentDestination,FQuat::Identity,ECC_Visibility,FCollisionShape::MakeSphere(Radius));
+
+		if (bDebug)
+		{
+			// Disegna il percorso dello sphere cast
+			DrawDebugSphere(GetWorld(), CurrentDestination, Radius, 12, FColor::Red, false, 2.0f);
+			DrawDebugLine(GetWorld(), GetActorLocation(), CurrentDestination, bHit ? FColor::Red : FColor::Green, false, 2.0f);
+		}
+
+		if (!bHit)
+		{
+			// Nessun ostacolo, ritorna un punto casuale entro il raggio dello sphere cast
+			FVector RandomPoint = UKismetMathLibrary::RandomPointInBoundingBox(
+				CurrentDestination,
+				FVector(Radius, Radius, Radius)
+			);
+
+			if (bDebug)
+			{
+				DrawDebugSphere(GetWorld(), RandomPoint, 10.0f, 8, FColor::Green, false, 2.0f);
+				UE_LOG(LogTemp, Log, TEXT("Valid destination found: %s"), *RandomPoint.ToString());
+			}
+
+			return RandomPoint;
+		}
+
+		// Se c'è un ostacolo, sposta a destra o a sinistra di 100 unità
+		FVector RightVector = FVector::CrossProduct(Direction, FVector::UpVector).GetSafeNormal();
+		CurrentDestination += (Attempt % 2 == 0 ? RightVector : -RightVector) * 100.0f;
+
+		if (bDebug)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Obstacle detected. Adjusting destination to: %s"), *CurrentDestination.ToString());
+		}
+	}
+
+	// Ritorna la destinazione originale se non si trova un percorso valido
+	if (bDebug)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to find a valid destination after %d attempts"), MaxAttempts);
+	}
+
+	return OriginalDestination;
+}
+
+bool ACustomNavLinkProxy::CheckJumpHeightRequired(AActor* Pawn) const
+{
+	ABWNPCBaseEnemy* NPC = Cast<ABWNPCBaseEnemy>(Pawn);
+	if (!NPC)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Pawn is not an NPC"));
+		return false;
+	}
+	
+	return NPC->GetJumpHeight() > JumpHeightRequired;
+}
+
+void ACustomNavLinkProxy::Release()
+{
+	bIsOccupied = false;
+	
+	GetWorldTimerManager().ClearTimer(OccupyTimerHandle);
+
+	UE_LOG(LogTemp, Log, TEXT("Nav Link is now available again"));
+}

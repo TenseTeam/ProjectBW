@@ -54,5 +54,6 @@ bool UBTDecorator_CanJumpToElevatedPosition::CalculateRawConditionValue(UBehavio
 		BlackboardComp->SetValueAsVector(TargetPositionKey.SelectedKeyName, AttackTarget->GetActorLocation());
 		return true;
 	}
+	
 	return false;
 }
