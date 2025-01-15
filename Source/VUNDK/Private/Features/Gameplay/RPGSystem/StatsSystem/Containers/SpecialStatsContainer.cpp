@@ -6,12 +6,12 @@
 void USpecialStatsContainer::AddSpecialStats(TSet<USpecialStatData*> SpecialStats)
 {
 	for (USpecialStatData* SpecialStat : SpecialStats)
-		AddStat(SpecialStat, SpecialStat->StatMinValue);
+		AddStat(SpecialStat, SpecialStat->StatDefaultValue);
 }
 
-TMap<USpecialStatData*, int32> USpecialStatsContainer::GetSpecialStatsValues()
+TMap<USpecialStatData*, float> USpecialStatsContainer::GetSpecialStatsValues()
 {
-    TMap<USpecialStatData*, int32> SpecialStatsValues;
+    TMap<USpecialStatData*, float> SpecialStatsValues;
 	
     for (auto& Stat : Values)
     {

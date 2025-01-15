@@ -12,13 +12,13 @@ class VUNDK_API UEquipSlotKey : public UPrimaryDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, AdvancedDisplay)
-	FName EquipSlotKeyID;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, AdvancedDisplay)
+	FName EquipSlotKey;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText EquipSlotName;
 	
 public:
-	UEquipSlotKey() : EquipSlotKeyID(FName("NotGeneratedID")),
+	UEquipSlotKey() : EquipSlotKey(FName("NotGeneratedID")),
 	                  EquipSlotName(FText::FromString("Equip Slot Name"))
 	{
 	}
@@ -26,6 +26,6 @@ public:
 	FORCEINLINE virtual void PostInitProperties() override
 	{
 		Super::PostInitProperties();
-		EquipSlotKeyID = FName(FGuid::NewGuid().ToString());
+		EquipSlotKey = FName(FGuid::NewGuid().ToString());
 	}
 };

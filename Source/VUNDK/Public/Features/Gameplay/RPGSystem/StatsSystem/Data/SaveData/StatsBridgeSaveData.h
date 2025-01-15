@@ -12,8 +12,16 @@ class VUNDK_API UStatsBridgeSaveData : public USaveData
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = true))
-	TMap<FName, int32> SavedSpecialStats;
-	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = true))
-	TMap<FName, int32> SavedCoreStats;
+	UPROPERTY(BlueprintReadWrite)
+	TMap<FGuid, float> SavedSpecialStats;
+	UPROPERTY(BlueprintReadWrite)
+	TMap<FGuid, float> SavedCoreStats;
+
+public:
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE void Init(const TMap<FGuid, float> InSavedSpecialStats, const TMap<FGuid, float> InSavedCoreStats)
+	{
+		SavedSpecialStats = InSavedSpecialStats;
+		SavedCoreStats = InSavedCoreStats;
+	}
 };

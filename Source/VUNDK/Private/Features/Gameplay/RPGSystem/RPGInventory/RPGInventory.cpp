@@ -20,7 +20,7 @@ USaveData* URPGInventory::CreateSaveData()
 		if (Item->IsA(URPGGearItem::StaticClass()))
 		{
 			const URPGGearItem* GearItem = Cast<URPGGearItem>(Item);
-			FName ItemID = Item->GetItemData()->ItemDataID;
+			FGuid ItemID = Item->GetItemData()->ItemDataID;
 
 			if (!SaveData->ItemsSaveData.GearItems.Contains(ItemID))
 				SaveData->ItemsSaveData.GearItems.Add(ItemID, FRPGGearItemsSaveArray());
@@ -31,7 +31,7 @@ USaveData* URPGInventory::CreateSaveData()
 		}
 
 		const URPGItem* RPGItem = Cast<URPGItem>(Item);
-		FName ItemID = Item->GetItemData()->ItemDataID;
+		FGuid ItemID = Item->GetItemData()->ItemDataID;
 
 		if (!SaveData->ItemsSaveData.GenericItems.Contains(ItemID))
 			SaveData->ItemsSaveData.GenericItems.Add(ItemID, FRPGItemsSaveArray());
@@ -47,9 +47,9 @@ void URPGInventory::LoadInventorySaveData_Implementation(UInventoryBaseSaveData*
 {
 	URPGInventorySaveData* RPGInventorySaveData = Cast<URPGInventorySaveData>(InventorySaveData);
 
-	for (TPair<FName, FRPGItemsSaveArray>& GenericItems : RPGInventorySaveData->ItemsSaveData.GenericItems)
+	for (auto& GenericItems : RPGInventorySaveData->ItemsSaveData.GenericItems)
 	{
-		const FName ItemID = GenericItems.Key;
+		const FGuid ItemID = GenericItems.Key;
 
 		for (FRPGItemSaveData& RPGItemSaveData : GenericItems.Value.Items)
 		{
@@ -63,15 +63,15 @@ void URPGInventory::LoadInventorySaveData_Implementation(UInventoryBaseSaveData*
 
 			if (URPGItemData* RPGItemData = Cast<URPGItemData>(ItemData))
 			{
-				URPGItem* RPGItem = URPGFactory::CreateRPGItem(RPGItemData, nullptr, false);
+				URPGItem* RPGItem = URPGFactory::CreateRPGGenericItem(RPGItemData, nullptr, false);
 				RPGItem->LoadRPGItemSaveData(this, RPGItemSaveData);
 			}
 		}
 	}
 	
-	for (TPair<FName, FRPGGearItemsSaveArray>& GearItems : RPGInventorySaveData->ItemsSaveData.GearItems)
+	for (auto& GearItems : RPGInventorySaveData->ItemsSaveData.GearItems)
 	{
-		const FName ItemID = GearItems.Key;
+		const FGuid ItemID = GearItems.Key;
 
 		for (FRPGGearItemSaveData& GearItemSaveData : GearItems.Value.GearItems)
 		{

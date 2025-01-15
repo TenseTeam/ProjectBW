@@ -11,22 +11,6 @@ UStatsBridgeBase::UStatsBridgeBase(): SpecialStatsContainer(nullptr),
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UStatsBridgeBase::BeginPlay()
-{
-	CreateStatsContainers();
-	SpecialStatsContainer->AddSpecialStats(SpecialStats);
-	CoreStatsContainer->AddCoreStats(CoreStats);
-	CalculateCoreStatsValues();
-	Super::BeginPlay();
-	SpecialStatsContainer->OnStatsValuesChanged.AddDynamic(this, &UStatsBridgeBase::CalculateAllStatsValues);
-}
-
-void UStatsBridgeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	Super::EndPlay(EndPlayReason);
-	SpecialStatsContainer->OnStatsValuesChanged.RemoveDynamic(this, &UStatsBridgeBase::CalculateAllStatsValues);
-}
-
 USaveData* UStatsBridgeBase::CreateSaveData()
 {
 	UStatsBridgeSaveData* BridgeSaveData = NewObject<UStatsBridgeSaveData>();
@@ -46,42 +30,87 @@ bool UStatsBridgeBase::LoadSaveData(USaveData* SavedData)
 		return false;
 
 	const UStatsBridgeSaveData* BridgeSaveData = Cast<UStatsBridgeSaveData>(SavedData);
+	
+	if (!BridgeSaveData)
+		return false;
 
-	for (TMap<FName, int32> SpecialStatsMap = BridgeSaveData->SavedSpecialStats; auto& Pair : SpecialStatsMap)
+	for (auto& SpecialStatsMap = BridgeSaveData->SavedSpecialStats; auto& Pair : SpecialStatsMap)
 	{
 		if (USpecialStatData* SpecialStatData = GetSpecialStatByID(Pair.Key))
-			SpecialStatsContainer->TrySetValue(SpecialStatData, Pair.Value);
+			SpecialStatsContainer->AddStat(SpecialStatData, Pair.Value);
 	}
 	
-	for (TMap<FName, int32> CoreStatsMap = BridgeSaveData->SavedCoreStats; auto& Pair : CoreStatsMap)
+	for (auto& CoreStatsMap = BridgeSaveData->SavedCoreStats; auto& Pair : CoreStatsMap)
 	{
 		if (UCoreStatData* CoreStatData = GetCoreStatByID(Pair.Key))
-			CoreStatsContainer->TrySetValue(CoreStatData, Pair.Value);
+			CoreStatsContainer->AddStat(CoreStatData, Pair.Value);
 	}
 	
 	return true;
 }
 
-UCoreStatData* UStatsBridgeBase::GetCoreStatByID(const FName& BaseStatID) const
+void UStatsBridgeBase::BeginPlay()
+{
+	CreateStatsContainers();
+	SpecialStatsContainer->AddSpecialStats(SpecialStats);
+	CoreStatsContainer->AddCoreStats(CoreStats);
+	Super::BeginPlay();
+	SpecialStatsContainer->OnStatsValuesChanged.AddDynamic(this, &UStatsBridgeBase::CalculateAllStatsValues);
+	CoreStatsContainer->OnStatsValuesChanged.AddDynamic(this, &UStatsBridgeBase::CalculateFullStatsValues);
+}
+
+void UStatsBridgeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	SpecialStatsContainer->OnStatsValuesChanged.RemoveDynamic(this, &UStatsBridgeBase::CalculateAllStatsValues);
+	CoreStatsContainer->OnStatsValuesChanged.RemoveDynamic(this, &UStatsBridgeBase::CalculateFullStatsValues);
+}
+
+USpecialStatData* UStatsBridgeBase::GetSpecialStatByID(const FGuid SpecialStatID) const
+{
+	for (USpecialStatData* SpecialStat : SpecialStats)
+	{
+		if (SpecialStat->StatID == SpecialStatID)
+			return SpecialStat;
+	}
+
+	return nullptr;
+}
+
+UCoreStatData* UStatsBridgeBase::GetCoreStatByID(const FGuid CoreStatID) const
 {
 	for (UCoreStatData* CoreStatData : CoreStats)
 	{
-		if (CoreStatData->StatID.IsEqual(BaseStatID))
+		if (CoreStatData->StatID == CoreStatID)
 			return CoreStatData;
 	}
 
 	return nullptr;
 }
 
-USpecialStatData* UStatsBridgeBase::GetSpecialStatByID(const FName& SpecialStatID) const
+TMap<UCoreStatData*, float> UStatsBridgeBase::GetFullStatsValues() const
 {
-	for (USpecialStatData* SpecialStat : SpecialStats)
-	{
-		if (SpecialStat->StatID.IsEqual(SpecialStatID))
-			return SpecialStat;
-	}
+	return FullStatsContainer->GetCoreStatsValues();
+}
 
-	return nullptr;
+float UStatsBridgeBase::GetFullStatValueAsFloat(const UStatDataBase* Stat) const
+{
+	return FullStatsContainer->GetValueAsFloat(Stat);
+}
+
+int32 UStatsBridgeBase::GetFullStatValueAsInt(const UStatDataBase* Stat) const
+{
+	return FullStatsContainer->GetValueAsInt(Stat);
+}
+
+FString UStatsBridgeBase::GetFullStatValueAsString(const UStatDataBase* Stat) const
+{
+	return FullStatsContainer->GetValueAsString(Stat);
+}
+
+int32 UStatsBridgeBase::GetFullStatsLength() const
+{
+	return FullStatsContainer->GetStatsLength();
 }
 
 void UStatsBridgeBase::CalculateCoreStatValueWithSpecialStat(USpecialStatData* SpecialStatData, UCoreStatData* CoreStatData, const TSubclassOf<UStatOperation> OperationClass)
@@ -94,7 +123,7 @@ void UStatsBridgeBase::CalculateCoreStatValueWithSpecialStat(USpecialStatData* S
 	if (!IsValid(Operation))
 		return;
 
-	CoreStatsContainer->TrySetValue(CoreStatData, Operation->GetResultOperation());
+	CoreStatsContainer->TryModifyValue(CoreStatData, Operation->GetResultOperation(), false);
 }
 
 void UStatsBridgeBase::CalculateAllStatsValues()
@@ -103,17 +132,27 @@ void UStatsBridgeBase::CalculateAllStatsValues()
 	CalculateFullStatsValues();
 }
 
+void UStatsBridgeBase::SetFullStatValue(UStatDataBase* Stat, const float Value) const
+{
+	FullStatsContainer->TrySetValue(Stat, Value);
+}
+
+void UStatsBridgeBase::ModifyFullStatValue(UStatDataBase* Stat, const float Value) const
+{
+	FullStatsContainer->TryModifyValue(Stat, Value);
+}
+
 void UStatsBridgeBase::CalculateCoreStatsValues()
 {
 	OnCalculateCoreStatsValues();
-	OnCalculatedCoreStatsValues.Broadcast();
+	OnCalculatedCoreStatsValues.Broadcast(this);
 }
 
 void UStatsBridgeBase::CalculateFullStatsValues()
 {
 	FullStatsContainer->CopyStats(CoreStatsContainer); // By default, full values are equal to core values
 	OnCalculateFullStatsValues();
-	OnCalculatedFullStatsValues.Broadcast(FullStatsContainer);
+	OnCalculatedFullStatsValues.Broadcast(this);
 }
 
 void UStatsBridgeBase::OnCalculateCoreStatsValues_Implementation()

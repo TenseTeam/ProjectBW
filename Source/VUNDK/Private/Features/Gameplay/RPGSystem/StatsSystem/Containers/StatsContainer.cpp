@@ -7,14 +7,14 @@ class UStatsSaveData;
 void UStatsContainer::AddStats(TSet<UStatDataBase*> Stats)
 {
 	for (UStatDataBase* Stat : Stats)
-		AddStat(Stat, Stat->StatMinValue);
+		AddStat(Stat, Stat->StatDefaultValue);
 }
 
-void UStatsContainer::AddStat(UStatDataBase* Stat, const int32 Value)
+void UStatsContainer::AddStat(UStatDataBase* Stat, const float Value)
 {
 	if (!Values.Contains(Stat))
-		Values.Add(Stat, Stat->StatMinValue);
-	
+		Values.Add(Stat, Stat->StatDefaultValue);
+
 	TrySetValue(Stat, Value);
 }
 
@@ -36,8 +36,8 @@ void UStatsContainer::RemoveStat(UStatDataBase* Stat)
 void UStatsContainer::CopyStats(UStatsContainer* StatsContainer)
 {
 	if (StatsContainer == nullptr)
-        return;
-	
+		return;
+
 	Values = StatsContainer->Values;
 	OnStatsValuesChanged.Broadcast();
 }
@@ -56,7 +56,7 @@ bool UStatsContainer::AreStatsEqual(UStatsContainer* StatsContainer) const
 	return true;
 }
 
-int32 UStatsContainer::GetValue(const UStatDataBase* Stat) const
+int32 UStatsContainer::GetValueAsInt(const UStatDataBase* Stat) const
 {
 	if (!Values.Contains(Stat))
 		return 0;
@@ -64,25 +64,66 @@ int32 UStatsContainer::GetValue(const UStatDataBase* Stat) const
 	return Values[Stat];
 }
 
-bool UStatsContainer::TrySetValue(UStatDataBase* Stat, const int32 Value)
+float UStatsContainer::GetValueAsFloat(const UStatDataBase* Stat) const
+{
+	if (!Values.Contains(Stat))
+		return 0.f;
+
+	return Values[Stat];
+}
+
+FString UStatsContainer::GetValueAsString(const UStatDataBase* Stat) const
+{
+	if (!Values.Contains(Stat))
+		return "";
+
+	return Stat->bRapresentAsDecimal ? FString::Printf(TEXT("%.2f"), GetValueAsFloat(Stat)) : FString::Printf(TEXT("%d"), GetValueAsInt(Stat));
+}
+
+int32 UStatsContainer::GetStatsLength() const
+{
+	return Values.Num();
+}
+
+bool UStatsContainer::TrySetValue(UStatDataBase* Stat, const float Value, const bool bNotifyEvent)
 {
 	if (!Values.Contains(Stat))
 		return false;
 
-	Values[Stat] = Stat->bIsUncapped ? Value : FMath::Clamp(Value, Stat->StatMinValue, Stat->StatMaxValue);
-	OnStatsValuesChanged.Broadcast();
+	Values[Stat] = ValidateStatValue(Value, Stat->StatValueRange);
+
+	if (bNotifyEvent)
+		OnStatsValuesChanged.Broadcast();
+
 	return true;
 }
 
-bool UStatsContainer::TryModifyValue(UStatDataBase* Stat, const int32 SumValue)
+bool UStatsContainer::TryModifyValue(UStatDataBase* Stat, const float SumValue, const bool bNotifyEvent)
 {
 	if (!Values.Contains(Stat))
 		return false;
 
-	return TrySetValue(Stat, GetValue(Stat) + SumValue);
+	return TrySetValue(Stat, GetValueAsFloat(Stat) + SumValue, bNotifyEvent);
 }
 
-TMap<UStatDataBase*, int32> const& UStatsContainer::GetValues() const
+TMap<UStatDataBase*, float> const& UStatsContainer::GetValues() const
 {
 	return Values;
+}
+
+float UStatsContainer::ValidateStatValue(const float Value, const FFloatRange& Range)
+{
+	if (Range.GetUpperBound().IsOpen() && Range.GetLowerBound().IsOpen())
+		return Value;
+
+	float MinClamp = MIN_flt;
+	float MaxClamp = MAX_flt;
+
+	if (Range.GetLowerBound().IsClosed())
+		MinClamp = Range.GetLowerBound().IsInclusive() ? Range.GetLowerBound().GetValue() : Range.GetLowerBound().GetValue() + 1;
+
+	if (Range.GetUpperBound().IsClosed())
+		MaxClamp = Range.GetUpperBound().IsInclusive() ? Range.GetUpperBound().GetValue() : Range.GetUpperBound().GetValue() - 1;
+
+	return FMath::Clamp(Value, MinClamp, MaxClamp);
 }

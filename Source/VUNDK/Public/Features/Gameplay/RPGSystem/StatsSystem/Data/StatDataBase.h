@@ -12,8 +12,8 @@ class VUNDK_API UStatDataBase : public UPrimaryDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, AdvancedDisplay)
-	FName StatID;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, AdvancedDisplay)
+	FGuid StatID;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (MaxLength = 3))
 	FName StatCodeName;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -21,26 +21,20 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (MultiLine = true))
 	FText StatDescription;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int32 StatMinValue;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition = "!bIsUncapped", EditConditionHides))
-	int32 StatMaxValue;
+	bool bRapresentAsDecimal;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	bool bIsUncapped;
+	float StatDefaultValue;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FFloatRange StatValueRange;
 
 public:
-	UStatDataBase(): StatID("NotGeneratedID"),
+	UStatDataBase(): StatID(FGuid::NewGuid()),
 	                 StatCodeName("AAA"),
-	                 StatFullName(),
-	                 StatDescription(),
-	                 StatMinValue(0),
-	                 StatMaxValue(1),
-	                 bIsUncapped(false)
+	                 bRapresentAsDecimal(false),
+	                 StatDefaultValue(0),
+	                 StatValueRange(0.0f, 1.0f)
 	{
-	}
-
-	FORCEINLINE virtual void PostInitProperties() override
-	{
-		Super::PostInitProperties();
-		StatID = FName(FGuid::NewGuid().ToString());
+		StatValueRange.SetLowerBound(TRangeBound<float>::Open());
+		StatValueRange.SetUpperBound(TRangeBound<float>::Open());
 	}
 };
