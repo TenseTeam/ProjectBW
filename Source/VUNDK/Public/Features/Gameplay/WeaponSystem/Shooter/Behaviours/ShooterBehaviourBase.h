@@ -39,6 +39,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bHasInfiniteAmmo = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bUseCameraTargetLocation = true;
 
 protected:
 	UPROPERTY(BlueprintReadOnly)
@@ -89,20 +91,15 @@ public:
 	UWorld* GetWorld() const;
 
 protected:
-	void ShootSuccess(const FVector& ShootPointLocation, const FVector& ShootPointDirection);
+	void ShootSuccess(const FVector& ShootPointLocation, const FVector& ShootPointDirection) const;
 
 	void ShootFail();
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void OnInit();
 	
-	/**
-	 * @brief Called when the shoot is successful.
-	 * @param ShootPointLocation By default, the start point of the shoot point.
-	 * @param ShootPointDirection By default, the direction of the shoot point.
-	 */
 	UFUNCTION(BlueprintNativeEvent)
-	void OnShootSuccess(const FVector& ShootPointLocation, const FVector& ShootPointDirection);
+	void OnShootSuccess(const FVector& ShootPointLocation, const FVector& ShootPointDirection, const FVector& ShooterTargetLocation, const FVector& ShootPointDirectionToTarget) const;
 
 	/**
 	 * @brief Called when the shoot is failed.
@@ -112,6 +109,12 @@ protected:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnRefill();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
+	FVector CalculateShooterTargetLocation() const;
+	
+	UFUNCTION(BlueprintPure)
+	FVector GetShooterTargetLocation() const;
 
 	UFUNCTION(BlueprintCallable)
 	bool TryGetCameraPoints(FVector& OutStartPoint, FVector& OutEndPoint, FVector& OutHitPoint) const;

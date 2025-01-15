@@ -16,7 +16,7 @@ void UShooterPhysicProjectileBehaviour::Init(UShooter* InShooter, const FShootDa
 	ProjectilePool->Init();
 }
 
-void UShooterPhysicProjectileBehaviour::OnShootSuccess_Implementation(const FVector& ShootPointLocation, const FVector& ShootPointDirection)
+void UShooterPhysicProjectileBehaviour::OnShootSuccess_Implementation(const FVector& ShootPointLocation, const FVector& ShootPointDirection, const FVector& ShooterTargetLocation, const FVector& ShootPointDirectionToTarget) const
 {
 	AActor* ActorPrj = ProjectilePool->AcquireActor();
 
@@ -25,17 +25,8 @@ void UShooterPhysicProjectileBehaviour::OnShootSuccess_Implementation(const FVec
 		UE_LOG(LogShooter, Error, TEXT("ShooterPhysicProjectileBehaviour ShootSuccess(), Invalid projectile."));
 		return;
 	}
-
-	FVector CameraStartPoint;
-	FVector CameraEndPoint;
-	FVector CameraHitPoint;
-	if (!TryGetCameraPoints(CameraStartPoint, CameraEndPoint, CameraHitPoint))
-		return;
 	
 	AProjectileBase* Projectile = Cast<AProjectileBase>(ActorPrj);
 	Projectile->SetActorLocation(ShootPointLocation);
-
-	FVector PrjDirection = CameraHitPoint - ShootPointLocation;
-	PrjDirection.Normalize();
-	Projectile->Init(Shooter->GetOwner(), GetDamage(), ProjectileLifeTime, HitRadius, GetDamageChannel(), PrjDirection * ProjectileSpeed);
+	Projectile->Init(Shooter->GetOwner(), GetDamage(), ProjectileLifeTime, HitRadius, GetDamageChannel(), ShootPointDirectionToTarget * ProjectileSpeed);
 }

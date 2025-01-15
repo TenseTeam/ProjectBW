@@ -133,9 +133,12 @@ UWorld* UShooterBehaviourBase::GetWorld() const
 	return Shooter->GetWorld();
 }
 
-void UShooterBehaviourBase::ShootSuccess(const FVector& ShootPointLocation, const FVector& ShootPointDirection)
+void UShooterBehaviourBase::ShootSuccess(const FVector& ShootPointLocation, const FVector& ShootPointDirection) const
 {
-	OnShootSuccess(ShootPointLocation, ShootPointDirection);
+	FVector ShootPointDirToTarget = GetShooterTargetLocation() - ShootPointLocation;
+	ShootPointDirToTarget.Normalize();
+	
+	OnShootSuccess(ShootPointLocation, ShootPointDirection, GetShooterTargetLocation(), ShootPointDirToTarget);
 	OnBehaviourShootSuccess.Broadcast();
 }
 
@@ -149,7 +152,7 @@ void UShooterBehaviourBase::OnInit_Implementation()
 {
 }
 
-void UShooterBehaviourBase::OnShootSuccess_Implementation(const FVector& ShootPointLocation, const FVector& ShootPointDirection)
+void UShooterBehaviourBase::OnShootSuccess_Implementation(const FVector& ShootPointLocation, const FVector& ShootPointDirection, const FVector& ShooterTargetLocation, const FVector& ShootPointDirectionToTarget) const
 {
 }
 
@@ -159,6 +162,31 @@ void UShooterBehaviourBase::OnShootFail_Implementation()
 
 void UShooterBehaviourBase::OnRefill_Implementation()
 {
+}
+
+FVector UShooterBehaviourBase::CalculateShooterTargetLocation_Implementation() const
+{
+	return FVector::ZeroVector;
+}
+
+FVector UShooterBehaviourBase::GetShooterTargetLocation() const
+{
+	if (!Check())
+	{
+		UE_LOG(LogShooter, Error, TEXT("ShooterBehaviour GetShooterTargetLocation(), Shooter is invalid in %s."), *GetName());
+		return FVector::ZeroVector;
+	}
+
+	if (!bUseCameraTargetLocation)
+		return CalculateShooterTargetLocation();
+	
+	FVector CameraStartPoint;
+	FVector CameraEndPoint;
+	FVector CameraHitPoint;
+	if (TryGetCameraPoints(CameraStartPoint, CameraEndPoint, CameraHitPoint))
+		return CameraHitPoint;
+
+	return FVector::ZeroVector;
 }
 
 bool UShooterBehaviourBase::TryGetCameraPoints(FVector& OutStartPoint, FVector& OutEndPoint, FVector& OutHitPoint) const
@@ -180,6 +208,7 @@ bool UShooterBehaviourBase::TryGetCameraPoints(FVector& OutStartPoint, FVector& 
 
 	OutStartPoint = CameraManager->GetCameraCacheView().Location;
 	OutEndPoint = OutStartPoint + CameraManager->GetCameraCacheView().Rotation.Vector() * GetRange();
+	OutHitPoint = OutEndPoint;
 	
 	if (FHitResult HitResult; World->LineTraceSingleByChannel(HitResult, OutStartPoint, OutEndPoint, ECollisionChannel::ECC_Camera))
 		OutHitPoint = HitResult.ImpactPoint;
@@ -199,7 +228,7 @@ bool UShooterBehaviourBase::IsInLineOfSight(const FVector& StartPoint, const FVe
 
 	FHitResult HitResult;
 	if (World->LineTraceSingleByChannel(HitResult, StartPoint, TargetPoint, ECC_Visibility))
-		return !HitResult.ImpactPoint.Equals(TargetPoint, Tolerance);
+		return HitResult.ImpactPoint.Equals(TargetPoint, Tolerance);
 
 	return true;
 }
