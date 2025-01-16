@@ -12,13 +12,17 @@ class VUNDK_API AProjectileGrenade : public AProjectileBase
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float ExplosionRadius = 300.0f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TEnumAsByte<ECollisionChannel> ExplosionPreventionChannel = ECC_Visibility;
+	
+public:
 	AProjectileGrenade();
-
-	virtual void OnPooledActorBeginPlay_Implementation() override;
-
-	virtual void OnPooledActorEndPlay_Implementation() override;
-
+	
 protected:
+	void ApplyExplosionDamage();
+	
 	virtual void OnProjectileLifeSpanEnd_Implementation() override;
 
 	UFUNCTION(BlueprintNativeEvent)

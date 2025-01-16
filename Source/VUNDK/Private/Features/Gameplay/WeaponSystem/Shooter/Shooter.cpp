@@ -12,8 +12,10 @@ void UShooter::Init(const TArray<UShootPoint*> InShootPoints)
 {
 	ShootPoints = InShootPoints;
 	
-	if (Check())
-		ShooterBehaviour->Init(this, ShootData, ShootPoints);
+	if (!Check())
+		return;
+	
+	ShooterBehaviour->Init(this, ShootData, ShootPoints);
 }
 
 bool UShooter::Shoot(const EShootType ShootType) const
@@ -37,7 +39,7 @@ void UShooter::RefillAllMagazine() const
 	if (!Check())
 		return;
 	
-	return ShooterBehaviour->RefillAllMagazine();
+	ShooterBehaviour->RefillAllMagazine();
 }
 
 void UShooter::SetShooterDamage(const float NewDamage) const

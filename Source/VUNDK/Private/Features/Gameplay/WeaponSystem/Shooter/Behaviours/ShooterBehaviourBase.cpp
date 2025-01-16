@@ -56,7 +56,7 @@ int32 UShooterBehaviourBase::Refill(const int32 Ammo)
 {
 	ModifyCurrentAmmo(Ammo);
 	OnRefill();
-	OnBehaviourRefill.Broadcast();
+	OnBehaviourRefill.Broadcast(CurrentAmmo);
 	return FMath::Abs(CurrentAmmo - Ammo);
 }
 
@@ -133,13 +133,13 @@ UWorld* UShooterBehaviourBase::GetWorld() const
 	return Shooter->GetWorld();
 }
 
-void UShooterBehaviourBase::ShootSuccess(const FVector& ShootPointLocation, const FVector& ShootPointDirection) const
+void UShooterBehaviourBase::ShootSuccess(UShootPoint* ShootPoint) const
 {
-	FVector ShootPointDirToTarget = GetShooterTargetLocation() - ShootPointLocation;
+	const FVector ShooterTargetLocation = GetShooterTargetLocation();
+	FVector ShootPointDirToTarget = ShooterTargetLocation - ShootPoint->GetShootPointLocation();
 	ShootPointDirToTarget.Normalize();
-	
-	OnShootSuccess(ShootPointLocation, ShootPointDirection, GetShooterTargetLocation(), ShootPointDirToTarget);
-	OnBehaviourShootSuccess.Broadcast();
+	OnShootSuccess(ShootPoint, ShooterTargetLocation, ShootPointDirToTarget);
+	OnBehaviourShootSuccess.Broadcast(ShootPoint);
 }
 
 void UShooterBehaviourBase::ShootFail()
@@ -152,7 +152,7 @@ void UShooterBehaviourBase::OnInit_Implementation()
 {
 }
 
-void UShooterBehaviourBase::OnShootSuccess_Implementation(const FVector& ShootPointLocation, const FVector& ShootPointDirection, const FVector& ShooterTargetLocation, const FVector& ShootPointDirectionToTarget) const
+void UShooterBehaviourBase::OnShootSuccess_Implementation(UShootPoint* ShootPoint, const FVector& ShooterTargetLocation, const FVector& ShootPointDirectionToTarget) const
 {
 }
 
@@ -241,8 +241,16 @@ bool UShooterBehaviourBase::HandleSimultaneousShoot()
 	}
 
 	ModifyCurrentAmmo(-ShootPoints.Num());
-	for (const UShootPoint* ShootPoint : ShootPoints)
-		ShootSuccess(ShootPoint->GetShootPointLocation(), ShootPoint->GetShootPointDirection());
+	for (UShootPoint* ShootPoint : ShootPoints)
+	{
+		if (!IsValid(ShootPoint))
+		{
+			UE_LOG(LogShooter, Error, TEXT("HandleSimultaneousShoot(), Invalid ShootPoint in %s."), *GetName());
+			continue;
+		}
+		
+		ShootSuccess(ShootPoint);
+	}
 
 	return true;
 }
@@ -257,7 +265,14 @@ bool UShooterBehaviourBase::HandleSequentialShoot()
 
 	ModifyCurrentAmmo(-1);
 	NextShootPointIndex();
-	ShootSuccess(ShootPoints[CurrentShootPointIndex]->GetShootPointLocation(), ShootPoints[CurrentShootPointIndex]->GetShootPointDirection());
+
+	if (!IsValid(ShootPoints[CurrentShootPointIndex]))
+	{
+		UE_LOG(LogShooter, Error, TEXT("HandleSequentialShoot(), Invalid ShootPoint in %s."), *GetName());
+		return false;
+	}
+	
+	ShootSuccess(ShootPoints[CurrentShootPointIndex]);
 
 	return true;
 }
@@ -310,7 +325,7 @@ void UShooterBehaviourBase::StartShootCooldown()
 	bIsInCooldown = true;
 	FTimerHandle TimerHandle;
 	const float Cooldown = 1.0f / (GetFireRate() / 60.0f);
-	Shooter->GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UShooterBehaviourBase::EndShootCooldown, Cooldown);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UShooterBehaviourBase::EndShootCooldown, Cooldown);
 }
 
 void UShooterBehaviourBase::EndShootCooldown()
