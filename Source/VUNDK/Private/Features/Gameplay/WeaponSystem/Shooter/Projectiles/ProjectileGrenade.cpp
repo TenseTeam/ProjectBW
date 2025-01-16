@@ -2,19 +2,21 @@
 
 #include "Features/Gameplay/WeaponSystem/Shooter/Projectiles/ProjectileGrenade.h"
 
+#include "Kismet/GameplayStatics.h"
+
 AProjectileGrenade::AProjectileGrenade()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	ProjectileMovementComponent->ProjectileGravityScale = 1.0f;
 }
 
-void AProjectileGrenade::OnPooledActorBeginPlay_Implementation()
+void AProjectileGrenade::ApplyExplosionDamage()
 {
-	Super::OnPooledActorBeginPlay_Implementation();
-}
+	const UWorld* World = GetWorld();
 
-void AProjectileGrenade::OnPooledActorEndPlay_Implementation()
-{
-	Super::OnPooledActorEndPlay_Implementation();
+	TArray<AActor*> IgnoredActors;
+	IgnoredActors.Add(this);
+	IgnoredActors.Add(ProjectileInstigator);
+	UGameplayStatics::ApplyRadialDamage(World, GetDamage(), GetActorLocation(), ExplosionRadius, UDamageType::StaticClass(), IgnoredActors, this, ProjectileInstigator->GetInstigatorController(), true, ExplosionPreventionChannel);
 }
 
 void AProjectileGrenade::OnProjectileLifeSpanEnd_Implementation()
@@ -25,5 +27,5 @@ void AProjectileGrenade::OnProjectileLifeSpanEnd_Implementation()
 
 void AProjectileGrenade::OnExplosion_Implementation()
 {
-	RadialDamage();
+	ApplyExplosionDamage();
 }

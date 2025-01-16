@@ -25,8 +25,10 @@ void UShooterPhysicProjectileBehaviour::OnShootSuccess_Implementation(UShootPoin
 		UE_LOG(LogShooter, Error, TEXT("ShooterPhysicProjectileBehaviour ShootSuccess(), Invalid projectile."));
 		return;
 	}
-	
+
+	FVector ProjectileDirection = ShootPointDirectionToTarget;
 	AProjectileBase* Projectile = Cast<AProjectileBase>(ActorPrj);
+	
 	Projectile->SetActorLocation(ShootPoint->GetShootPointLocation());
-	Projectile->Init(Shooter->GetOwner(), GetDamage(), ProjectileLifeTime, HitRadius, GetDamageChannel(), ShootPointDirectionToTarget * ProjectileSpeed);
+	Projectile->Init(Shooter->GetOwner(), GetDamage(), ProjectileLifeTime, ShootPointDirectionToTarget * ProjectileSpeed);
 }
