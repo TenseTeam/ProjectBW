@@ -7,12 +7,13 @@
 // Sets default values
 ARangedEnemy::ARangedEnemy()
 {
+	Shooter = CreateDefaultSubobject<UShooter>(TEXT("ShooterComponent"));
+	
 }
 
 void ARangedEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 

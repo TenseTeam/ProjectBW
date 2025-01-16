@@ -13,12 +13,12 @@
 
 ABaseEnemyController::ABaseEnemyController()
 {
-	BWControlledPawn = nullptr;
+	EnemyBase = nullptr;
 }
 
 void ABaseEnemyController::BeginPlay()
 {
-	BWControlledPawn = Cast<ANPCBaseStateEnemy>(GetControlledPawn());
+	EnemyBase = Cast<AEnemyBase>(GetControlledPawn());
 	Super::BeginPlay();
 	
 }
@@ -39,17 +39,17 @@ void ABaseEnemyController::InitializeBlackboardValues()
 	
 	Blackboard->SetValueAsVector(TEXT("TargetLocation"), FVector::ZeroVector);
 	Blackboard->SetValueAsObject(TEXT("AttackTarget"), nullptr);
-	Blackboard->SetValueAsFloat(TEXT("TimeBeforeInvestigating"), BWControlledPawn->GetTimeBeforeInvestigating());
-	Blackboard->SetValueAsFloat(TEXT("RandomInvestigatingTimeDeviation"), BWControlledPawn->GetRandomInvestigatingTimeDeviation());
-	Blackboard->SetValueAsFloat(TEXT("MaxAttackRadius"), BWControlledPawn->GetMaxRadius());
-	Blackboard->SetValueAsFloat(TEXT("MinAttackRadius"), BWControlledPawn->GetMinRadius());
-	Blackboard->SetValueAsFloat(TEXT("StrafeRadius"), BWControlledPawn->GetRandomStrafeRadius());
-	Blackboard->SetValueAsFloat(TEXT("JumpHeight"), BWControlledPawn->GetJumpHeight());
-	Blackboard->SetValueAsFloat(TEXT("JumpDistance"), BWControlledPawn->GetJumpDistance());
+	Blackboard->SetValueAsFloat(TEXT("TimeBeforeInvestigating"), EnemyBase->GetTimeBeforeInvestigating());
+	Blackboard->SetValueAsFloat(TEXT("RandomInvestigatingTimeDeviation"), EnemyBase->GetRandomInvestigatingTimeDeviation());
+	Blackboard->SetValueAsFloat(TEXT("MaxAttackRadius"), EnemyBase->GetMaxRadius());
+	Blackboard->SetValueAsFloat(TEXT("MinAttackRadius"), EnemyBase->GetMinRadius());
+	Blackboard->SetValueAsFloat(TEXT("StrafeRadius"), EnemyBase->GetRandomStrafeRadius());
+	Blackboard->SetValueAsFloat(TEXT("JumpHeight"), EnemyBase->GetJumpHeight());
+	Blackboard->SetValueAsFloat(TEXT("JumpDistance"), EnemyBase->GetJumpDistance());
 	
 	// LGDebug::Log("InitializeBlackboardValues",true);
-	// LGDebug::Log(FString::SanitizeFloat(BWControlledPawn->GetRandomRadius()), true);
-	// LGDebug::Log(FString::SanitizeFloat(BWControlledPawn->GetMinRadius()), true);
+	// LGDebug::Log(FString::SanitizeFloat(EnemyBase->GetRandomRadius()), true);
+	// LGDebug::Log(FString::SanitizeFloat(EnemyBase->GetMinRadius()), true);
 }
 
 void ABaseEnemyController::SetStateAsPassive()
@@ -62,9 +62,9 @@ void ABaseEnemyController::SetStateAsPassive()
 		LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)EEnemyState::Passive).ToString(),true);
 	}
 
-	if (BWControlledPawn)
+	if (EnemyBase)
 	{
-		BWControlledPawn->SetEnemyState(EEnemyState::Passive);
+		EnemyBase->SetEnemyState(EEnemyState::Passive);
 	}
 }
 
@@ -78,9 +78,9 @@ void ABaseEnemyController::SetStateAsPatrolling()
 		LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)EEnemyState::Patrolling).ToString(),true);
 	}
 
-	if (BWControlledPawn)
+	if (EnemyBase)
 	{
-		BWControlledPawn->SetEnemyState(EEnemyState::Patrolling);
+		EnemyBase->SetEnemyState(EEnemyState::Patrolling);
 	}
 }
 
@@ -94,10 +94,10 @@ void ABaseEnemyController::SetStateAsAttacking(AActor* Actor)
 		LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)EEnemyState::Attacking).ToString(),true);
 	}
 	
-	if (BWControlledPawn)
+	if (EnemyBase)
 	{
-		BWControlledPawn->SetEnemyState(EEnemyState::Attacking);
-		BWControlledPawn->SetAttackTarget(Actor);
+		EnemyBase->SetEnemyState(EEnemyState::Attacking);
+		EnemyBase->SetAttackTarget(Actor);
 	}
 	
 }
@@ -110,9 +110,9 @@ void ABaseEnemyController::SetStateAsInvestigating()
 		BlackboardComp->SetValueAsEnum(TEXT("EnemyState"), uint8(EEnemyState::Investigating));
 	}
 
-	if (BWControlledPawn)
+	if (EnemyBase)
 	{
-		BWControlledPawn->SetEnemyState(EEnemyState::Investigating);
+		EnemyBase->SetEnemyState(EEnemyState::Investigating);
 	}
 }
 
@@ -138,7 +138,7 @@ void ABaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 	}
 	else
 	{
-		if (BWControlledPawn->GetState() == EEnemyState::Investigating)return;
+		if (EnemyBase->GetState() == EEnemyState::Investigating)return;
 			
 		GetWorld()->GetTimerManager().SetTimer(
 			LostSightTimerHandle,
@@ -160,7 +160,7 @@ void ABaseEnemyController::HandleHear(AActor* Actor, FAIStimulus Stimulus)
 	if (Stimulus.WasSuccessfullySensed())
 	{
 		if (Stimulus.Type != UAISense::GetSenseID<UAISense_Hearing>())return;
-		if (BWControlledPawn->GetState() == EEnemyState::Attacking)return;
+		if (EnemyBase->GetState() == EEnemyState::Attacking)return;
 
 		///new restart behaviour i prefer use a jolly state -> SetStateAsPassive
 		// if (ControlledPawn->GetState() == EEnemyState::Investigating)
@@ -178,7 +178,7 @@ void ABaseEnemyController::HandleHear(AActor* Actor, FAIStimulus Stimulus)
 			GetBlackboardComponent()->SetValueAsBool("HasBeenInvestigating",true);
 		}
 			
-		GetBlackboardComponent()->SetValueAsVector("TargetLocation",BWControlledPawn->RandomPosition(Stimulus.StimulusLocation));
+		GetBlackboardComponent()->SetValueAsVector("TargetLocation",EnemyBase->RandomPosition(Stimulus.StimulusLocation));
 			
 		SetStateAsPassive();
 		SetStateAsInvestigating();
@@ -192,7 +192,7 @@ void ABaseEnemyController::HandleDamage(AActor* Actor, FAIStimulus Stimulus)
 	if (Stimulus.WasSuccessfullySensed())
 	{
 		if (Stimulus.Type != UAISense::GetSenseID<UAISense_Damage>())return;
-		if (BWControlledPawn->GetState() == EEnemyState::Attacking)return;
+		if (EnemyBase->GetState() == EEnemyState::Attacking)return;
 		SetStateAsAttacking(Actor);
 	}
 }

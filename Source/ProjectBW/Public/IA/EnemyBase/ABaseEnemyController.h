@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EnemyBase.h"
 #include "AI/NPC/NPCBaseStateEnemy/NPCBaseStateEnemyController.h"
 #include "ABaseEnemyController.generated.h"
 
@@ -44,6 +45,6 @@ protected:
 private:
 	
 	UPROPERTY()
-	ANPCBaseStateEnemy* BWControlledPawn;
+	AEnemyBase* EnemyBase;
 
 };

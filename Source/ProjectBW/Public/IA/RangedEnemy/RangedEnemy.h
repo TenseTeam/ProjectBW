@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Features/Gameplay/WeaponSystem/Shooter/Shooter.h"
 #include "IA/EnemyBase/EnemyBase.h"
 #include "RangedEnemy.generated.h"
 
@@ -18,4 +19,7 @@ public:
 protected:
 
 	virtual void BeginPlay() override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UShooter* Shooter;
 };
