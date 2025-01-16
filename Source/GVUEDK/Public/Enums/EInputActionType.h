@@ -13,5 +13,6 @@ enum class EInputActionType : uint8
 	StopShoot UMETA(DisplayName = "StopShoot"),
 	Aim UMETA(DisplayName = "Aim"),
 	StopAim UMETA(DisplayName = "StopAim"),
-	Hook UMETA(DisplayName = "Hook")
+	Hook UMETA(DisplayName = "Hook"),
+	Interact UMETA(DisplayName = "Interact")
 };

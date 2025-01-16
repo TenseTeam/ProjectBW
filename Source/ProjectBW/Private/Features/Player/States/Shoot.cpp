@@ -4,6 +4,7 @@
 #include "Features/Player/States/Shoot.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Utility/FGvDebug.h"
 
 void UShoot::Initialize(AActor* Context)
@@ -156,6 +157,13 @@ void UShoot::HandleInput(AActor* Context, const EInputActionType InputAction, co
 				return;
 			}
 		}
+	}
+
+	if (InputAction == EInputActionType::Interact)
+	{
+		if (Character->IsShooting()) return;
+		Character->ChangeActionState(2);
+		return;
 	}
 }
 

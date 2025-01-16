@@ -35,6 +35,6 @@ public:
 
 private:
 	FVector GetPlayerCameraLocation() const;
-	bool ObstacleInBetween(const ACharacter* Character, TArray<FHitResult>& HitResults) const;
+	bool ObstacleInBetween(const ACharacter* Character, FHitResult& HitResult) const;
 	void Initialize();
 };

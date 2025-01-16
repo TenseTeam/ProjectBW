@@ -43,6 +43,7 @@ ABWCharacter::ABWCharacter()
 	bCanDodge = true;
 	bCanHook = true;
 	bCanShoot = true;
+	bCanInteract = true;
 
 }
 
@@ -145,6 +146,11 @@ UDodgerComponent* ABWCharacter::GetDodgerComponent() const
 UCameraComponent* ABWCharacter::GetFollowCamera() const
 {
 	return FollowCamera;
+}
+
+UInteractableDetectorComponent* ABWCharacter::GetInteractableDetector() const
+{
+	return InteractableDetector;
 }
 
 float ABWCharacter::GetGroundDistance() const
@@ -282,6 +288,16 @@ void ABWCharacter::SetCanShoot(bool Value)
 bool ABWCharacter::CanShoot() const
 {
 	return bCanShoot && !IsDodging() && !IsHooking();
+}
+
+void ABWCharacter::SetCanInteract(bool Value)
+{
+	bCanInteract = Value;
+}
+
+bool ABWCharacter::CanInteract() const
+{
+	return bCanInteract;
 }
 
 void ABWCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)
