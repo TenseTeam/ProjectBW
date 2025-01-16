@@ -9,7 +9,7 @@
 class ANPCBaseStateEnemy;
 
 UCLASS()
-class LGUEDK_API ABWNPCbaseEnemyController : public ANPCBaseStateEnemyController
+class PROJECTBW_API ABWNPCbaseEnemyController : public ANPCBaseStateEnemyController
 {
 	GENERATED_BODY()
 

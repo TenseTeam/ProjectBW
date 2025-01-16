@@ -1,7 +1,7 @@
 // Copyright Villains, Inc. All Rights Reserved.
 
 
-#include "AI/NPC/BWNPCBaseEnemy/BWNPCbaseEnemyController.h"
+#include "IA/EnemyBase/BWNPCbaseEnemyController.h"
 
 #include <string>
 
@@ -123,7 +123,7 @@ void ABWNPCbaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 	if (Stimulus.WasSuccessfullySensed())
 	{
 		if (Stimulus.Type != UAISense::GetSenseID<UAISense_Sight>())return;
-
+		
 		if (Actor->Implements<UAITargetInterface>())
 		{
 			if (GetWorld()->GetTimerManager().IsTimerActive(LostSightTimerHandle))

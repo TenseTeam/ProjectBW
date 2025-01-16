@@ -8,7 +8,7 @@
 
 // This class does not need to be modified.
 UINTERFACE(Blueprintable)
-class UAITargetInterface : public UInterface
+class LGUEDK_API UAITargetInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -24,5 +24,5 @@ class LGUEDK_API IAITargetInterface
 public:
 	// virtual void ReleaseToken() = 0; ASTRATTO = 0;
 	UFUNCTION()
-	virtual void ReleaseToken();
+	virtual void ReleaseToken(){};
 };

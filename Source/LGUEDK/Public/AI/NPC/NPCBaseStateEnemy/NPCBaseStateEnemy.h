@@ -17,6 +17,7 @@ public:
 		
 	UFUNCTION(BlueprintCallable)
 	FVector RandomPosition(FVector Position);
+
 	
 	UFUNCTION()
 	virtual int GetMinInvestigatingRadius() const { return MinInvestigatingRadius; }

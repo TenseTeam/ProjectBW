@@ -3,7 +3,6 @@
 
 #include "AI/NPC/NPCBaseStateEnemy/NPCBaseStateEnemy.h"
 
-#include "AI/NPC/BWNPCBaseEnemy/BWNPCbaseEnemyController.h"
 #include "Kismet/GameplayStatics.h"
 
 
