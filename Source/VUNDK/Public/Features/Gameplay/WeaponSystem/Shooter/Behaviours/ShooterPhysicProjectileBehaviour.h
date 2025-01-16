@@ -16,8 +16,6 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Instanced)
 	UActorPool* ProjectilePool;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0.0", UIMin = "0.0"))
-	float HitRadius = 100.0f;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0.0", UIMin = "0.0"))
 	float ProjectileLifeTime = 5.0f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0.0", UIMin = "0.0"))
 	float ProjectileSpeed = 1000.0f;

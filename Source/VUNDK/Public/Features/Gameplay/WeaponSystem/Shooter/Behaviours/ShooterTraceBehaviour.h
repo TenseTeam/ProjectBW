@@ -23,10 +23,13 @@ public:
 protected:
 	virtual void OnShootSuccess_Implementation(UShootPoint* ShootPoint, const FVector& ShooterTargetLocation, const FVector& ShootPointDirectionToTarget) const override;
 
+	UFUNCTION(BlueprintNativeEvent)
+	void OnLineTraceDamage(const TArray<FHitResult>& TraceHitResults, const TArray<FHitResult>& DamageHitResults) const;
+	
 private:
-	void TraceFromCamera(const UWorld* World, const FVector& InShootPointLocation) const;
+	void TraceFromCamera(const UWorld* World, const UShootPoint* ShootPoint) const;
 
-	void TraceFromShootPoint(const UWorld* World, const FVector& InShootPointLocation, const FVector& ShootPointDirectionToTarget) const;
+	void TraceFromShootPoint(const UWorld* World, const UShootPoint* ShootPoint) const;
 
 	void LineTraceDamage(const UWorld* World, const FVector& TraceStartPoint, const FVector& TraceEndPoint) const;
 };

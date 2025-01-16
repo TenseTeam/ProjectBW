@@ -12,6 +12,7 @@ AProjectileBase::AProjectileBase()
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	ProjectileMovementComponent->SetUpdatedComponent(MeshComponent);
 	ProjectileMovementComponent->bRotationFollowsVelocity = true;
+	ProjectileMovementComponent->bShouldBounce = true;
 }
 
 void AProjectileBase::Init(AActor* InInstigator, const float InDamage, const float InLifeSpan, const FVector& InVelocity)
@@ -25,6 +26,7 @@ void AProjectileBase::Init(AActor* InInstigator, const float InDamage, const flo
 
 void AProjectileBase::SetVelocity(const FVector NewVelocity) const
 {
+	ProjectileMovementComponent->SetUpdatedComponent(MeshComponent);
 	ProjectileMovementComponent->bShouldBounce = true;
 	ProjectileMovementComponent->Velocity = NewVelocity;
 }
@@ -61,7 +63,7 @@ void AProjectileBase::DisposeProjectile()
 
 void AProjectileBase::ClearPooledActor_Implementation()
 {
-	ProjectileMovementComponent->Velocity = FVector::ZeroVector;
+	ProjectileMovementComponent->StopMovementImmediately();
 }
 
 void AProjectileBase::BeginPlay()

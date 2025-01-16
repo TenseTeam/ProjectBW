@@ -135,10 +135,9 @@ UWorld* UShooterBehaviourBase::GetWorld() const
 
 void UShooterBehaviourBase::ShootSuccess(UShootPoint* ShootPoint) const
 {
-	const FVector ShooterTargetLocation = GetShooterTargetLocation();	
+	const FVector ShooterTargetLocation = GetShooterTargetLocation();
 	FVector ShootPointDirToTarget = ShooterTargetLocation - ShootPoint->GetShootPointLocation();
 	ShootPointDirToTarget.Normalize();
-	
 	OnShootSuccess(ShootPoint, ShooterTargetLocation, ShootPointDirToTarget);
 	OnBehaviourShootSuccess.Broadcast(ShootPoint);
 }
@@ -326,7 +325,7 @@ void UShooterBehaviourBase::StartShootCooldown()
 	bIsInCooldown = true;
 	FTimerHandle TimerHandle;
 	const float Cooldown = 1.0f / (GetFireRate() / 60.0f);
-	Shooter->GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UShooterBehaviourBase::EndShootCooldown, Cooldown);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UShooterBehaviourBase::EndShootCooldown, Cooldown);
 }
 
 void UShooterBehaviourBase::EndShootCooldown()

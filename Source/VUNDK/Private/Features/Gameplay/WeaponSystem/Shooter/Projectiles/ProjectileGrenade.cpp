@@ -6,7 +6,7 @@
 
 AProjectileGrenade::AProjectileGrenade()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	ProjectileMovementComponent->ProjectileGravityScale = 1.0f;
 }
 
 void AProjectileGrenade::ApplyExplosionDamage()
