@@ -21,9 +21,17 @@ protected:
 public:
 	AWeaponFirearm();
 
+	virtual void SetWeaponDamage(const float NewDamage) override;
+
+	void SetWeaponFireRate(const float NewFireRate) const;
+
+	void SetWeaponMagSize(const int32 NewMagSize) const;
+
+	void SetWeaponRange(const float NewRange) const;
+	
 	UFUNCTION(BlueprintCallable)
 	void SetWeaponShootType(const EShootType NewShootType);
-
+	
 	UFUNCTION(BlueprintCallable)
 	int32 Reload(int32 Ammo);
 

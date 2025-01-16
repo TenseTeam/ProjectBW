@@ -28,6 +28,9 @@ bool URPGItemsGenerator::TryGenerateRPGGearItem(URPGGearItem* GearItem, const UR
 
 FRPGItemVisualDetails URPGItemsGenerator::GenerateVisualDetails(const URPGItemVisualSetData* Set)
 {
+	if (!IsValid(Set))
+		return FRPGItemVisualDetails();
+	
 	TArray<FRPGItemVisualDetails> Visuals = Set->Visuals.Array();
 	return Visuals[FMath::RandRange(0, Visuals.Num() - 1)];
 }
