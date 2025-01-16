@@ -22,4 +22,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI|Shooter")
 	UShooter* Shooter;
+
+	UFUNCTION(BlueprintCallable, Category = "AI|Shooter")
+	void BaseAttack(AActor* Target);
 };

@@ -29,5 +29,8 @@ public:
 	FBlackboardKeySelector AttackTargetPositionKey;
 	
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
-	FBlackboardKeySelector AccettableRadiusKey;
+	FBlackboardKeySelector MaxAttackRadiusKey;
+
+	UPROPERTY(EditAnywhere, Category = "Blackboard")
+	FBlackboardKeySelector MinAttackRadiusKey;
 };

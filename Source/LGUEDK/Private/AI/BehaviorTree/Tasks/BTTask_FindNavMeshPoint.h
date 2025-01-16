@@ -35,5 +35,11 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Task Settings")
 	bool bSamePlane;
 
-	FVector FindFarthestPointWithinRange(const FVector& PlayerLocation,const FVector& EnemyLocation,float MinDistance, float MaxDistance);
+	FVector FindFarthestPointWithinRange(const AActor* Player,const AActor* Enemy,float MinDistance, float MaxDistance);
+
+	bool IsHittingSomething(const FVector& Start, const FVector& End,const AActor* Enemy);
+
+	bool IsInRange(float Distance,const float MinDistance,const float MaxDistance);
+
+	FVector GetCorrectNavPoint(TArray<FNavLocation> NavPoints,float BestDistance, const FVector& PlayerLocation,FVector PlayerNavMeshLocation,const float MinDistance,const float MaxDistance,const AActor* Enemy);
 };

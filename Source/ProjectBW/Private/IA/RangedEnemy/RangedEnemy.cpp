@@ -16,4 +16,9 @@ void ARangedEnemy::BeginPlay()
 	Super::BeginPlay();
 }
 
+void ARangedEnemy::BaseAttack(AActor* Target)
+{
+	
+}
+
 
