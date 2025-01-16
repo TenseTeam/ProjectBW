@@ -58,7 +58,7 @@ bool ABWGrabPoint::CanBeGrabbed(const ACharacter* Character) const
 	}
 
 	// Check if there are any obstacles between the player and the grab point
-	TArray<FHitResult> HitResults;
+	FHitResult HitResults;
 	if (ObstacleInBetween(Character, HitResults))
 	{
 		return false;
@@ -73,7 +73,7 @@ bool ABWGrabPoint::CanBeGrabbed(const ACharacter* Character) const
 	const bool bCoincident = FVector::Coincident(Direction.GetSafeNormal(), CameraForward, Tolerance);
 
 #if WITH_EDITOR && !UE_BUILD_SHIPPING
-	if (bShowDebug)
+	if (bShowDebug && bCoincident)
 		DrawDebugSphere(GetWorld(), GetActorLocation(), 100, 12, bCoincident ? FColor::Green : FColor::Red, false, -1,
 		                0,
 		                1);
@@ -87,19 +87,19 @@ FVector ABWGrabPoint::GetPlayerCameraLocation() const
 	return UGameplayStatics::GetPlayerCameraManager(this, 0)->GetCameraCacheView().Location;
 }
 
-bool ABWGrabPoint::ObstacleInBetween(const ACharacter* Character, TArray<FHitResult>& HitResults) const
+bool ABWGrabPoint::ObstacleInBetween(const ACharacter* Character, FHitResult& HitResult) const
 {
 	// between landing point and player
-	GetWorld()->LineTraceMultiByProfile(HitResults, GetLandingPoint(), Character->GetActorLocation(), "BlockAll",
-	                                    TraceParams);
-	if (HitResults.Num() > 0)
+	GetWorld()->LineTraceSingleByChannel(HitResult, GetLandingPoint(), Character->GetActorLocation(), ECC_Visibility,
+										 TraceParams);
+	if (HitResult.bBlockingHit)
 	{
 		return true;
 	}
 	// between grab point and player
-	GetWorld()->LineTraceMultiByProfile(HitResults, GetActorLocation(), Character->GetActorLocation(), "BlockAll",
-	                                    TraceParams);
-	if (HitResults.Num() > 0)
+	GetWorld()->LineTraceSingleByChannel(HitResult, GetActorLocation(), Character->GetActorLocation(), ECC_Visibility,
+                                         TraceParams);
+	if (HitResult.bBlockingHit)
 	{
 		return true;
 	}

@@ -33,6 +33,8 @@ private:
 	UInputAction* ShootAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UInputAction* AimAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UInputAction* InteractAction;
 	
 	UPROPERTY()
 	UEnhancedInputComponent* EnhancedInputComponent;
@@ -61,4 +63,5 @@ private:
 	void StopShoot(const FInputActionValue& Value);
 	void Aim(const FInputActionValue& Value);
 	void StopAim(const FInputActionValue& Value);
+	void Interact(const FInputActionValue& Value);
 };
