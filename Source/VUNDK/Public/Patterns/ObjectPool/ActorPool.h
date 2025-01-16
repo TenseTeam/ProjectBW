@@ -26,6 +26,7 @@ private:
 	TSubclassOf<AActor> ActorClass;
 	UPROPERTY()
 	TArray<AActor*> AvailableActors;
+	bool bHasBeenDestroyed;
 	
 public:
 	UActorPool();
@@ -40,7 +41,11 @@ public:
 	void ReleaseActor(AActor* InActor);
 
 	void SetActorClass(const TSubclassOf<AActor>& InActorClass);
+	
+	void DestroyPool();
 
+	virtual void BeginDestroy() override;
+	
 private:
 	void SpawnInstances(const int32 InCount);
 

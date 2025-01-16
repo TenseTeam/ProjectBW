@@ -8,6 +8,11 @@ AWeaponBase::AWeaponBase()
 	MeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
 }
 
+void AWeaponBase::SetWeaponDamage(const float NewDamage)
+{
+	WeaponData.Damage = NewDamage;
+}
+
 bool AWeaponBase::WeaponAttack()
 {
 	if (OnWeaponAttack())
@@ -17,6 +22,11 @@ bool AWeaponBase::WeaponAttack()
 	}
 
 	return false;
+}
+
+FWeaponData AWeaponBase::GetWeaponData() const
+{
+	return WeaponData;
 }
 
 bool AWeaponBase::OnWeaponAttack_Implementation()

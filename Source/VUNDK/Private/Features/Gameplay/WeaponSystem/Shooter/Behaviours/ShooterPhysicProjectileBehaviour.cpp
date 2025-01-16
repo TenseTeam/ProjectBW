@@ -16,6 +16,11 @@ void UShooterPhysicProjectileBehaviour::Init(UShooter* InShooter, const FShootDa
 	ProjectilePool->Init();
 }
 
+void UShooterPhysicProjectileBehaviour::OnBehaviourDisabled_Implementation()
+{
+	ProjectilePool->DestroyPool();
+}
+
 void UShooterPhysicProjectileBehaviour::OnShootSuccess_Implementation(UShootPoint* ShootPoint, const FVector& ShooterTargetLocation, const FVector& ShootPointDirectionToTarget) const
 {
 	AActor* ActorPrj = ProjectilePool->AcquireActor();
@@ -30,5 +35,5 @@ void UShooterPhysicProjectileBehaviour::OnShootSuccess_Implementation(UShootPoin
 	AProjectileBase* Projectile = Cast<AProjectileBase>(ActorPrj);
 	
 	Projectile->SetActorLocation(ShootPoint->GetShootPointLocation());
-	Projectile->Init(Shooter->GetOwner(), GetDamage(), ProjectileLifeTime, ShootPointDirectionToTarget * ProjectileSpeed);
+	Projectile->Init(Shooter->GetOwner(), GetDamage(), ProjectileMaxLifeTime, ShootPointDirectionToTarget * ProjectileSpeed);
 }

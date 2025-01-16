@@ -18,9 +18,11 @@ class VUNDK_API UShooter : public UActorComponent
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
 	UShooterBehaviourBase* ShooterBehaviour;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+
+private:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	FShootData ShootData;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY()
 	TArray<UShootPoint*> ShootPoints;
 
 public:
@@ -37,12 +39,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
 	void RefillAllMagazine() const;
-
-	UFUNCTION(BlueprintCallable)
-	void SetShooterDamage(const float NewDamage) const;
-
+	
 	UFUNCTION(BlueprintPure)
 	int32 GetCurrentAmmo() const;
+
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 private:
 	bool Check() const;
