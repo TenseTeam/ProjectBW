@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "AI/NPC/NPCBaseStateEnemy/NPCBaseStateEnemyController.h"
-#include "BWNPCbaseEnemyController.generated.h"
+#include "ABaseEnemyController.generated.h"
 
 class ANPCBaseStateEnemy;
 
 UCLASS()
-class PROJECTBW_API ABWNPCbaseEnemyController : public ANPCBaseStateEnemyController
+class PROJECTBW_API ABaseEnemyController : public ANPCBaseStateEnemyController
 {
 	GENERATED_BODY()
 
 public:
 
-	ABWNPCbaseEnemyController();
+	ABaseEnemyController();
 	
 	virtual void SetStateAsPassive() override;
 	

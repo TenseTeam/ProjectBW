@@ -1,7 +1,7 @@
 // Copyright Villains, Inc. All Rights Reserved.
 
 
-#include "IA/EnemyBase/BWNPCbaseEnemyController.h"
+#include "IA/EnemyBase/ABaseEnemyController.h"
 
 #include <string>
 
@@ -11,24 +11,24 @@
 #include "Components/HealtComponent/HealthBaseComponent.h"
 
 
-ABWNPCbaseEnemyController::ABWNPCbaseEnemyController()
+ABaseEnemyController::ABaseEnemyController()
 {
 	BWControlledPawn = nullptr;
 }
 
-void ABWNPCbaseEnemyController::BeginPlay()
+void ABaseEnemyController::BeginPlay()
 {
 	BWControlledPawn = Cast<ANPCBaseStateEnemy>(GetControlledPawn());
 	Super::BeginPlay();
 	
 }
 
-void ABWNPCbaseEnemyController::OnPossess(APawn* InPawn)
+void ABaseEnemyController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 }
 
-void ABWNPCbaseEnemyController::InitializeBlackboardValues()
+void ABaseEnemyController::InitializeBlackboardValues()
 {
 	Super::InitializeBlackboardValues();
 	if (!Blackboard)
@@ -52,7 +52,7 @@ void ABWNPCbaseEnemyController::InitializeBlackboardValues()
 	// LGDebug::Log(FString::SanitizeFloat(BWControlledPawn->GetMinRadius()), true);
 }
 
-void ABWNPCbaseEnemyController::SetStateAsPassive()
+void ABaseEnemyController::SetStateAsPassive()
 {
 	Super::SetStateAsPassive();
 	if (UBlackboardComponent* BlackboardComp = GetBlackboardComponent())
@@ -68,7 +68,7 @@ void ABWNPCbaseEnemyController::SetStateAsPassive()
 	}
 }
 
-void ABWNPCbaseEnemyController::SetStateAsPatrolling()
+void ABaseEnemyController::SetStateAsPatrolling()
 {
 	Super::SetStateAsPatrolling();
 	if (UBlackboardComponent* BlackboardComp = GetBlackboardComponent())
@@ -84,7 +84,7 @@ void ABWNPCbaseEnemyController::SetStateAsPatrolling()
 	}
 }
 
-void ABWNPCbaseEnemyController::SetStateAsAttacking(AActor* Actor)
+void ABaseEnemyController::SetStateAsAttacking(AActor* Actor)
 {
 	Super::SetStateAsAttacking(Actor);
 	if (UBlackboardComponent* BlackboardComp = GetBlackboardComponent())
@@ -102,7 +102,7 @@ void ABWNPCbaseEnemyController::SetStateAsAttacking(AActor* Actor)
 	
 }
 
-void ABWNPCbaseEnemyController::SetStateAsInvestigating()
+void ABaseEnemyController::SetStateAsInvestigating()
 {
 	Super::SetStateAsInvestigating();
 	if (UBlackboardComponent* BlackboardComp = GetBlackboardComponent())
@@ -116,7 +116,7 @@ void ABWNPCbaseEnemyController::SetStateAsInvestigating()
 	}
 }
 
-void ABWNPCbaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
+void ABaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 {
 	Super::HandleSight(Actor, Stimulus);
 	LGDebug::Log("VEDO PLAYER ",true);
@@ -143,7 +143,7 @@ void ABWNPCbaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 		GetWorld()->GetTimerManager().SetTimer(
 			LostSightTimerHandle,
 			this,
-			&ABWNPCbaseEnemyController::OnLostSight,
+			&ABaseEnemyController::OnLostSight,
 			SightMaxAge,
 			false
 		);
@@ -154,7 +154,7 @@ void ABWNPCbaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 	
 }
 
-void ABWNPCbaseEnemyController::HandleHear(AActor* Actor, FAIStimulus Stimulus)
+void ABaseEnemyController::HandleHear(AActor* Actor, FAIStimulus Stimulus)
 {
 	Super::HandleHear(Actor, Stimulus);
 	if (Stimulus.WasSuccessfullySensed())
@@ -186,7 +186,7 @@ void ABWNPCbaseEnemyController::HandleHear(AActor* Actor, FAIStimulus Stimulus)
 	}
 }
 
-void ABWNPCbaseEnemyController::HandleDamage(AActor* Actor, FAIStimulus Stimulus)
+void ABaseEnemyController::HandleDamage(AActor* Actor, FAIStimulus Stimulus)
 {
 	Super::HandleDamage(Actor, Stimulus);
 	if (Stimulus.WasSuccessfullySensed())
@@ -198,14 +198,14 @@ void ABWNPCbaseEnemyController::HandleDamage(AActor* Actor, FAIStimulus Stimulus
 }
 
 
-void ABWNPCbaseEnemyController::OnLostSight()
+void ABaseEnemyController::OnLostSight()
 {
 	Super::OnLostSight();
 	SetStateAsPatrolling();
 	LGDebug::Log("LOST SIGHT PLAYER", true);
 }
 
-void ABWNPCbaseEnemyController::OnLostHear()
+void ABaseEnemyController::OnLostHear()
 {
 	Super::OnLostHear();
 	
@@ -213,7 +213,7 @@ void ABWNPCbaseEnemyController::OnLostHear()
 	LGDebug::Log(" LOST HEAR PLAYER ",true);
 }
 
-void ABWNPCbaseEnemyController::OnLostDamage()
+void ABaseEnemyController::OnLostDamage()
 {
 	Super::OnLostDamage();
 	
