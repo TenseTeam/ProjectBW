@@ -263,6 +263,11 @@ bool ABWCharacter::CanRun() const
 	return bCanRun;
 }
 
+void ABWCharacter::SetCanRun(bool Value)
+{
+	bCanRun = Value;
+}
+
 void ABWCharacter::SetCanDodge(bool Value)
 {
 	bCanDodge = Value;

@@ -66,6 +66,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopAiming);
 
 //Running events
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartRunning);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRunning);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopRunning);
 
 //Dodge events
@@ -106,6 +107,8 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
 	FStartRunning OnStartRunning;
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FRunning OnRunning;
 	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
 	FStopRunning OnStopRunning;
 
@@ -258,6 +261,8 @@ public:
 	bool CanLook() const;
 	UFUNCTION(BlueprintCallable)
 	bool CanRun() const;
+	UFUNCTION(BlueprintCallable)
+	void SetCanRun(bool Value);
 
 	UFUNCTION(BlueprintCallable)
 	void SetCanDodge(bool Value);
