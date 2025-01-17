@@ -34,14 +34,14 @@ void UShooterBehaviourBase::EnableBehaviour()
 void UShooterBehaviourBase::DisableBehaviour()
 {
 	bIsBehaviourActive = false;
-    OnBehaviourDisabled();
+	OnBehaviourDisabled();
 }
 
 bool UShooterBehaviourBase::Shoot(const EShootType ShootType)
 {
 	if (!Check())
 		return false;
-	
+
 	if (bIsInCooldown)
 		return false;
 
@@ -72,7 +72,7 @@ int32 UShooterBehaviourBase::Refill(const int32 Ammo)
 {
 	if (!Check())
 		return 0;
-	
+
 	ModifyCurrentAmmo(Ammo);
 	OnRefill();
 	OnBehaviourRefill.Broadcast(CurrentAmmo);
@@ -173,13 +173,18 @@ TEnumAsByte<ECollisionChannel> UShooterBehaviourBase::GetDamageChannel() const
 UWorld* UShooterBehaviourBase::GetWorld() const
 {
 	if (!IsValid(Shooter))
-	{
-		UE_LOG(LogShooter, Error, TEXT("ShooterBehaviour::GetWorld: Shooter is invalid in %s."), *GetName());
-		return nullptr;
-	}
+		return Super::GetWorld();
 	
 	return Shooter->GetWorld();
 }
+
+#if WITH_EDITOR
+bool UShooterBehaviourBase::ImplementsGetWorld() const
+{
+	// Return true so in Editor we can see WorldContexts Functions
+	return true;
+}
+#endif
 
 void UShooterBehaviourBase::ShootSuccess(UShootPoint* ShootPoint) const
 {
@@ -229,7 +234,7 @@ FVector UShooterBehaviourBase::GetShooterTargetLocation() const
 {
 	if (!bUseCameraTargetLocation)
 		return CalculateShooterTargetLocation();
-	
+
 	FVector CameraStartPoint;
 	FVector CameraEndPoint;
 	FVector CameraHitPoint;
@@ -248,7 +253,7 @@ bool UShooterBehaviourBase::TryGetCameraPoints(FVector& OutStartPoint, FVector& 
 		UE_LOG(LogShooter, Error, TEXT("ShooterBehaviour LineTraceFromCamera(), World is invalid in %s."), *GetName());
 		return false;
 	}
-	
+
 	const APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(World, 0);
 	if (!IsValid(CameraManager))
 	{
@@ -259,10 +264,10 @@ bool UShooterBehaviourBase::TryGetCameraPoints(FVector& OutStartPoint, FVector& 
 	OutStartPoint = CameraManager->GetCameraCacheView().Location;
 	OutEndPoint = OutStartPoint + CameraManager->GetCameraCacheView().Rotation.Vector() * GetRange();
 	OutHitPoint = OutEndPoint;
-	
+
 	if (FHitResult HitResult; World->LineTraceSingleByChannel(HitResult, OutStartPoint, OutEndPoint, ECollisionChannel::ECC_Camera))
 		OutHitPoint = HitResult.ImpactPoint;
-	
+
 	return true;
 }
 
@@ -298,7 +303,7 @@ bool UShooterBehaviourBase::HandleSimultaneousShoot()
 			UE_LOG(LogShooter, Error, TEXT("HandleSimultaneousShoot(), Invalid ShootPoint in %s."), *GetName());
 			continue;
 		}
-		
+
 		ShootSuccess(ShootPoint);
 	}
 
@@ -321,7 +326,7 @@ bool UShooterBehaviourBase::HandleSequentialShoot()
 		UE_LOG(LogShooter, Error, TEXT("HandleSequentialShoot(), Invalid ShootPoint in %s."), *GetName());
 		return false;
 	}
-	
+
 	ShootSuccess(ShootPoints[CurrentShootPointIndex]);
 
 	return true;
