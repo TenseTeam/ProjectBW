@@ -107,10 +107,13 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	TEnumAsByte<ECollisionChannel> GetDamageChannel() const;
+	
+	virtual UWorld* GetWorld() const override;
 
-	UFUNCTION(BlueprintPure)
-	UWorld* GetWorld() const;
-
+#if WITH_EDITOR
+	virtual bool ImplementsGetWorld() const override;
+#endif
+	
 protected:
 	void ShootSuccess(UShootPoint* ShootPoint) const;
 
