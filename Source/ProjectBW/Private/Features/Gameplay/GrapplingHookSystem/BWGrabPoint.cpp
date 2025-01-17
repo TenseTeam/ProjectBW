@@ -72,7 +72,7 @@ bool ABWGrabPoint::CanBeGrabbed(const ACharacter* Character) const
 	const float Tolerance = FMath::Lerp(0.999f, 0.8f, ToleranceMultiplier);
 	const bool bCoincident = FVector::Coincident(Direction.GetSafeNormal(), CameraForward, Tolerance);
 
-#if WITH_EDITOR && !UE_BUILD_SHIPPING
+#if WITH_EDITOR || !UE_BUILD_SHIPPING
 	if (bShowDebug && bCoincident)
 		DrawDebugSphere(GetWorld(), GetActorLocation(), 100, 12, bCoincident ? FColor::Green : FColor::Red, false, -1,
 		                0,
@@ -80,6 +80,7 @@ bool ABWGrabPoint::CanBeGrabbed(const ACharacter* Character) const
 #endif
 
 	return bCoincident;
+	
 }
 
 FVector ABWGrabPoint::GetPlayerCameraLocation() const
