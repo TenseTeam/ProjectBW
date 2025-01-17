@@ -16,5 +16,7 @@ public:
 	void AddCoreStats(TSet<UCoreStatData*> CoreStats);
 
 	UFUNCTION(BlueprintPure)
-	TMap<UCoreStatData*, int32> GetCoreStatsValues();
+	TMap<UCoreStatData*, float> GetCoreStatsValues();
+	
+	virtual FString GetValueAsString(const UStatDataBase* Stat) const override;
 };

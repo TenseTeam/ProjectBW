@@ -22,7 +22,7 @@ USaveData* UClassicInventory::CreateSaveData()
 	{
 		const UClassicItem* ClassicItem = Cast<UClassicItem>(Item);
 		FClassicItemSaveData ItemSaveData = ClassicItem->CreateClassicItemSaveData();
-		FName ItemID = Item->GetItemData()->ItemDataID;
+		FGuid ItemID = Item->GetItemData()->ItemDataID;
 		ClassicInventorySaveData->SavedItems.Add(ItemID, ItemSaveData);
 	}
 
@@ -33,9 +33,9 @@ void UClassicInventory::LoadInventorySaveData_Implementation(UInventoryBaseSaveD
 {
 	const UClassicInventorySaveData* ClassicInventorySaveData = Cast<UClassicInventorySaveData>(InventorySaveData);
 	
-	for (const TPair<FName, FClassicItemSaveData>& LoadedItem : ClassicInventorySaveData->SavedItems)
+	for (const auto& LoadedItem : ClassicInventorySaveData->SavedItems)
 	{
-		const FName ItemID = LoadedItem.Key;
+		const FGuid ItemID = LoadedItem.Key;
 		const FClassicItemSaveData ItemSaveData = LoadedItem.Value;
 	
 		if (UItemDataBase* ItemData = GetItemDataFromRegistry(ItemID))

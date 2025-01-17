@@ -13,6 +13,8 @@
 #include "Patterns/State/StateMachineComponent.h"
 #include "BWCharacter.generated.h"
 
+class UResourceAttributeManager;
+class UInteractableDetectorComponent;
 class UCharacterState;
 class AGameplayController;
 
@@ -64,6 +66,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopAiming);
 
 //Running events
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartRunning);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRunning);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopRunning);
 
 //Dodge events
@@ -75,6 +78,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopDodging);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartHook);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopHook);
 
+//Interaction events
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInteract, AActor*, Interactable);
+
 
 UCLASS()
 class PROJECTBW_API ABWCharacter : public ABWCharacterBase
@@ -84,7 +90,7 @@ class PROJECTBW_API ABWCharacter : public ABWCharacterBase
 public:
 	static FMovementModeChanged OnMovementModeChangedEvent;
 	static FNotifyApex OnNotifyApexEvent;
-
+	
 	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
 	FStartShooting OnStartShooting;
 	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
@@ -102,6 +108,8 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
 	FStartRunning OnStartRunning;
 	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FRunning OnRunning;
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
 	FStopRunning OnStopRunning;
 
 	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
@@ -115,6 +123,9 @@ public:
 	FStartHook OnStartHook;
 	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
 	FStopHook OnStopHook;
+
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FInteract OnInteract;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UCharacterData* Data;
@@ -136,49 +147,41 @@ private:
 	UStateMachineComponent* MotionStateMachineComponent;
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
 	UStateMachineComponent* ActionStateMachineComponent;
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UGvSpringArmComponent* SpringArm;
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UGroundCheckComponent* GroundCheckComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UGrapplingHookComponent* GrapplingHook;
-	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UDodgerComponent* DodgerComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UInteractableDetectorComponent* InteractableDetector;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UResourceAttributeManager* AttributeManager;
 	
 	UPROPERTY()
 	AGameplayController* BWController;
 
-	UPROPERTY()
-	bool bIsRunning;
-	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bWantRunning;
-	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
     bool bWantShooting;
-	UPROPERTY()
-	bool bIsShooting;
-	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bWantAiming;
-	UPROPERTY()
+	
+	bool bIsRunning;
+	bool bIsShooting;
 	bool bIsAiming;
-	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bIsHooking;
-	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bIsDodging;
 	
-	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bCanMove;
-	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bCanLook;
-	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bCanRun;
-	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bCanDodge;
-	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bCanShoot;
-	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bCanHook;
+	bool bCanInteract;
 	
 
 public:
@@ -205,6 +208,10 @@ public:
 	UGvSpringArmComponent* GetSpringArm() const;
 	UFUNCTION(BlueprintCallable)
 	UDodgerComponent* GetDodgerComponent() const;
+	UFUNCTION(BlueprintCallable)
+	UCameraComponent* GetFollowCamera() const;
+	UFUNCTION(BlueprintCallable)
+	UInteractableDetectorComponent* GetInteractableDetector() const;
 
 	UFUNCTION(BlueprintCallable)
 	float GetGroundDistance() const;
@@ -254,6 +261,8 @@ public:
 	bool CanLook() const;
 	UFUNCTION(BlueprintCallable)
 	bool CanRun() const;
+	UFUNCTION(BlueprintCallable)
+	void SetCanRun(bool Value);
 
 	UFUNCTION(BlueprintCallable)
 	void SetCanDodge(bool Value);
@@ -270,6 +279,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool CanShoot() const;
 
+	UFUNCTION(BlueprintCallable)
+	void SetCanInteract(bool Value);
+	UFUNCTION(BlueprintCallable)
+	bool CanInteract() const;
+
 private:
 	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode) override;
 	virtual void NotifyJumpApex() override;
@@ -285,4 +299,7 @@ private:
 	void Dodging();
 	UFUNCTION()
 	void StopDodging();
+
+	void InitStats();
+	void UpdateStats();
 };

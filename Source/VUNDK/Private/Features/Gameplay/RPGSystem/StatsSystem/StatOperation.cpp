@@ -2,7 +2,7 @@
 
 #include "VUNDK/Public/Features/Gameplay/RPGSystem/StatsSystem/StatOperation.h"
 
-void UStatOperation::Init(UObject* InPayload, const int32 InModifierValue)
+void UStatOperation::Init(UObject* InPayload, const float InModifierValue)
 {
 	Payload = InPayload;
 	ModifierValue = InModifierValue;
@@ -13,7 +13,7 @@ void UStatOperation::OnInit_Implementation()
 {
 }
 
-int32 UStatOperation::GetResultOperation_Implementation() const
+float UStatOperation::GetResultOperation_Implementation() const
 {
 	return ModifierValue / 2;
 }

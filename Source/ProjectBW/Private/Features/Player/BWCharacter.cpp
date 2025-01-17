@@ -5,6 +5,8 @@
 
 #include <string>
 
+#include "Features/Gameplay/InteractionSystem/Components/InteractableDetectorComponent.h"
+#include "Features/Gameplay/ResourceAttributeSystem/Components/ResourceAttributeManager.h"
 #include "Features/Player/States/Base/CharacterState.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "UGameFramework/Controllers/GameplayController.h"
@@ -34,12 +36,17 @@ ABWCharacter::ABWCharacter()
 
 	DodgerComponent = CreateDefaultSubobject<UDodgerComponent>("DodgerComponent");
 
+	InteractableDetector = CreateDefaultSubobject<UInteractableDetectorComponent>("InteractableDetector");
+
+	AttributeManager = CreateDefaultSubobject<UResourceAttributeManager>("AttributeManager");
+	
 	bCanMove = true;
 	bCanLook = true;
 	bCanRun = true;
 	bCanDodge = true;
 	bCanHook = true;
 	bCanShoot = true;
+	bCanInteract = true;
 
 }
 
@@ -59,6 +66,8 @@ void ABWCharacter::BeginPlay()
 	DodgerComponent->OnStartDodge.AddDynamic(this, &ABWCharacter::StartDodging);
 	DodgerComponent->OnDodge.AddDynamic(this, &ABWCharacter::Dodging);
 	DodgerComponent->OnStopDodge.AddDynamic(this, &ABWCharacter::StopDodging);
+
+	InitStats();
 }
 
 void ABWCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -71,6 +80,8 @@ void ABWCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void ABWCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	//IInteractable* Interactable = nullptr;
+	//InteractableDetector->TryGetInteractable(Interactable);
 }
 
 void ABWCharacter::HandleMotionInput(const EInputActionType InputAction, const FInputActionValue& Value) const
@@ -133,6 +144,16 @@ UGvSpringArmComponent* ABWCharacter::GetSpringArm() const
 UDodgerComponent* ABWCharacter::GetDodgerComponent() const
 {
 	return DodgerComponent;
+}
+
+UCameraComponent* ABWCharacter::GetFollowCamera() const
+{
+	return FollowCamera;
+}
+
+UInteractableDetectorComponent* ABWCharacter::GetInteractableDetector() const
+{
+	return InteractableDetector;
 }
 
 float ABWCharacter::GetGroundDistance() const
@@ -242,6 +263,11 @@ bool ABWCharacter::CanRun() const
 	return bCanRun;
 }
 
+void ABWCharacter::SetCanRun(bool Value)
+{
+	bCanRun = Value;
+}
+
 void ABWCharacter::SetCanDodge(bool Value)
 {
 	bCanDodge = Value;
@@ -270,6 +296,16 @@ void ABWCharacter::SetCanShoot(bool Value)
 bool ABWCharacter::CanShoot() const
 {
 	return bCanShoot && !IsDodging() && !IsHooking();
+}
+
+void ABWCharacter::SetCanInteract(bool Value)
+{
+	bCanInteract = Value;
+}
+
+bool ABWCharacter::CanInteract() const
+{
+	return bCanInteract;
 }
 
 void ABWCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)
@@ -319,4 +355,14 @@ void ABWCharacter::Dodging()
 void ABWCharacter::StopDodging()
 {
 	OnStopDodging.Broadcast();
+}
+
+void ABWCharacter::InitStats()
+{
+	UpdateStats();
+}
+
+void ABWCharacter::UpdateStats()
+{
+	GetCharacterMovement()->MaxWalkSpeed = Data->WalkSpeed;
 }

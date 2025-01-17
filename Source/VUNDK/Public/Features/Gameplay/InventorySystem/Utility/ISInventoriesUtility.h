@@ -30,5 +30,5 @@ public:
 	static bool IsItemInRegistry(const UItemDataBase* ItemData);
 
 	UFUNCTION(BlueprintPure, Category = "VUNDK|Gameplay|Tetris Inventory System")
-	static UItemDataBase* GetItemDataFromRegistry(const FName& ItemDataID);
+	static UItemDataBase* GetItemDataFromRegistry(const FGuid& ItemDataID);
 };
