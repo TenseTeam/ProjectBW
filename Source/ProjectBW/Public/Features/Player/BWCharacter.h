@@ -13,6 +13,7 @@
 #include "Patterns/State/StateMachineComponent.h"
 #include "BWCharacter.generated.h"
 
+class UResourceAttributeManager;
 class UInteractableDetectorComponent;
 class UCharacterState;
 class AGameplayController;
@@ -155,6 +156,8 @@ private:
 	UDodgerComponent* DodgerComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UInteractableDetectorComponent* InteractableDetector;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UResourceAttributeManager* AttributeManager;
 	
 	UPROPERTY()
 	AGameplayController* BWController;

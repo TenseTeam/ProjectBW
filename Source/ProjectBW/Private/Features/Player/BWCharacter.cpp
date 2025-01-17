@@ -6,6 +6,7 @@
 #include <string>
 
 #include "Features/Gameplay/InteractionSystem/Components/InteractableDetectorComponent.h"
+#include "Features/Gameplay/ResourceAttributeSystem/Components/ResourceAttributeManager.h"
 #include "Features/Player/States/Base/CharacterState.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "UGameFramework/Controllers/GameplayController.h"
@@ -36,6 +37,8 @@ ABWCharacter::ABWCharacter()
 	DodgerComponent = CreateDefaultSubobject<UDodgerComponent>("DodgerComponent");
 
 	InteractableDetector = CreateDefaultSubobject<UInteractableDetectorComponent>("InteractableDetector");
+
+	AttributeManager = CreateDefaultSubobject<UResourceAttributeManager>("AttributeManager");
 	
 	bCanMove = true;
 	bCanLook = true;
