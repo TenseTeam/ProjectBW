@@ -11,7 +11,7 @@ void UWalk::Enter(AActor* Context)
 	}
 	
 	Super::Enter(Context);
-	if (Character->WantRunning() && !Character->IsAiming() && !Character->IsShooting())
+	if (Character->WantRunning() && Character->CanRun() && !Character->IsAiming() && !Character->IsShooting())
 	{
 		Character->ChangeMotionState(2);
 		return;
@@ -30,6 +30,11 @@ void UWalk::Update(AActor* Context, float DeltaTime)
 	}
 	
 	Super::Update(Context, DeltaTime);
+	if (Character->WantRunning() && Character->CanRun() && !Character->IsAiming() && !Character->IsShooting())
+	{
+		Character->ChangeMotionState(2);
+		return;
+	}
 	if (Controller->GetMoveInputValue().IsNearlyZero())
 	{
 		Character->ChangeMotionState(0);
@@ -98,7 +103,7 @@ void UWalk::CheckWantRun()
         return;
     }
 	
-	if (Character->WantRunning())
+	if (Character->WantRunning() && Character->CanRun())
 	{
 		Character->ChangeMotionState(2);
 	}

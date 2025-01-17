@@ -27,6 +27,12 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void StopInteract();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void Highlight();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void Unhighlight();
 	
 	/**
 	* @brief Check if the interactable can be interacted
