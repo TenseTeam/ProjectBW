@@ -81,7 +81,7 @@ FVector UBTTask_FindNavMeshPoint::FindFarthestPointWithinRange(const AActor* Pla
     {
         for (const FNavLocation& NavPoint : NavPoints)
         {
-            float Distance = FVector::Dist(PlayerLocation, NavPoint.Location);
+            float Distance = FVector::Distance(PlayerLocation, NavPoint.Location);
             if (IsInRange(Distance,MinDistance,MaxDistance) && !IsHittingSomething(NavPoint.Location, PlayerLocation, Enemy))
             {
                 if (Distance > BestDistance)
@@ -122,7 +122,7 @@ bool UBTTask_FindNavMeshPoint::IsHittingSomething(const FVector& Start, const FV
 
 bool UBTTask_FindNavMeshPoint::IsInRange(float Distance, const float MinDistance, const float MaxDistance)
 {
-    return Distance >= MinDistance && Distance <= MaxDistance;
+    return Distance > MinDistance && Distance < MaxDistance;
 }
 
 FVector UBTTask_FindNavMeshPoint::GetCorrectNavPoint(TArray<FNavLocation> NavPoints,float BestDistance, const FVector& PlayerLocation, FVector PlayerNavMeshLocation,const float MinDistance, const float MaxDistance,const AActor* Enemy)
@@ -131,20 +131,17 @@ FVector UBTTask_FindNavMeshPoint::GetCorrectNavPoint(TArray<FNavLocation> NavPoi
     
     for (const FNavLocation& NavPoint : NavPoints)
     {
-        if (FMath::IsNearlyEqual(NavPoint.Location.Z , PlayerNavMeshLocation.Z ,50))
-        {
-            float Distance = FVector::Dist(PlayerLocation, NavPoint.Location);
+        float Distance = FVector::Distance(PlayerLocation, NavPoint.Location);
             
-            if (IsInRange(Distance,MinDistance,MaxDistance) && !IsHittingSomething(NavPoint.Location, PlayerLocation, Enemy) )
+        if (IsInRange(Distance,MinDistance,MaxDistance) && !IsHittingSomething(NavPoint.Location, PlayerLocation, Enemy) )
+        {
+            LGDebug::Log("Raycast non colpisce nulla: punto valido", true);
+            if (Distance > BestDistance)
             {
-                LGDebug::Log("Raycast non colpisce nulla: punto valido", true);
-                if (Distance > BestDistance)
-                {
-                    LGDebug::Log("player location : " + FString::SanitizeFloat(PlayerLocation.Z), true);
-                    LGDebug::Log("Punto considerato valido Z: " + FString::SanitizeFloat(NavPoint.Location.Z), true);
-                    BestDistance = Distance;
-                    BestPoint = NavPoint.Location;
-                }
+                LGDebug::Log("player location : " + FString::SanitizeFloat(PlayerLocation.Z), true);
+                LGDebug::Log("Punto considerato valido Z: " + FString::SanitizeFloat(NavPoint.Location.Z), true);
+                BestDistance = Distance;
+                BestPoint = NavPoint.Location;
             }
         }
     }

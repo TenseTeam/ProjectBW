@@ -24,40 +24,29 @@ bool UBTDecorator_CanJumpToElevatedPosition::CalculateRawConditionValue(UBehavio
 	{
 		return false;
 	}
-	
-	AAIController* AIController = OwnerComp.GetAIOwner();
-	if (!AIController)
-	{
-		return false;
-	}
-	
-	APawn* ControlledPawn = AIController->GetPawn();
-	if (!ControlledPawn)
-	{
-		return false;
-	}
-	
-	const FVector SelfPosition = ControlledPawn->GetActorLocation();
 	AActor* AttackTarget = Cast<AActor>(BlackboardComp->GetValueAsObject(AttackTargetKey.SelectedKeyName));
-	const FVector TargetPosition = AttackTarget->GetActorLocation();
+	UCharacterMovementComponent* MovementComponent = AttackTarget->FindComponentByClass<UCharacterMovementComponent>();
+	
+	const FVector SelfPosition = BlackboardComp->GetValueAsVector(SelfPositionKey.SelectedKeyName);
+	const FVector TargetPosition = BlackboardComp->GetValueAsVector(AttackTargetPositionKey.SelectedKeyName);
+	
+	if (!FMath::IsNearlyEqual(TargetPosition.Z , SelfPosition.Z ,150))return false;
 	
 	const float ZDifference = TargetPosition.Z - SelfPosition.Z;
-	const float HorizontalDistance = FVector::Dist2D(SelfPosition, TargetPosition);
+	const float HorizontalDistance = FVector::Distance(TargetPosition,SelfPosition);
 
-	UCharacterMovementComponent* MovementComponent = AttackTarget->FindComponentByClass<UCharacterMovementComponent>();
-
-	// LGDebug::Log("SelfZPosition " + FString::SanitizeFloat(SelfPosition), true);
-	// LGDebug::Log("TargetZPosition " + FString::SanitizeFloat(TargetZPosition), true);
-	
 	const float MaxJumpHeight = BlackboardComp->GetValueAsFloat(MaxJumpHeightKey.SelectedKeyName);
 	const float AttackRange = BlackboardComp->GetValueAsFloat(AttackRangeKey.SelectedKeyName);
 	const float MinJumpDistance = BlackboardComp->GetValueAsFloat(MinJumpDistanceKey.SelectedKeyName);
 	
 	if (ZDifference > MinJumpDistance && ZDifference <= MaxJumpHeight && HorizontalDistance > AttackRange && !MovementComponent->IsFalling() )
 	{
-		BlackboardComp->SetValueAsVector(TargetPositionKey.SelectedKeyName, AttackTarget->GetActorLocation());
 		return true;
 	}
 	
 	return false;
+
+	// LGDebug::Log("SelfZPosition " + FString::SanitizeFloat(SelfPosition), true);
+	// LGDebug::Log("TargetZPosition " + FString::SanitizeFloat(TargetZPosition), true);
 }
+

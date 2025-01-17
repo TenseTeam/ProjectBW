@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AI/NPC/NPCBaseStateEnemy/NPCBaseStateEnemy.h"
+#include "Features/Gameplay/ResourceAttributeSystem/Components/ResourceAttributeManager.h"
 #include "EnemyBase.generated.h"
 
 UCLASS()
@@ -18,4 +19,6 @@ protected:
 	virtual void BeginPlay() override;
 
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI|Health")
+	UResourceAttributeManager* ResourceAttributeManager;
 };

@@ -34,5 +34,9 @@ public:
 	FBlackboardKeySelector AttackTargetKey;
 
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
-	FBlackboardKeySelector TargetPositionKey;
+	FBlackboardKeySelector AttackTargetPositionKey;
+	
+	UPROPERTY(EditAnywhere, Category = "Blackboard")
+	FBlackboardKeySelector SelfPositionKey;
+	
 };

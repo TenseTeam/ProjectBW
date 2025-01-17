@@ -4,9 +4,11 @@
 #include "IA/EnemyBase/EnemyBase.h"
 
 
+
 // Sets default values
 AEnemyBase::AEnemyBase()
 {
+	ResourceAttributeManager = CreateDefaultSubobject<UResourceAttributeManager>(TEXT("ResourceAttributeManager"));
 }
 
 

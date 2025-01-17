@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Features/Gameplay/ResourceAttributeSystem/Components/ResourceAttributeManager.h"
 #include "Features/Gameplay/WeaponSystem/Shooter/Shooter.h"
 #include "IA/EnemyBase/EnemyBase.h"
 #include "RangedEnemy.generated.h"
@@ -25,4 +26,6 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "AI|Shooter")
 	void BaseAttack(AActor* Target);
+	
+
 };

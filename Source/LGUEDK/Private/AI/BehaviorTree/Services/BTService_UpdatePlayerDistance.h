@@ -30,6 +30,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
 	FBlackboardKeySelector PawnPositionKey;
+
+	UPROPERTY(EditAnywhere, Category = "Blackboard")
+	FBlackboardKeySelector DistanceFromPlayerKey;
 	
 	UPROPERTY()
 	AActor* CachedAttackTarget;

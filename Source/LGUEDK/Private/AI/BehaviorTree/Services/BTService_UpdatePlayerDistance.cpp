@@ -74,9 +74,11 @@ void UBTService_UpdatePlayerDistance::TickNode(UBehaviorTreeComponent& OwnerComp
 		LGDebug::Log("CachedBlackboardComp non trovati", true);
 		return;
 	}
-
+	
+	
 	CachedBlackboardComp->SetValueAsVector(AttackTargetPositionKey.SelectedKeyName, CachedAttackTarget->GetActorLocation());
 	CachedBlackboardComp->SetValueAsVector(PawnPositionKey.SelectedKeyName, CachedSelf->GetActorLocation());
+
 	
 	// LGDebug::Log("player position " + CachedAttackTarget->GetActorLocation().ToString(), true);
 	// LGDebug::Log("enemy position " + CachedSelf->GetActorLocation().ToString(), true);
