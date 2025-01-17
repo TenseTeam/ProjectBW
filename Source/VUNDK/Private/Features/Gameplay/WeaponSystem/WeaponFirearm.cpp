@@ -7,6 +7,27 @@ AWeaponFirearm::AWeaponFirearm()
 	Shooter = CreateDefaultSubobject<UShooter>(TEXT("Shooter"));
 }
 
+void AWeaponFirearm::SetWeaponDamage(const float NewDamage)
+{
+	Super::SetWeaponDamage(NewDamage);
+	Shooter->ShooterBehaviour->SetDamage(NewDamage);
+}
+
+void AWeaponFirearm::SetWeaponFireRate(const float NewFireRate) const
+{
+	Shooter->ShooterBehaviour->SetFireRate(NewFireRate);
+}
+
+void AWeaponFirearm::SetWeaponMagSize(const int32 NewMagSize) const
+{
+	Shooter->ShooterBehaviour->SetMagSize(NewMagSize);
+}
+
+void AWeaponFirearm::SetWeaponRange(const float NewRange) const
+{
+	Shooter->ShooterBehaviour->SetRange(NewRange);
+}
+
 void AWeaponFirearm::SetWeaponShootType(const EShootType NewShootType)
 {
 	WeaponShootType = NewShootType;
@@ -28,7 +49,7 @@ void AWeaponFirearm::ReloadAllMagazine()
 void AWeaponFirearm::BeginPlay()
 {
 	Super::BeginPlay();
-	Shooter->SetShooterDamage(WeaponData.Damage);
+	SetWeaponDamage(WeaponData.Damage);
 }
 
 void AWeaponFirearm::OnReload_Implementation()

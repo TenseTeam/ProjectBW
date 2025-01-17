@@ -55,9 +55,16 @@ private:
 	int32 CurrentAmmo;
 	bool bIsInCooldown;
 	int32 CurrentShootPointIndex;
+	bool bIsBehaviourActive;
 
 public:
 	virtual void Init(UShooter* InShooter, const FShootData InShootData, const TArray<UShootPoint*> InShootPoints);
+
+	UFUNCTION(BlueprintCallable)
+	void EnableBehaviour();
+	
+	UFUNCTION(BlueprintCallable)
+	void DisableBehaviour();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
 	virtual bool Shoot(const EShootType ShootType = EShootType::Simultaneous) override;
@@ -69,11 +76,20 @@ public:
 	virtual void RefillAllMagazine() override;
 
 	UFUNCTION(BlueprintCallable)
+	void SetShootParams(const float NewDamage, const float NewFireRate, const float NewRange, const int32 NewMagSize);
+	
+	UFUNCTION(BlueprintCallable)
 	void SetDamage(const float NewDamage);
 
-	UFUNCTION(BlueprintPure)
-	virtual int32 GetCurrentAmmo() const override;
+	UFUNCTION(BlueprintCallable)
+	void SetFireRate(const float NewFireRate);
 
+	UFUNCTION(BlueprintCallable)
+	void SetRange(const float NewRange);
+
+	UFUNCTION(BlueprintCallable)
+	void SetMagSize(const int32 NewMagSize);
+	
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
 	float GetDamage() const;
 
@@ -85,6 +101,9 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
 	int32 GetMagSize() const;
+
+	UFUNCTION(BlueprintPure)
+	virtual int32 GetCurrentAmmo() const override;
 
 	UFUNCTION(BlueprintPure)
 	TEnumAsByte<ECollisionChannel> GetDamageChannel() const;
@@ -99,6 +118,12 @@ protected:
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void OnInit();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnBehaviourEnabled();
+	
+	UFUNCTION(BlueprintNativeEvent)
+	void OnBehaviourDisabled();
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void OnShootSuccess(UShootPoint* ShootPoint, const FVector& ShooterTargetLocation, const FVector& ShootPointDirectionToTarget) const;

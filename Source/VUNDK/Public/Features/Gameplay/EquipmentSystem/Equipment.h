@@ -8,6 +8,8 @@
 #include "Features/Gameplay/InventorySystem/Base/ItemBase.h"
 #include "Equipment.generated.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogEquipment, All, All);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(
 	FOnAnyItemEquipped,
 	UEquipSlotKey*, EquipSlotKey,

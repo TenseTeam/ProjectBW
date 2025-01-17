@@ -16,7 +16,7 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Instanced)
 	UActorPool* ProjectilePool;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0.0", UIMin = "0.0"))
-	float ProjectileLifeTime = 5.0f;
+	float ProjectileMaxLifeTime = 5.0f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0.0", UIMin = "0.0"))
 	float ProjectileSpeed = 1000.0f;
 
@@ -26,5 +26,7 @@ public:
 protected:
 	virtual void Init(UShooter* InShooter, const FShootData InShootData, const TArray<UShootPoint*> InShootPoints) override;
 
+	virtual void OnBehaviourDisabled_Implementation() override;
+	
 	virtual void OnShootSuccess_Implementation(UShootPoint* ShootPoint, const FVector& ShooterTargetLocation, const FVector& ShootPointDirectionToTarget) const override;
 };

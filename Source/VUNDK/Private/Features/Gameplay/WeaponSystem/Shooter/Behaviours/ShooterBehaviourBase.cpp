@@ -6,7 +6,7 @@
 
 void UShooterBehaviourBase::Init(UShooter* InShooter, const FShootData InShootData, const TArray<UShootPoint*> InShootPoints)
 {
-	if (InShooter == nullptr)
+	if (!IsValid(InShooter))
 	{
 		UE_LOG(LogShooter, Error, TEXT("Shooter in %s is null."), *GetName());
 		return;
@@ -21,11 +21,27 @@ void UShooterBehaviourBase::Init(UShooter* InShooter, const FShootData InShootDa
 	ShootData = InShootData;
 	Shooter = InShooter;
 	ShootPoints = InShootPoints;
+	EnableBehaviour();
 	OnInit();
+}
+
+void UShooterBehaviourBase::EnableBehaviour()
+{
+	bIsBehaviourActive = true;
+	OnBehaviourEnabled();
+}
+
+void UShooterBehaviourBase::DisableBehaviour()
+{
+	bIsBehaviourActive = false;
+    OnBehaviourDisabled();
 }
 
 bool UShooterBehaviourBase::Shoot(const EShootType ShootType)
 {
+	if (!Check())
+		return false;
+	
 	if (bIsInCooldown)
 		return false;
 
@@ -54,6 +70,9 @@ bool UShooterBehaviourBase::Shoot(const EShootType ShootType)
 
 int32 UShooterBehaviourBase::Refill(const int32 Ammo)
 {
+	if (!Check())
+		return 0;
+	
 	ModifyCurrentAmmo(Ammo);
 	OnRefill();
 	OnBehaviourRefill.Broadcast(CurrentAmmo);
@@ -63,6 +82,14 @@ int32 UShooterBehaviourBase::Refill(const int32 Ammo)
 void UShooterBehaviourBase::RefillAllMagazine()
 {
 	Refill(GetMagSize());
+}
+
+void UShooterBehaviourBase::SetShootParams(const float NewDamage, const float NewFireRate, const float NewRange, const int32 NewMagSize)
+{
+	SetDamage(NewDamage);
+	SetFireRate(NewFireRate);
+	SetRange(NewRange);
+	SetMagSize(NewMagSize);
 }
 
 void UShooterBehaviourBase::SetDamage(const float NewDamage)
@@ -77,56 +104,77 @@ void UShooterBehaviourBase::SetDamage(const float NewDamage)
 	ShootData.Damage = NewDamage;
 }
 
-int32 UShooterBehaviourBase::GetCurrentAmmo() const
+void UShooterBehaviourBase::SetFireRate(const float NewFireRate)
 {
-	return CurrentAmmo;
+	if (NewFireRate < 0.0f)
+	{
+		UE_LOG(LogShooter, Warning, TEXT("Trying to set negative fire rate in %s. New Fire Rate set to zero."), *GetName());
+		ShootData.FireRate = 0.0f;
+		return;
+	}
+
+	ShootData.FireRate = NewFireRate;
+}
+
+void UShooterBehaviourBase::SetRange(const float NewRange)
+{
+	if (NewRange < 0.0f)
+	{
+		UE_LOG(LogShooter, Warning, TEXT("Trying to set negative range in %s. New Range set to zero."), *GetName());
+		ShootData.Range = 0.0f;
+		return;
+	}
+
+	ShootData.Range = NewRange;
+}
+
+void UShooterBehaviourBase::SetMagSize(const int32 NewMagSize)
+{
+	if (NewMagSize < 0)
+	{
+		UE_LOG(LogShooter, Warning, TEXT("Trying to set negative mag size in %s. New Mag Size set to zero."), *GetName());
+		ShootData.MagSize = 0;
+		return;
+	}
+
+	ShootData.MagSize = NewMagSize;
 }
 
 float UShooterBehaviourBase::GetRange_Implementation() const
 {
-	if (!Check())
-		return 0.f;
-
 	return ShootData.Range * 100.f;
 }
 
 float UShooterBehaviourBase::GetFireRate_Implementation() const
 {
-	if (!Check())
-		return 0.f;
-
 	return ShootData.FireRate;
 }
 
 float UShooterBehaviourBase::GetDamage_Implementation() const
 {
-	if (!Check())
-		return 0.f;
-
 	return ShootData.Damage;
 }
 
 int32 UShooterBehaviourBase::GetMagSize_Implementation() const
 {
-	if (!Check())
-		return 0;
-
 	return ShootData.MagSize;
+}
+
+int32 UShooterBehaviourBase::GetCurrentAmmo() const
+{
+	return CurrentAmmo;
 }
 
 TEnumAsByte<ECollisionChannel> UShooterBehaviourBase::GetDamageChannel() const
 {
-	if (!Check())
-		return ECollisionChannel::ECC_Visibility;
-	
 	return ShootData.DamageChannel;
 }
 
 UWorld* UShooterBehaviourBase::GetWorld() const
 {
-	if (!Check())
+	if (!IsValid(Shooter))
 	{
-		UE_LOG(LogShooter, Error, TEXT("ShooterBehaviour GetWorld(), Shooter is invalid in %s."), *GetName());
+		UE_LOG(LogShooter, Error, TEXT("ShooterBehaviour::GetWorld: Shooter is invalid in %s."), *GetName());
 		return nullptr;
 	}
 	
@@ -146,6 +194,14 @@ void UShooterBehaviourBase::ShootFail()
 {
 	OnShootFail();
 	OnBehaviourShootFail.Broadcast();
+}
+
+void UShooterBehaviourBase::OnBehaviourEnabled_Implementation()
+{
+}
+
+void UShooterBehaviourBase::OnBehaviourDisabled_Implementation()
+{
 }
 
 void UShooterBehaviourBase::OnInit_Implementation()
@@ -171,12 +227,6 @@ FVector UShooterBehaviourBase::CalculateShooterTargetLocation_Implementation() c
 
 FVector UShooterBehaviourBase::GetShooterTargetLocation() const
 {
-	if (!Check())
-	{
-		UE_LOG(LogShooter, Error, TEXT("ShooterBehaviour GetShooterTargetLocation(), Shooter is invalid in %s."), *GetName());
-		return FVector::ZeroVector;
-	}
-
 	if (!bUseCameraTargetLocation)
 		return CalculateShooterTargetLocation();
 	
@@ -279,12 +329,6 @@ bool UShooterBehaviourBase::HandleSequentialShoot()
 
 bool UShooterBehaviourBase::HasEnoughAmmoToShoot(const int32 DesiredAmmoToConsume) const
 {
-	if (!Check())
-	{
-		UE_LOG(LogShooter, Error, TEXT("Trying to shoot with invalid Shooter in %s."), *GetName());
-		return false;
-	}
-
 	return ShootPoints.Num() > 0 && (bHasInfiniteAmmo || CurrentAmmo - DesiredAmmoToConsume >= 0);
 }
 
@@ -335,5 +379,5 @@ void UShooterBehaviourBase::EndShootCooldown()
 
 bool UShooterBehaviourBase::Check() const
 {
-	return IsValid(Shooter);
+	return IsValid(Shooter) && bIsBehaviourActive;
 }

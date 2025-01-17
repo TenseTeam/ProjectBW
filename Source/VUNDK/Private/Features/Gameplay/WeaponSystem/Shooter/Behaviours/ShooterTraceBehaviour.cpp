@@ -10,7 +10,7 @@ void UShooterTraceBehaviour::OnShootSuccess_Implementation(UShootPoint* ShootPoi
 
 	if (!IsValid(World))
 	{
-		UE_LOG(LogShooter, Error, TEXT("UShooterTraceBehaviour::OnShootSuccess_Implementation: World is not valid"));
+		UE_LOG(LogShooter, Error, TEXT("UShooterTraceBehaviour::OnShootSuccess_Implementation: World is not valid."));
 		return;
 	}
 	
@@ -28,7 +28,7 @@ void UShooterTraceBehaviour::TraceFromCamera(const UWorld* World, const UShootPo
 {
 	if (!IsValid(ShootPoint))
 	{
-		UE_LOG(LogShooter, Error, TEXT("UShooterTraceBehaviour::TraceFromCamera: ShootPoint is not valid"));
+		UE_LOG(LogShooter, Error, TEXT("UShooterTraceBehaviour::TraceFromCamera: ShootPoint is not valid."));
 		return;
 	}
 	
@@ -38,6 +38,7 @@ void UShooterTraceBehaviour::TraceFromCamera(const UWorld* World, const UShootPo
 
 	if (!TryGetCameraPoints(CameraStartPoint, CameraEndPoint, CameraHitPoint))
 	{
+		UE_LOG(LogShooter, Error, TEXT("UShooterTraceBehaviour::TraceFromCamera: TryGetCameraPoints failed, using Fallback option."));
 		TraceFromShootPoint(World, ShootPoint); // Fallback option
 		return;
 	}
@@ -65,7 +66,7 @@ void UShooterTraceBehaviour::TraceFromShootPoint(const UWorld* World, const USho
 {
 	if (!IsValid(ShootPoint))
 	{
-		UE_LOG(LogShooter, Error, TEXT("UShooterTraceBehaviour::TraceFromCamera: ShootPoint is not valid"));
+		UE_LOG(LogShooter, Error, TEXT("UShooterTraceBehaviour::TraceFromShootPoint: ShootPoint is not valid."));
 		return;
 	}
 	

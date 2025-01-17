@@ -42,6 +42,19 @@ AActor* UActorPool::AcquireActor()
 
 void UActorPool::ReleaseActor(AActor* InActor)
 {
+	if (!IsValid(InActor))
+	{
+		UE_LOG(LogObjectPool, Error, TEXT("ActorPool ReleaseActor(), Invalid actor."));
+		return;
+	}
+
+	if (bHasBeenDestroyed)
+	{
+		UE_LOG(LogObjectPool, Warning, TEXT("ActorPool ReleaseActor(), Cannot release actor, pool has been destroyed."));
+		InActor->Destroy();
+		return;
+	}
+	
 	if (AvailableActors.Contains(InActor))
 	{
 		UE_LOG(LogObjectPool, Warning, TEXT("ActorPool ReleaseActor(), Actor already released."));
@@ -68,6 +81,21 @@ void UActorPool::SetActorClass(const TSubclassOf<AActor>& InActorClass)
 	}
 
 	ActorClass = InActorClass;
+}
+
+void UActorPool::DestroyPool()
+{
+	for (AActor* Actor : AvailableActors)
+		if (IsValid(Actor))
+			Actor->Destroy();
+
+	bHasBeenDestroyed = true;
+}
+
+void UActorPool::BeginDestroy()
+{
+	UObject::BeginDestroy();
+	DestroyPool();
 }
 
 void UActorPool::SpawnInstances(const int32 InCount)
