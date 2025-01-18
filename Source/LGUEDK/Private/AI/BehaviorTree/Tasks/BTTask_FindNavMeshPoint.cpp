@@ -46,10 +46,10 @@ EBTNodeResult::Type UBTTask_FindNavMeshPoint::ExecuteTask(UBehaviorTreeComponent
 FVector UBTTask_FindNavMeshPoint::FindFarthestPointWithinRange(FVector PlayerLocation,const AActor* Enemy,float MinDistance, float MaxDistance)
 {
     FVector BestPoint = FVector::Zero();
-    float BestDistance = -1.0f;
     TArray<FNavLocation> NavPoints;
+    TArray<FNavLocation> CurrentPossiblePoints;
     FNavLocation NavLocation;
-    
+
     UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
     if (!NavSystem) return BestPoint;
 
@@ -62,29 +62,78 @@ FVector UBTTask_FindNavMeshPoint::FindFarthestPointWithinRange(FVector PlayerLoc
         if (NavSystem->GetRandomReachablePointInRadius(PlayerLocation, MaxDistance, NavLocation))
         {
             NavPoints.Add(NavLocation);
-            LGDebug::Log("NavLocation: " + NavLocation.Location.ToString(), true);
-            LGDebug::Log("NavPoints. : " + FString::SanitizeFloat(NavPoints.Num()), true);
+            // LGDebug::Log("NavLocation: " + NavLocation.Location.ToString(), true);
+            // LGDebug::Log("NavPoints. : " + FString::SanitizeFloat(NavPoints.Num()), true);
         }
     }
-
+    
     for (const FNavLocation& NavPoint : NavPoints)
     {
         float Distance = FVector::Distance(PlayerLocation, NavPoint.Location);
-        
-        if (IsInRange(Distance,MinDistance,MaxDistance) && !IsHittingSomething(NavPoint.Location, PlayerLocation, Enemy))
+    
+        if (IsInRange(Distance, MinDistance, MaxDistance + 400) && !IsHittingSomething(NavPoint.Location, PlayerLocation, Enemy))
         {
-            LGDebug::Log("DISTANZA CORRETTA : " + NavPoint.Location.ToString(), true);
-            LGDebug::Log("NON HO HITTATO NULLA : " + NavPoint.Location.ToString(), true);
-
-            if (Distance > BestDistance)
-            {
-                BestDistance = Distance;
-                BestPoint = NavPoint.Location;
-                LGDebug::Log("TROVATO PUNTO PIù LONTANO : " + BestPoint.ToString(), true);
-            }
+            // LGDebug::Log("DISTANZA CORRETTA : " + NavPoint.Location.ToString(), true);
+            // LGDebug::Log("NON HO HITTATO NULLA : " + NavPoint.Location.ToString(), true);
+            
+            CurrentPossiblePoints.Add(NavPoint);
         }
     }
+    
+    if (CurrentPossiblePoints.Num() > 0)
+    {
+        int32 RandomIndex = FMath::RandRange(0, CurrentPossiblePoints.Num() - 1);
+        BestPoint= CurrentPossiblePoints[RandomIndex];
+    }
+    else
+    {
+        BestPoint = PlayerLocation;
+    }
+    
     return BestPoint;
+    
+     
+    
+    
+    // if (FVector::Dist(Enemy->GetActorLocation(), BestPoint) < 100.0f)  
+    // {
+    //     FVector AlternativePoint = FVector::ZeroVector;
+    //     float ClosestDistanceToBestPoint = FLT_MAX;
+    //     
+    //     for (const FNavLocation& NavPoint : NavPoints)
+    //     {
+    //         float DistanceToBestPoint = FVector::Distance(BestPoint, NavPoint.Location);
+    //         float DistanceToPlayer = FVector::Distance(PlayerLocation, NavPoint.Location);
+    //         
+    //         if (IsInRange(DistanceToPlayer, MinDistance, MaxDistance) &&
+    //             !IsHittingSomething(NavPoint.Location, PlayerLocation, Enemy) &&
+    //             DistanceToBestPoint > 50 && 
+    //             DistanceToBestPoint < ClosestDistanceToBestPoint)
+    //         {
+    //             ClosestDistanceToBestPoint = DistanceToBestPoint;
+    //             AlternativePoint = NavPoint.Location;
+    //         }
+    //     }
+    //
+    //     // Se troviamo un altro punto valido, usalo
+    //     if (AlternativePoint != FVector::ZeroVector)
+    //     {
+    //         BestPoint = AlternativePoint;
+    //         LGDebug::Log("ALTERNATIVE POINT FOUND : " + BestPoint.ToString(), true);
+    //     }
+    //     else
+    //     {
+    //         // Se non ci sono punti alternativi, scegli un punto casuale
+    //         FNavLocation RandomNavPoint;
+    //         if (NavSystem->GetRandomReachablePointInRadius(PlayerLocation, MaxDistance, RandomNavPoint))
+    //         {
+    //             BestPoint = RandomNavPoint.Location;
+    //             LGDebug::Log("PUNTO CASUALE UTILIZZATO : " + BestPoint.ToString(), true);
+    //         }
+    //     }
+    // }
+
+    //return BestPoint;
     
     // if (NavSystem->GetRandomReachablePointInRadius(PlayerLocation, MaxDistance, NavLocation))
     // {
@@ -146,7 +195,7 @@ bool UBTTask_FindNavMeshPoint::IsHittingSomething(const FVector& Start, const FV
         ECC_Visibility,
         TraceParams
     );
-    DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, 5.0f, 0, 1.0f);  // Linea rossa
+    //DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, 5.0f, 0, 1.0f);  // Linea rossa
     return bHit;
 }
 
@@ -183,10 +232,9 @@ FVector UBTTask_FindNavMeshPoint::GetCorrectNavPoint(TArray<FNavLocation> NavPoi
 
 void UBTTask_FindNavMeshPoint::GetAllReachableNavPoints(UNavigationSystemV1* NavSystem, const FVector& Center,float Radius, TArray<FNavLocation>& OutNavPoints)
 {
-    const float GridRadius = Radius + 200.0f; 
-    const float StepSize = 700;           
+    const float GridRadius = Radius + 400; 
+    const float StepSize = 500;           
     const int32 GridSize = FMath::CeilToInt(GridRadius / StepSize); 
-
     
     for (int32 X = -GridSize; X <= GridSize; ++X)
     {
@@ -199,24 +247,24 @@ void UBTTask_FindNavMeshPoint::GetAllReachableNavPoints(UNavigationSystemV1* Nav
             {
                 
                 OutNavPoints.Add(NavLocation);
-                LGDebug::Log("Found Reachable Point: " + NavLocation.Location.ToString(), true);
+                //LGDebug::Log("Found Reachable Point: " + NavLocation.Location.ToString(), true);
             }
         }
     }
 
-    // Debug: Disegna sfere per visualizzare tutti i punti generati
-    for (const FNavLocation& NavPoint : OutNavPoints)
-    {
-        DrawDebugSphere(
-            GetWorld(), 
-            NavPoint.Location, // Posizione della sfera
-            50.0f,             // Raggio della sfera
-            12,                // Numero di segmenti
-            FColor::Green,     // Colore della sfera
-            false,             // Persistente nel tempo
-            5.0f               // Durata della sfera
-        );
-    }
+    
+    // for (const FNavLocation& NavPoint : OutNavPoints)
+    // {
+    //     DrawDebugSphere(
+    //         GetWorld(), 
+    //         NavPoint.Location, // Posizione della sfera
+    //         50.0f,             // Raggio della sfera
+    //         12,                // Numero di segmenti
+    //         FColor::Green,     // Colore della sfera
+    //         false,             // Persistente nel tempo
+    //         5.0f               // Durata della sfera
+    //     );
+    // }
 }
 
 

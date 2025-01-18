@@ -41,5 +41,5 @@ private:
 
 	FVector GetCorrectNavPoint(TArray<FNavLocation> NavPoints,float BestDistance, const FVector& PlayerLocation,FVector PlayerNavMeshLocation,const float MinDistance,const float MaxDistance,const AActor* Enemy);
 
-	void GetAllReachableNavPoints(UNavigationSystemV1* NavSystem, const FVector& Center, float Radius, TArray<FNavLocation>& OutNavPoints);
+	void GetAllReachableNavPoints(UNavigationSystemV1* NavSystem, const FVector& Center,float Radius, TArray<FNavLocation>& OutNavPoints);
 };

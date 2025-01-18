@@ -119,7 +119,7 @@ void ABaseEnemyController::SetStateAsInvestigating()
 void ABaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 {
 	Super::HandleSight(Actor, Stimulus);
-	LGDebug::Log("VEDO PLAYER ",true);
+	
 	if (Stimulus.WasSuccessfullySensed())
 	{
 		if (Stimulus.Type != UAISense::GetSenseID<UAISense_Sight>())return;
@@ -139,7 +139,8 @@ void ABaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 	else
 	{
 		if (EnemyBase->GetState() == EEnemyState::Investigating)return;
-			
+		if (!Actor->Implements<UAITargetInterface>()) return;
+		
 		GetWorld()->GetTimerManager().SetTimer(
 			LostSightTimerHandle,
 			this,
