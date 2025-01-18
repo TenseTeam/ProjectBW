@@ -40,7 +40,7 @@ void UBTService_StopAttackingTarget::OnBecomeRelevant(UBehaviorTreeComponent& Ow
 	if (CachedPlayerActor)
 	{
 		CachedHealthComponent = CachedPlayerActor->FindComponentByClass<UHealthBaseComponent>();
-		LGDebug::Log("Player and HealthComponent cached", true);
+		//LGDebug::Log("Player and HealthComponent cached", true);
 	}
 
 	
@@ -54,7 +54,7 @@ void UBTService_StopAttackingTarget::TickNode(UBehaviorTreeComponent& OwnerComp,
 	{
 		if (CachedHealthComponent->IsDead())
 		{
-			LGDebug::Log("Player is dead, stopping attack", true);
+			//LGDebug::Log("Player is dead, stopping attack", true);
 
 			UBlackboardComponent* CurrentBlackboard = OwnerComp.GetBlackboardComponent();
 			if (CurrentBlackboard)

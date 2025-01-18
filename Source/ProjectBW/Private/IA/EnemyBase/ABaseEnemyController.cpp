@@ -59,7 +59,7 @@ void ABaseEnemyController::SetStateAsPassive()
 	{
 		BlackboardComp->SetValueAsEnum(TEXT("EnemyState"), uint8(EEnemyState::Passive));
 
-		LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)EEnemyState::Passive).ToString(),true);
+		//LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)EEnemyState::Passive).ToString(),true);
 	}
 
 	if (EnemyBase)
@@ -75,7 +75,7 @@ void ABaseEnemyController::SetStateAsPatrolling()
 	{
 		BlackboardComp->SetValueAsEnum(TEXT("EnemyState"), uint8 (EEnemyState::Patrolling));
 
-		LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)EEnemyState::Patrolling).ToString(),true);
+		//LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)EEnemyState::Patrolling).ToString(),true);
 	}
 
 	if (EnemyBase)
@@ -91,7 +91,7 @@ void ABaseEnemyController::SetStateAsAttacking(AActor* Actor)
 	{
 		BlackboardComp->SetValueAsEnum(TEXT("EnemyState"), uint8(EEnemyState::Attacking));
 		BlackboardComp->SetValueAsObject(TEXT("AttackTarget"),Actor);
-		LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)EEnemyState::Attacking).ToString(),true);
+		//LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)EEnemyState::Attacking).ToString(),true);
 	}
 	
 	if (EnemyBase)

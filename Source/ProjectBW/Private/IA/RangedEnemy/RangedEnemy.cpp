@@ -11,15 +11,16 @@ ARangedEnemy::ARangedEnemy()
 	
 }
 
+void ARangedEnemy::BaseAttack_Implementation()
+{
+	
+}
+
 void ARangedEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
-void ARangedEnemy::BaseAttack(AActor* Target)
-{
-	
-}
 
 

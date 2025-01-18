@@ -14,9 +14,11 @@ class LGUEDK_API UBTService_UpdatePlayerDistance : public UBTService
 {
 	GENERATED_BODY()
 public:
+	
 	explicit UBTService_UpdatePlayerDistance(FObjectInitializer const& ObjectInitializer);
 	virtual void OnBecomeRelevant(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
+
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Blackboard")

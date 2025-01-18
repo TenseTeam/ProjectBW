@@ -24,7 +24,7 @@ void ANPCBaseController::OnPossess(APawn* InPawn)
 			UseBlackboard(tree->BlackboardAsset,BlackboardComponent);
 			Blackboard = BlackboardComponent;
 			RunBehaviorTree(tree);
-			LGDebug::Log("aic controller inizializzata",true);
+			//LGDebug::Log("aic controller inizializzata",true);
 		}
 	}
 }

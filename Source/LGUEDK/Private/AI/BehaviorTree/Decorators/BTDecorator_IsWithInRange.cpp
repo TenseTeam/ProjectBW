@@ -27,12 +27,9 @@ bool UBTDecorator_IsWithInRange::CalculateRawConditionValue(UBehaviorTreeCompone
 		return false;
 	}
 
-	const FVector SelfPosition = BlackboardComp->GetValueAsVector(SelfPositionKey.SelectedKeyName);
-	const FVector TargetPosition = BlackboardComp->GetValueAsVector(AttackTargetPositionKey.SelectedKeyName);
 	const float MaxRange = BlackboardComp->GetValueAsFloat(MaxAttackRadiusKey.SelectedKeyName);
 	const float MinRange = BlackboardComp->GetValueAsFloat(MinAttackRadiusKey.SelectedKeyName);
-
-	const float DistanceFromPlayer = FVector::Distance(TargetPosition, SelfPosition);
+	float DistanceFromPlayer = BlackboardComp->GetValueAsFloat(DistanceFromPlayerKey.SelectedKeyName);
 	
 	//LGDebug::Log("DistanceFromPlayer: " + FString::SanitizeFloat(DistanceFromPlayer), true);
 	// LGDebug::Log("MaxRange: " + FString::SanitizeFloat(MaxRange), true);

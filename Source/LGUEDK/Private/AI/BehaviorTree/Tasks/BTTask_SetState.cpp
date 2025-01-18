@@ -30,7 +30,7 @@ EBTNodeResult::Type UBTTask_SetState::ExecuteTask(UBehaviorTreeComponent& OwnerC
 	
 	BlackboardComp->SetValueAsEnum(TEXT("EnemyState"), uint8 (DesiredState));
 	
-	LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)DesiredState).ToString(),true);
+	//LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)DesiredState).ToString(),true);
 
 	FinishLatentTask(OwnerComp,EBTNodeResult::Succeeded);
 	return EBTNodeResult::Succeeded;
