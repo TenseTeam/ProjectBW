@@ -16,10 +16,10 @@ class PROJECTBW_API UBWWeaponsFactory : public UBlueprintFunctionLibrary
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "ProjectBW|WeaponSystem")
-	static AWeaponBase* CreateWeapon(UObject* Instigator, UWeaponItem* WeaponItem);
+	static AWeaponBase* CreateWeapon(APawn* Owner, UWeaponItem* WeaponItem);
 
 	UFUNCTION(BlueprintCallable, Category = "ProjectBW|WeaponSystem")
-	static AWeaponFirearm* CreateWeaponFirearm(UObject* Instigator, UWeaponFirearmItem* WeaponItem);
+	static AWeaponFirearm* CreateWeaponFirearm(APawn* Owner, UWeaponFirearmItem* WeaponItem);
 
 private:
 	static AActor* SpawnWeaponActor(const UObject* Instigator, const UWeaponItem* WeaponItem);

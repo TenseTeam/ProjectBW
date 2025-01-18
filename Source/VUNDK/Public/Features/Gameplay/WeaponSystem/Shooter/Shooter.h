@@ -31,8 +31,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Init(const TArray<UShootPoint*> InShootPoints);
 
+	UFUNCTION(BlueprintCallable)
+	void SetOwner(APawn* InOwner) const;
+
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
 	bool Shoot(const EShootType ShootType = EShootType::Simultaneous) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure = false)
+	void ResetRecoil() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
 	int32 Refill(const int32 Ammo) const;

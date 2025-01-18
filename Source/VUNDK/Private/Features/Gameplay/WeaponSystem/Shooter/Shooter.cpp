@@ -18,12 +18,22 @@ void UShooter::Init(const TArray<UShootPoint*> InShootPoints)
 	ShooterBehaviour->Init(this, ShootData, ShootPoints);
 }
 
+void UShooter::SetOwner(APawn* InOwner) const
+{
+	ShooterBehaviour->SetOwner(InOwner);
+}
+
 bool UShooter::Shoot(const EShootType ShootType) const
 {
 	if (!Check())
 		return false;
 	
 	return ShooterBehaviour->Shoot(ShootType);
+}
+
+void UShooter::ResetRecoil() const
+{
+	ShooterBehaviour->ResetRecoil();
 }
 
 int32 UShooter::Refill(const int32 Ammo) const
@@ -53,6 +63,10 @@ int32 UShooter::GetCurrentAmmo() const
 void UShooter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+
+	if (!Check())
+		return;
+	
 	ShooterBehaviour->DisableBehaviour();
 }
 

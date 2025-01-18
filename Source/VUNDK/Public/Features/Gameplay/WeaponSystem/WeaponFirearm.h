@@ -21,6 +21,11 @@ protected:
 public:
 	AWeaponFirearm();
 
+	virtual void Init(APawn* InOwner) override;
+
+	UFUNCTION(BlueprintCallable)
+	void ResetRecoil() const;
+
 	virtual void SetWeaponDamage(const float NewDamage) override;
 
 	void SetWeaponFireRate(const float NewFireRate) const;

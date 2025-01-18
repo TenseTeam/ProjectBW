@@ -8,6 +8,12 @@ AWeaponBase::AWeaponBase()
 	MeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
 }
 
+void AWeaponBase::Init(APawn* InOwner)
+{
+	SetOwner(InOwner);
+	SetInstigator(InOwner);
+}
+
 void AWeaponBase::SetWeaponDamage(const float NewDamage)
 {
 	WeaponData.Damage = NewDamage;

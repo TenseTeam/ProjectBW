@@ -47,12 +47,15 @@ public:
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	UShooter* Shooter;
+	UPROPERTY(BlueprintReadOnly)
+	APawn* Owner;
 
 private:
 	UPROPERTY()
 	TArray<UShootPoint*> ShootPoints;
 	FShootData ShootData;
 	int32 CurrentAmmo;
+	int32 ShotsFired;
 	bool bIsInCooldown;
 	int32 CurrentShootPointIndex;
 	bool bIsBehaviourActive;
@@ -60,6 +63,8 @@ private:
 public:
 	virtual void Init(UShooter* InShooter, const FShootData InShootData, const TArray<UShootPoint*> InShootPoints);
 
+	void SetOwner(APawn* InOwner);
+	
 	UFUNCTION(BlueprintCallable)
 	void EnableBehaviour();
 	
@@ -68,6 +73,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
 	virtual bool Shoot(const EShootType ShootType = EShootType::Simultaneous) override;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure = false)
+	void ResetRecoil();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
 	virtual int32 Refill(const int32 Ammo) override;
@@ -115,8 +123,8 @@ public:
 #endif
 	
 protected:
-	void ShootSuccess(UShootPoint* ShootPoint) const;
-
+	void ShootSuccess(UShootPoint* ShootPoint);
+	
 	void ShootFail();
 	
 	UFUNCTION(BlueprintNativeEvent)
@@ -129,7 +137,10 @@ protected:
 	void OnBehaviourDisabled();
 	
 	UFUNCTION(BlueprintNativeEvent)
-	void OnShootSuccess(UShootPoint* ShootPoint, const FVector& ShooterTargetLocation, const FVector& ShootPointDirectionToTarget) const;
+	void OnDeployShoot(UShootPoint* ShootPoint, const bool bIsUsingCameraHitTargetLocation, const FVector& TargetLocation, const FVector& DirectionToTarget) const;
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnShootSuccess(UShootPoint* ShootPoint, const FVector& TargetLocation, const FVector& DirectionToTarget) const;
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void OnShootFail();
@@ -137,7 +148,7 @@ protected:
 	UFUNCTION(BlueprintNativeEvent)
 	void OnRefill();
 	
-	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
+	UFUNCTION(BlueprintNativeEvent)
 	FVector CalculateShooterTargetLocation() const;
 	
 	UFUNCTION(BlueprintPure)
@@ -147,8 +158,12 @@ protected:
 	bool TryGetCameraPoints(FVector& OutStartPoint, FVector& OutEndPoint, FVector& OutHitPoint) const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsInLineOfSight(const FVector& StartPoint, const FVector& TargetPoint, const float Tolerance = 1.0f) const;
+	bool IsInLineOfSight(const FVector& StartPoint, const FVector& TargetPoint, const float Tolerance = 50.0f) const;
 
+	void ApplyRecoil() const;
+
+	virtual bool Check() const;
+	
 private:
 	bool HandleSimultaneousShoot();
 
@@ -165,6 +180,4 @@ private:
 	void StartShootCooldown();
 
 	void EndShootCooldown();
-
-	bool Check() const;
 };

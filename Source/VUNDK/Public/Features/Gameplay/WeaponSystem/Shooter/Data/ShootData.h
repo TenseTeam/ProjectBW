@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Curves/CurveVector.h"
 #include "Engine/DataAsset.h"
 #include "ShootData.generated.h"
 
@@ -21,4 +22,8 @@ struct VUNDK_API FShootData
 	int32 MagSize;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TEnumAsByte<ECollisionChannel> DamageChannel = ECollisionChannel::ECC_Visibility;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bHasRecoil;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition = "bHasRecoil", HideEditCondition, ToolTip = "Recoil curve for Y (Pitch) and Z (Yaw) axes."))
+	UCurveVector* RecoilCurve;
 };

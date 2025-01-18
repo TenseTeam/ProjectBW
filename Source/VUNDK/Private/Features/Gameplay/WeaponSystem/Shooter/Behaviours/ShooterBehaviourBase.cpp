@@ -17,12 +17,23 @@ void UShooterBehaviourBase::Init(UShooter* InShooter, const FShootData InShootDa
 		UE_LOG(LogShooter, Error, TEXT("ShootPoints in %s is empty."), *GetName());
 		return;
 	}
-
+	
 	ShootData = InShootData;
 	Shooter = InShooter;
 	ShootPoints = InShootPoints;
 	EnableBehaviour();
 	OnInit();
+}
+
+void UShooterBehaviourBase::SetOwner(APawn* InOwner)
+{
+	if (!IsValid(InOwner))
+	{
+		UE_LOG(LogShooter, Error, TEXT("Owner in %s is null."), *GetName());
+		return;
+	}
+	
+	Owner = InOwner;
 }
 
 void UShooterBehaviourBase::EnableBehaviour()
@@ -40,7 +51,10 @@ void UShooterBehaviourBase::DisableBehaviour()
 bool UShooterBehaviourBase::Shoot(const EShootType ShootType)
 {
 	if (!Check())
+	{
+		UE_LOG(LogShooter, Error, TEXT("Shoot() in %s failed check."), *GetName());
 		return false;
+	}
 
 	if (bIsInCooldown)
 		return false;
@@ -68,11 +82,13 @@ bool UShooterBehaviourBase::Shoot(const EShootType ShootType)
 	return true;
 }
 
+void UShooterBehaviourBase::ResetRecoil()
+{
+	ShotsFired = 0;
+}
+
 int32 UShooterBehaviourBase::Refill(const int32 Ammo)
 {
-	if (!Check())
-		return 0;
-
 	ModifyCurrentAmmo(Ammo);
 	OnRefill();
 	OnBehaviourRefill.Broadcast(CurrentAmmo);
@@ -186,13 +202,19 @@ bool UShooterBehaviourBase::ImplementsGetWorld() const
 }
 #endif
 
-void UShooterBehaviourBase::ShootSuccess(UShootPoint* ShootPoint) const
+void UShooterBehaviourBase::ShootSuccess(UShootPoint* ShootPoint)
 {
 	const FVector ShooterTargetLocation = GetShooterTargetLocation();
 	FVector ShootPointDirToTarget = ShooterTargetLocation - ShootPoint->GetShootPointLocation();
 	ShootPointDirToTarget.Normalize();
+	OnDeployShoot(ShootPoint, bUseCameraTargetLocation, ShooterTargetLocation, ShootPointDirToTarget);
 	OnShootSuccess(ShootPoint, ShooterTargetLocation, ShootPointDirToTarget);
 	OnBehaviourShootSuccess.Broadcast(ShootPoint);
+
+	if (ShootData.bHasRecoil)
+		ApplyRecoil();
+
+	ShotsFired++;
 }
 
 void UShooterBehaviourBase::ShootFail()
@@ -209,11 +231,15 @@ void UShooterBehaviourBase::OnBehaviourDisabled_Implementation()
 {
 }
 
-void UShooterBehaviourBase::OnInit_Implementation()
+void UShooterBehaviourBase::OnDeployShoot_Implementation(UShootPoint* ShootPoint, const bool bIsUsingCameraHitTargetLocation, const FVector& TargetLocation, const FVector& DirectionToTarget) const
 {
 }
 
-void UShooterBehaviourBase::OnShootSuccess_Implementation(UShootPoint* ShootPoint, const FVector& ShooterTargetLocation, const FVector& ShootPointDirectionToTarget) const
+void UShooterBehaviourBase::OnShootSuccess_Implementation(UShootPoint* ShootPoint, const FVector& TargetLocation, const FVector& DirectionToTarget) const
+{
+}
+
+void UShooterBehaviourBase::OnInit_Implementation()
 {
 }
 
@@ -264,8 +290,8 @@ bool UShooterBehaviourBase::TryGetCameraPoints(FVector& OutStartPoint, FVector& 
 	OutStartPoint = CameraManager->GetCameraCacheView().Location;
 	OutEndPoint = OutStartPoint + CameraManager->GetCameraCacheView().Rotation.Vector() * GetRange();
 	OutHitPoint = OutEndPoint;
-
-	if (FHitResult HitResult; World->LineTraceSingleByChannel(HitResult, OutStartPoint, OutEndPoint, ECollisionChannel::ECC_Camera))
+	
+	if (FHitResult HitResult; World->LineTraceSingleByChannel(HitResult, OutStartPoint, OutEndPoint, ECC_Visibility))
 		OutHitPoint = HitResult.ImpactPoint;
 
 	return true;
@@ -283,8 +309,33 @@ bool UShooterBehaviourBase::IsInLineOfSight(const FVector& StartPoint, const FVe
 
 	if (FHitResult HitResult; World->LineTraceSingleByChannel(HitResult, StartPoint, TargetPoint, ECC_Visibility))
 		return HitResult.ImpactPoint.Equals(TargetPoint, Tolerance);
-
+	
 	return true;
+}
+
+void UShooterBehaviourBase::ApplyRecoil() const
+{
+	if (!IsValid(ShootData.RecoilCurve))
+	{
+		UE_LOG(LogShooter, Error, TEXT("RecoilCurve is null in %s."), *GetName());
+		return;
+	}
+
+	if (!IsValid(Owner))
+	{
+		UE_LOG(LogShooter, Error, TEXT("Owner is null in %s."), *GetName());
+		return;
+	}
+
+	const float RecoilPitch = ShootData.RecoilCurve->GetVectorValue(ShotsFired).Y;
+	const float RecoilYaw = ShootData.RecoilCurve->GetVectorValue(ShotsFired).Z;
+	Owner->AddControllerPitchInput(-RecoilPitch);
+	Owner->AddControllerYawInput(RecoilYaw);
+}
+
+bool UShooterBehaviourBase::Check() const
+{
+	return IsValid(Shooter) && bIsBehaviourActive;
 }
 
 bool UShooterBehaviourBase::HandleSimultaneousShoot()
@@ -380,9 +431,4 @@ void UShooterBehaviourBase::StartShootCooldown()
 void UShooterBehaviourBase::EndShootCooldown()
 {
 	bIsInCooldown = false;
-}
-
-bool UShooterBehaviourBase::Check() const
-{
-	return IsValid(Shooter) && bIsBehaviourActive;
 }

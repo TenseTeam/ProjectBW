@@ -21,10 +21,10 @@ public:
 #endif
 	
 protected:
-	virtual void OnShootSuccess_Implementation(UShootPoint* ShootPoint, const FVector& ShooterTargetLocation, const FVector& ShootPointDirectionToTarget) const override;
-
+	virtual void OnDeployShoot_Implementation(UShootPoint* ShootPoint, const bool bIsUsingCameraHitTargetLocation, const FVector& TargetLocation, const FVector& DirectionToTarget) const override;
+	
 	UFUNCTION(BlueprintNativeEvent)
-	void OnLineTraceDamage(const TArray<FHitResult>& TraceHitResults, const TArray<FHitResult>& DamageHitResults) const;
+	void OnHitResults(const FVector& HitLocation, const TArray<FHitResult>& TraceHitResults, const TArray<FHitResult>& DamageHitResults) const;
 	
 private:
 	void TraceFromCamera(const UWorld* World, const UShootPoint* ShootPoint) const;
