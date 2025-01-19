@@ -1,0 +1,91 @@
+// Copyright Villains, Inc. All Rights Reserved.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Components/ActorComponent.h"
+#include "Features/Gameplay/EquipmentSystem/Equipment.h"
+#include "Features/Gameplay/InventorySystem/Items/WeaponItem.h"
+#include "Features/Gameplay/WeaponSystem/WeaponBase.h"
+#include "WeaponsSwitcher.generated.h"
+
+DEFINE_LOG_CATEGORY_STATIC(LogWeaponsSwitcher, All, All);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
+	FOnNewWeaponEquipped,
+	AWeaponBase*, Weapon
+);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(
+	FOnWeaponUnequipped
+);
+
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+class PROJECTBW_API UWeaponsSwitcher : public UActorComponent
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintAssignable)
+	FOnNewWeaponEquipped OnNewWeaponEquipped;
+	UPROPERTY(BlueprintAssignable)
+	FOnWeaponUnequipped OnWeaponUnequipped;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UEquipSlotKey* WeaponEquipSlotKey;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bEquipWeaponOnFirstSlot = true;
+
+private:
+	UPROPERTY()
+	UEquipment* Equipment;
+	UPROPERTY()
+	TMap<int32, AWeaponBase*> Weapons;
+	UPROPERTY()
+	AWeaponBase* CurrentEquippedWeapon;
+	UPROPERTY()
+	APawn* OwnerPawn;
+	UPROPERTY()
+	USceneComponent* AttachToComponentUnequipped;
+	UPROPERTY()
+	USceneComponent* AttachToComponentEquipped;
+	FName EquippedWeaponAttachSocketName;
+	FName UnequippedWeaponAttachSocketName;
+
+public:
+	UWeaponsSwitcher();
+	
+	UFUNCTION(BlueprintCallable)
+	void Init(UEquipment* InEquipment, USceneComponent* InAttachToComponentEquipped, FName InEquipppedWeaponAttachSocketName, USceneComponent* InAttachToComponentUnequipped, FName InUnequipppedWeaponAttachSocketName);
+	
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	
+	UFUNCTION(BlueprintPure)
+	bool TryGetEquippedWeapon(AWeaponBase*& OutWeapon) const;
+
+	UFUNCTION(BlueprintCallable)
+	bool TryEquipWeaponAtSlot(int32 SlotIndex);
+
+	UFUNCTION(BlueprintCallable)
+	bool TryUnequipCurrentWeapon();
+
+protected:
+	void AddWeaponActor(UWeaponItem* Item, int32 SlotIndex);
+
+	void RemoveWeaponActor(int32 SlotIndex);
+
+private:
+	UFUNCTION()
+	void OnAnyItemEquipped(UEquipSlotKey* EquipSlotKey, int32 SlotIndex, UItemBase* Item);
+	
+	UFUNCTION()
+	void OnAnyItemUnequipped(UEquipSlotKey* EquipSlotKey, int32 SlotIndex, UItemBase* Item);
+
+	static void ShowWeaponActor(AWeaponBase* Weapon);
+
+	static void HideWeaponActor(AWeaponBase* Weapon);
+
+	bool IsWeapon(const UEquipSlotKey* EquipSlotKey, const UItemBase* Item) const;
+
+	bool Check() const;
+};

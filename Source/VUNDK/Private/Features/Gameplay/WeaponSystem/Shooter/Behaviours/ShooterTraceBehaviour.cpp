@@ -89,7 +89,7 @@ void UShooterTraceBehaviour::LineTraceDamage(const UWorld* World, const FVector&
 #endif
 
 	TArray<FHitResult> HitResults;
-	World->LineTraceMultiByChannel(HitResults, TraceStartPoint, TraceEndPoint, GetDamageChannel(), CollisionQueryParams);
+	World->LineTraceMultiByChannel(HitResults, TraceStartPoint, TraceEndPoint, SightTraceChannel, CollisionQueryParams);
 
 	if (HitResults.Num() > 0)
 	{

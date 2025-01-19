@@ -21,8 +21,6 @@ struct VUNDK_API FShootData
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0", UIMin = "0"))
 	int32 MagSize;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TEnumAsByte<ECollisionChannel> DamageChannel = ECollisionChannel::ECC_Visibility;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bHasRecoil;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition = "bHasRecoil", HideEditCondition, ToolTip = "Recoil curve for Y (Pitch) and Z (Yaw) axes."))
 	UCurveVector* RecoilCurve;

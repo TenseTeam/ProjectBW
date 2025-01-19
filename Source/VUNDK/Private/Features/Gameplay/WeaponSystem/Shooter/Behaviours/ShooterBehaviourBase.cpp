@@ -181,11 +181,6 @@ int32 UShooterBehaviourBase::GetCurrentAmmo() const
 	return CurrentAmmo;
 }
 
-TEnumAsByte<ECollisionChannel> UShooterBehaviourBase::GetDamageChannel() const
-{
-	return ShootData.DamageChannel;
-}
-
 UWorld* UShooterBehaviourBase::GetWorld() const
 {
 	if (!IsValid(Shooter))
@@ -291,7 +286,7 @@ bool UShooterBehaviourBase::TryGetCameraPoints(FVector& OutStartPoint, FVector& 
 	OutEndPoint = OutStartPoint + CameraManager->GetCameraCacheView().Rotation.Vector() * GetRange();
 	OutHitPoint = OutEndPoint;
 	
-	if (FHitResult HitResult; World->LineTraceSingleByChannel(HitResult, OutStartPoint, OutEndPoint, ECC_Visibility))
+	if (FHitResult HitResult; World->LineTraceSingleByChannel(HitResult, OutStartPoint, OutEndPoint, SightTraceChannel))
 		OutHitPoint = HitResult.ImpactPoint;
 
 	return true;
@@ -307,7 +302,7 @@ bool UShooterBehaviourBase::IsInLineOfSight(const FVector& StartPoint, const FVe
 		return false;
 	}
 
-	if (FHitResult HitResult; World->LineTraceSingleByChannel(HitResult, StartPoint, TargetPoint, ECC_Visibility))
+	if (FHitResult HitResult; World->LineTraceSingleByChannel(HitResult, StartPoint, TargetPoint, SightTraceChannel))
 		return HitResult.ImpactPoint.Equals(TargetPoint, Tolerance);
 	
 	return true;

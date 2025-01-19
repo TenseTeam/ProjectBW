@@ -39,6 +39,8 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnRefill OnBehaviourRefill;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TEnumAsByte<ECollisionChannel> SightTraceChannel = ECollisionChannel::ECC_Visibility;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bHasInfiniteAmmo = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -112,9 +114,6 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	virtual int32 GetCurrentAmmo() const override;
-
-	UFUNCTION(BlueprintPure)
-	TEnumAsByte<ECollisionChannel> GetDamageChannel() const;
 	
 	virtual UWorld* GetWorld() const override;
 

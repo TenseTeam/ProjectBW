@@ -45,7 +45,7 @@ bool UEquipment::TryEquipItem(UItemBase* Item, UEquipSlotKey* TargetSlotKey, con
 
 	if (Item->IsEquipped())
 	{
-		ChangeItemEquipSlot(Item, ItemSlotKey, SlotIndex); // If the item is already equipped, unequip it first
+		ChangeItemEquipSlot(Item, ItemSlotKey, SlotIndex); // If the item is already equipped, change the slot
 		return true;
 	}
 	
@@ -164,11 +164,10 @@ void UEquipment::ChangeItemEquipSlot(UItemBase* Item, UEquipSlotKey* EquipSlotKe
 		return;
 	}
 	
-	AddItemInEquipSlot(nullptr, EquipSlotKey, *OldSlotKeyRef);
-	AddItemInEquipSlot(Item, EquipSlotKey, NewSlotIndex);
-	Item->SetEquipSlot(this, NewSlotIndex);
-
+	UnequipItem(Item, EquipSlotKey);
+	EquipItem(Item, EquipSlotKey, NewSlotIndex);
 	OnAnyItemEquipSlotChanged.Broadcast(EquipSlotKey, Item, NewSlotIndex, *OldSlotKeyRef);
+	OnEquipChanged.Broadcast();
 }
 
 void UEquipment::OnItemAddedToAnyInventory(UItemBase* Item, UInventoryBase* Inventory)

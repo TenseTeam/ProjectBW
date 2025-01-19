@@ -31,20 +31,25 @@ protected:
 	
 private:
 	float Damage;
-	float LifeSpan;
-	float HitRadius;
+	float Range;
 	FTimerHandle LifeSpanTimerHandle;
 
 public:
 	AProjectileBase();
+	
+	void Init(AActor* InInstigator, float InDamage, float InRange, float InSpeed, const FVector& InDirection);
 
-	void Init(AActor* InInstigator, const float InDamage, const float InLifeSpan, const FVector& InVelocity);
+	UFUNCTION(BlueprintNativeEvent)
+	void InitVelocityAndLifeSpan(float InRange, float InSpeed, const FVector& InDirection);
 
 	UFUNCTION(BlueprintCallable)
 	void SetVelocity(const FVector NewVelocity) const;
 
 	UFUNCTION(BlueprintPure)
 	float GetDamage() const;
+
+	UFUNCTION(BlueprintCallable)
+	float GetRange() const;
 
 	UFUNCTION(BlueprintCallable)
 	void ApplyProjectileDamage(AActor* TargetActor);
@@ -59,15 +64,18 @@ protected:
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	
+	void SetProjectileLifeSpan(float InLifeSpan);
+	
 	UFUNCTION(BlueprintNativeEvent)
 	void OnProjectileHit(const FHitResult& ImpactResult, const FVector& ImpactVelocity);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnProjectileLifeSpanEnd();
-
+	
 private:
 	UFUNCTION()
-	void ProjectileHit(const FHitResult& ImpactResult, const FVector& ImpactVelocity);
+	void ProjectileLifeSpanEnd();
 	
-	void SetProjectileLifeSpan(float InLifeSpan = 0.f);
+	UFUNCTION()
+	void ProjectileHit(const FHitResult& ImpactResult, const FVector& ImpactVelocity);
 };

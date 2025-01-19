@@ -15,9 +15,11 @@ class PROJECTBW_API UBWWeaponsFactory : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
+	static AWeaponBase* CreateWeaponBase(APawn* Owner, UWeaponItem* WeaponItem);
+
 	UFUNCTION(BlueprintCallable, Category = "ProjectBW|WeaponSystem")
 	static AWeaponBase* CreateWeapon(APawn* Owner, UWeaponItem* WeaponItem);
-
+	
 	UFUNCTION(BlueprintCallable, Category = "ProjectBW|WeaponSystem")
 	static AWeaponFirearm* CreateWeaponFirearm(APawn* Owner, UWeaponFirearmItem* WeaponItem);
 

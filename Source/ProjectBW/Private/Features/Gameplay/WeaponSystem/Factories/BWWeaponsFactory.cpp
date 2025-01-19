@@ -3,7 +3,7 @@
 #include "Features/Gameplay/WeponSystem/Factories/BWWeaponsFactory.h"
 #include "Features/Gameplay/InventorySystem/Data/WeaponItemData.h"
 
-AWeaponBase* UBWWeaponsFactory::CreateWeapon(APawn* Owner, UWeaponItem* WeaponItem)
+AWeaponBase* UBWWeaponsFactory::CreateWeaponBase(APawn* Owner, UWeaponItem* WeaponItem)
 {
 	AWeaponBase* WeaponBase = Cast<AWeaponBase>(SpawnWeaponActor(Owner, WeaponItem));
 
@@ -13,6 +13,14 @@ AWeaponBase* UBWWeaponsFactory::CreateWeapon(APawn* Owner, UWeaponItem* WeaponIt
 	WeaponBase->Init(Owner);
 	WeaponBase->SetWeaponDamage(WeaponItem->GetWeaponDamage());
 	return WeaponBase;
+}
+
+AWeaponBase* UBWWeaponsFactory::CreateWeapon(APawn* Owner, UWeaponItem* WeaponItem)
+{
+	if (WeaponItem->IsA(UWeaponFirearmItem::StaticClass()))
+		return CreateWeaponFirearm(Owner, Cast<UWeaponFirearmItem>(WeaponItem));
+	
+	return CreateWeaponBase(Owner, WeaponItem);
 }
 
 AWeaponFirearm* UBWWeaponsFactory::CreateWeaponFirearm(APawn* Owner, UWeaponFirearmItem* WeaponItem)
