@@ -22,6 +22,9 @@ struct VUNDK_API FShootData
 	int32 MagSize;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bHasRecoil;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition = "bHasRecoil", HideEditCondition, ToolTip = "Recoil curve for Y (Pitch) and Z (Yaw) axes."))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition = "bHasRecoil", EditConditionHides, ClampMin = "0", UIMin = "0", ClampMax = "1", UIMax = "1"))
+	float RecoilStrength = 1.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition = "bHasRecoil", EditConditionHides,
+		ToolTip = "The Horizontal axis is the number of shots fired while the Vertical axis is the recoil strength."))
 	UCurveVector* RecoilCurve;
 };

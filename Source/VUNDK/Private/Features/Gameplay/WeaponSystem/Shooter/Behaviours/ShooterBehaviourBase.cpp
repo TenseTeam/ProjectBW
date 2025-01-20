@@ -85,6 +85,7 @@ bool UShooterBehaviourBase::Shoot(const EShootType ShootType)
 void UShooterBehaviourBase::ResetRecoil()
 {
 	ShotsFired = 0;
+	PunchRecoil = FRotator::ZeroRotator;
 }
 
 int32 UShooterBehaviourBase::Refill(const int32 Ammo)
@@ -100,12 +101,13 @@ void UShooterBehaviourBase::RefillAllMagazine()
 	Refill(GetMagSize());
 }
 
-void UShooterBehaviourBase::SetShootParams(const float NewDamage, const float NewFireRate, const float NewRange, const int32 NewMagSize)
+void UShooterBehaviourBase::SetShootParams(const float NewDamage, const float NewFireRate, const float NewRange, const int32 NewMagSize, const int32 NewRecoilStrength)
 {
 	SetDamage(NewDamage);
 	SetFireRate(NewFireRate);
 	SetRange(NewRange);
 	SetMagSize(NewMagSize);
+	SetRecoilStrength(NewRecoilStrength);
 }
 
 void UShooterBehaviourBase::SetDamage(const float NewDamage)
@@ -156,9 +158,15 @@ void UShooterBehaviourBase::SetMagSize(const int32 NewMagSize)
 	ShootData.MagSize = NewMagSize;
 }
 
+void UShooterBehaviourBase::SetRecoilStrength(float NewRecoilStrength)
+{
+	NewRecoilStrength = FMath::Clamp(NewRecoilStrength, 0.f, 1.f);
+	ShootData.RecoilStrength = NewRecoilStrength;
+}
+
 float UShooterBehaviourBase::GetRange_Implementation() const
 {
-	return ShootData.Range * 100.f;
+	return ShootData.Range * RangeMultiplier;
 }
 
 float UShooterBehaviourBase::GetFireRate_Implementation() const
@@ -174,6 +182,11 @@ float UShooterBehaviourBase::GetDamage_Implementation() const
 int32 UShooterBehaviourBase::GetMagSize_Implementation() const
 {
 	return ShootData.MagSize;
+}
+
+float UShooterBehaviourBase::GetRecoilStrength_Implementation() const
+{
+	return ShootData.RecoilStrength * RecoilStrengthMultiplier;
 }
 
 int32 UShooterBehaviourBase::GetCurrentAmmo() const
@@ -204,11 +217,8 @@ void UShooterBehaviourBase::ShootSuccess(UShootPoint* ShootPoint)
 	ShootPointDirToTarget.Normalize();
 	OnDeployShoot(ShootPoint, bUseCameraTargetLocation, ShooterTargetLocation, ShootPointDirToTarget);
 	OnShootSuccess(ShootPoint, ShooterTargetLocation, ShootPointDirToTarget);
+	ApplyRecoilPunch();
 	OnBehaviourShootSuccess.Broadcast(ShootPoint);
-
-	if (ShootData.bHasRecoil)
-		ApplyRecoil();
-
 	ShotsFired++;
 }
 
@@ -216,6 +226,16 @@ void UShooterBehaviourBase::ShootFail()
 {
 	OnShootFail();
 	OnBehaviourShootFail.Broadcast();
+}
+
+void UShooterBehaviourBase::TickBehaviour(const float DeltaTime)
+{
+	OnTickBehaviour(DeltaTime);
+	ProcessRecoilPunchRotation(DeltaTime);
+}
+
+void UShooterBehaviourBase::OnTickBehaviour_Implementation(const float DeltaTime)
+{
 }
 
 void UShooterBehaviourBase::OnBehaviourEnabled_Implementation()
@@ -308,29 +328,38 @@ bool UShooterBehaviourBase::IsInLineOfSight(const FVector& StartPoint, const FVe
 	return true;
 }
 
-void UShooterBehaviourBase::ApplyRecoil() const
+bool UShooterBehaviourBase::Check() const
 {
-	if (!IsValid(ShootData.RecoilCurve))
-	{
-		UE_LOG(LogShooter, Error, TEXT("RecoilCurve is null in %s."), *GetName());
+	return IsValid(Shooter) && bIsBehaviourActive;
+}
+
+void UShooterBehaviourBase::ApplyRecoilPunch()
+{
+	if (!ShootData.bHasRecoil || !IsValid(ShootData.RecoilCurve))
 		return;
-	}
 
 	if (!IsValid(Owner))
 	{
-		UE_LOG(LogShooter, Error, TEXT("Owner is null in %s."), *GetName());
+		UE_LOG(LogShooter, Error, TEXT("UShooterBehaviourBase::ApplyRecoilPunch: Owner is null in %s."), *GetName());
 		return;
 	}
 
 	const float RecoilPitch = ShootData.RecoilCurve->GetVectorValue(ShotsFired).Y;
 	const float RecoilYaw = ShootData.RecoilCurve->GetVectorValue(ShotsFired).Z;
-	Owner->AddControllerPitchInput(-RecoilPitch);
-	Owner->AddControllerYawInput(RecoilYaw);
+	PunchRecoil = FRotator(RecoilPitch, RecoilYaw, 0.0f);
 }
 
-bool UShooterBehaviourBase::Check() const
+void UShooterBehaviourBase::ProcessRecoilPunchRotation(const float DeltaTime) const
 {
-	return IsValid(Shooter) && bIsBehaviourActive;
+	if (!IsValid(Owner))
+	{
+		UE_LOG(LogShooter, Error, TEXT("UShooterBehaviourBase::ProcessRecoilPunchRotation: Owner is null in %s."), *GetName());
+		return;
+	}
+	
+	const FRotator TargetRotation = FMath::RInterpTo(FRotator::ZeroRotator, PunchRecoil, DeltaTime, GetRecoilStrength());
+	Owner->AddControllerPitchInput(-TargetRotation.Pitch);
+	Owner->AddControllerYawInput(TargetRotation.Yaw);
 }
 
 bool UShooterBehaviourBase::HandleSimultaneousShoot()

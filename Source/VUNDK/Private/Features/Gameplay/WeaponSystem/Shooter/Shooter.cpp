@@ -70,6 +70,15 @@ void UShooter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	ShooterBehaviour->DisableBehaviour();
 }
 
+void UShooter::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
+	if (!Check())
+		return;
+	ShooterBehaviour->TickBehaviour(DeltaTime);
+}
+
 bool UShooter::Check() const
 {
 	return IsValid(ShooterBehaviour);

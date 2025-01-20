@@ -26,10 +26,15 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
 	int32, CurrentAmmo
 );
 
+constexpr float RecoilStrengthMultiplier = 100.f;
+constexpr float RangeMultiplier = 100.f;
+
 UCLASS(Abstract, Blueprintable, BlueprintType, EditInlineNew)
 class VUNDK_API UShooterBehaviourBase : public UObject, public IShooterBehaviour
 {
 	GENERATED_BODY()
+
+	friend class UShooter;
 
 public:
 	UPROPERTY(BlueprintAssignable)
@@ -61,6 +66,7 @@ private:
 	bool bIsInCooldown;
 	int32 CurrentShootPointIndex;
 	bool bIsBehaviourActive;
+	FRotator PunchRecoil;
 
 public:
 	virtual void Init(UShooter* InShooter, const FShootData InShootData, const TArray<UShootPoint*> InShootPoints);
@@ -86,7 +92,7 @@ public:
 	virtual void RefillAllMagazine() override;
 
 	UFUNCTION(BlueprintCallable)
-	void SetShootParams(const float NewDamage, const float NewFireRate, const float NewRange, const int32 NewMagSize);
+	void SetShootParams(const float NewDamage, const float NewFireRate, const float NewRange, const int32 NewMagSize, const int32 NewRecoilStrength);
 	
 	UFUNCTION(BlueprintCallable)
 	void SetDamage(const float NewDamage);
@@ -99,6 +105,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetMagSize(const int32 NewMagSize);
+
+	UFUNCTION(BlueprintCallable)
+	void SetRecoilStrength(float NewRecoilStrength);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
 	float GetDamage() const;
@@ -111,6 +120,9 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
 	int32 GetMagSize() const;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
+	float GetRecoilStrength() const;
 
 	UFUNCTION(BlueprintPure)
 	virtual int32 GetCurrentAmmo() const override;
@@ -128,6 +140,9 @@ protected:
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void OnInit();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnTickBehaviour(const float DeltaTime);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnBehaviourEnabled();
@@ -158,12 +173,16 @@ protected:
 
 	UFUNCTION(BlueprintPure)
 	bool IsInLineOfSight(const FVector& StartPoint, const FVector& TargetPoint, const float Tolerance = 50.0f) const;
-
-	void ApplyRecoil() const;
-
+	
 	virtual bool Check() const;
 	
 private:
+	void TickBehaviour(float DeltaTime);
+	
+	void ApplyRecoilPunch();
+	
+	void ProcessRecoilPunchRotation(float DeltaTime) const;
+	
 	bool HandleSimultaneousShoot();
 
 	bool HandleSequentialShoot();
