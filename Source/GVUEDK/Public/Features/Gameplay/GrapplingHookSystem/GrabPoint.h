@@ -25,4 +25,10 @@ public:
 	virtual FVector GetLandingPoint() const = 0;
 	virtual FVector GetLocation() const = 0;
 	virtual bool CanBeGrabbed(const ACharacter* Character) const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void Highlight();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void Unhighlight();
 };
