@@ -13,20 +13,22 @@ class VUNDK_API UShooterPhysicProjectileBehaviour : public UShooterBehaviourBase
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Instanced)
-	UActorPool* ProjectilePool;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0.0", UIMin = "0.0"))
-	float ProjectileMaxLifeTime = 5.0f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FName ProjectilesPoolName;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0.0", UIMin = "0.0"))
 	float ProjectileSpeed = 1000.0f;
+
+private:
+	UPROPERTY()
+	UActorPool* ProjectilePool;
 
 public:
 	UShooterPhysicProjectileBehaviour();
 
-protected:
 	virtual void Init(UShooter* InShooter, const FShootData InShootData, const TArray<UShootPoint*> InShootPoints) override;
 
-	virtual void OnBehaviourDisabled_Implementation() override;
-	
-	virtual void OnShootSuccess_Implementation(UShootPoint* ShootPoint, const FVector& ShooterTargetLocation, const FVector& ShootPointDirectionToTarget) const override;
+protected:
+	virtual void OnDeployShoot_Implementation(UShootPoint* ShootPoint, const bool bIsUsingCameraHitTargetLocation, const FVector& TargetLocation, const FVector& DirectionToTarget) const override;
+
+	virtual bool Check() const override;
 };

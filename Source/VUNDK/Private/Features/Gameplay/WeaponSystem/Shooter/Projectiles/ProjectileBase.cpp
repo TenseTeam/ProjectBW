@@ -13,27 +13,38 @@ AProjectileBase::AProjectileBase()
 	ProjectileMovementComponent->SetUpdatedComponent(MeshComponent);
 	ProjectileMovementComponent->bRotationFollowsVelocity = true;
 	ProjectileMovementComponent->bShouldBounce = true;
+	ProjectileMovementComponent->BounceVelocityStopSimulatingThreshold = 200.f;
 }
 
-void AProjectileBase::Init(AActor* InInstigator, const float InDamage, const float InLifeSpan, const FVector& InVelocity)
+void AProjectileBase::Init(AActor* InInstigator, const float InDamage, const float InRange, const float InSpeed, const FVector& InDirection)
 {
 	ProjectileInstigator = InInstigator;
 	Damage = InDamage;
-	LifeSpan = InLifeSpan;
-	SetProjectileLifeSpan(LifeSpan);
-	SetVelocity(InVelocity);
+	Range = InRange;
+	ProjectileMovementComponent->bShouldBounce = true;
+	InitVelocityAndLifeSpan(Range, InSpeed, InDirection);
+}
+
+void AProjectileBase::InitVelocityAndLifeSpan_Implementation(float InRange, float InSpeed, const FVector& InDirection)
+{
+	SetVelocity(InDirection * InSpeed);
+	SetProjectileLifeSpan(InRange / InSpeed);
 }
 
 void AProjectileBase::SetVelocity(const FVector NewVelocity) const
 {
 	ProjectileMovementComponent->SetUpdatedComponent(MeshComponent);
-	ProjectileMovementComponent->bShouldBounce = true;
 	ProjectileMovementComponent->Velocity = NewVelocity;
 }
 
 float AProjectileBase::GetDamage() const
 {
 	return Damage;
+}
+
+float AProjectileBase::GetRange() const
+{
+	return Range;
 }
 
 void AProjectileBase::ApplyProjectileDamage(AActor* TargetActor)
@@ -53,7 +64,7 @@ void AProjectileBase::DisposeProjectile()
 
 	if (!IsValid(World))
 	{
-		UE_LOG(LogShooter, Error, TEXT("ProjectileBase DisposeProjectile(), World is invalid."));
+		UE_LOG(LogShooter, Error, TEXT("ProjectileBase::DisposeProjectile: World is invalid."));
 		return;
 	}
 
@@ -78,6 +89,19 @@ void AProjectileBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	ProjectileMovementComponent->OnProjectileBounce.RemoveDynamic(this, &AProjectileBase::OnProjectileHit);
 }
 
+void AProjectileBase::SetProjectileLifeSpan(const float InLifeSpan)
+{
+	const UWorld* World = GetWorld();
+
+	if (!IsValid(World))
+	{
+		UE_LOG(LogShooter, Error, TEXT("ProjectileBase::SetProjectileLifeSpan(): World is invalid."));
+		return;
+	}
+
+	World->GetTimerManager().SetTimer(LifeSpanTimerHandle, this, &AProjectileBase::ProjectileLifeSpanEnd, InLifeSpan, false);
+}
+
 void AProjectileBase::OnProjectileHit_Implementation(const FHitResult& ImpactResult, const FVector& ImpactVelocity)
 {
 	ApplyProjectileDamage(ImpactResult.GetActor());
@@ -85,6 +109,11 @@ void AProjectileBase::OnProjectileHit_Implementation(const FHitResult& ImpactRes
 
 void AProjectileBase::OnProjectileLifeSpanEnd_Implementation()
 {
+}
+
+void AProjectileBase::ProjectileLifeSpanEnd()
+{
+	OnProjectileLifeSpanEnd();
 	DisposeProjectile();
 }
 
@@ -92,17 +121,4 @@ void AProjectileBase::ProjectileHit(const FHitResult& ImpactResult, const FVecto
 {
 	OnProjectileHit(ImpactResult, ImpactVelocity);
 	OnProjectileHitEvent.Broadcast(ImpactResult);
-}
-
-void AProjectileBase::SetProjectileLifeSpan(float InLifeSpan)
-{
-	const UWorld* World = GetWorld();
-
-	if (!IsValid(World))
-	{
-		UE_LOG(LogShooter, Error, TEXT("ProjectileBase SetProjectileLifeSpan(), World is invalid."));
-		return;
-	}
-
-	World->GetTimerManager().SetTimer(LifeSpanTimerHandle, this, &AProjectileBase::OnProjectileLifeSpanEnd, LifeSpan, false);
 }

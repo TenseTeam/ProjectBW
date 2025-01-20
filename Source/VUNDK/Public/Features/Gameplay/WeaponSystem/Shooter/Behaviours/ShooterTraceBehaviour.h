@@ -14,17 +14,21 @@ class VUNDK_API UShooterTraceBehaviour : public UShooterBehaviourBase
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "1", UIMin = "1"))
 	int32 MaxPenetration = 1;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TEnumAsByte<ECollisionChannel> DamageTraceChannel = ECollisionChannel::ECC_Visibility;
 	
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(EditDefaultsOnly)
 	bool bDrawDebugTraceLines = false;
+	UPROPERTY(EditDefaultsOnly, meta = (EditCondition = "bDrawDebugTraceLines", EditConditionHides))
+	float DebugTraceLineDuration = 5.f;
 #endif
 	
 protected:
-	virtual void OnShootSuccess_Implementation(UShootPoint* ShootPoint, const FVector& ShooterTargetLocation, const FVector& ShootPointDirectionToTarget) const override;
-
+	virtual void OnDeployShoot_Implementation(UShootPoint* ShootPoint, const bool bIsUsingCameraHitTargetLocation, const FVector& TargetLocation, const FVector& DirectionToTarget) const override;
+	
 	UFUNCTION(BlueprintNativeEvent)
-	void OnLineTraceDamage(const TArray<FHitResult>& TraceHitResults, const TArray<FHitResult>& DamageHitResults) const;
+	void OnHitResults(const FVector& HitLocation, const TArray<FHitResult>& TraceHitResults, const TArray<FHitResult>& DamageHitResults) const;
 	
 private:
 	void TraceFromCamera(const UWorld* World, const UShootPoint* ShootPoint) const;

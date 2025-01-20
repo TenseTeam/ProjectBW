@@ -15,11 +15,13 @@ class PROJECTBW_API UBWWeaponsFactory : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, Category = "ProjectBW|WeaponSystem")
-	static AWeaponBase* CreateWeapon(UObject* Instigator, UWeaponItem* WeaponItem);
+	static AWeaponBase* CreateWeaponBase(APawn* Owner, UWeaponItem* WeaponItem);
 
 	UFUNCTION(BlueprintCallable, Category = "ProjectBW|WeaponSystem")
-	static AWeaponFirearm* CreateWeaponFirearm(UObject* Instigator, UWeaponFirearmItem* WeaponItem);
+	static AWeaponBase* CreateWeapon(APawn* Owner, UWeaponItem* WeaponItem);
+	
+	UFUNCTION(BlueprintCallable, Category = "ProjectBW|WeaponSystem")
+	static AWeaponFirearm* CreateWeaponFirearm(APawn* Owner, UWeaponFirearmItem* WeaponItem);
 
 private:
 	static AActor* SpawnWeaponActor(const UObject* Instigator, const UWeaponItem* WeaponItem);
