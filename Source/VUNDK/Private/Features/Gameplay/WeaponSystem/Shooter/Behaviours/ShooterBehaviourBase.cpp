@@ -85,7 +85,7 @@ bool UShooterBehaviourBase::Shoot(const EShootType ShootType)
 void UShooterBehaviourBase::ResetRecoil()
 {
 	ShotsFired = 0;
-	PunchRecoil = FRotator::ZeroRotator;
+	ImpulseRecoil = FRotator::ZeroRotator;
 }
 
 int32 UShooterBehaviourBase::Refill(const int32 Ammo)
@@ -217,7 +217,7 @@ void UShooterBehaviourBase::ShootSuccess(UShootPoint* ShootPoint)
 	ShootPointDirToTarget.Normalize();
 	OnDeployShoot(ShootPoint, bUseCameraTargetLocation, ShooterTargetLocation, ShootPointDirToTarget);
 	OnShootSuccess(ShootPoint, ShooterTargetLocation, ShootPointDirToTarget);
-	ApplyRecoilPunch();
+	ApplyRecoilImpulse();
 	OnBehaviourShootSuccess.Broadcast(ShootPoint);
 	ShotsFired++;
 }
@@ -231,7 +231,8 @@ void UShooterBehaviourBase::ShootFail()
 void UShooterBehaviourBase::TickBehaviour(const float DeltaTime)
 {
 	OnTickBehaviour(DeltaTime);
-	ProcessRecoilPunchRotation(DeltaTime);
+	ProcessCooldown(DeltaTime);
+	ProcessRecoilImpulseRotation(DeltaTime);
 }
 
 void UShooterBehaviourBase::OnTickBehaviour_Implementation(const float DeltaTime)
@@ -333,35 +334,6 @@ bool UShooterBehaviourBase::Check() const
 	return IsValid(Shooter) && bIsBehaviourActive;
 }
 
-void UShooterBehaviourBase::ApplyRecoilPunch()
-{
-	if (!ShootData.bHasRecoil || !IsValid(ShootData.RecoilCurve))
-		return;
-
-	if (!IsValid(Owner))
-	{
-		UE_LOG(LogShooter, Error, TEXT("UShooterBehaviourBase::ApplyRecoilPunch: Owner is null in %s."), *GetName());
-		return;
-	}
-
-	const float RecoilPitch = ShootData.RecoilCurve->GetVectorValue(ShotsFired).Y;
-	const float RecoilYaw = ShootData.RecoilCurve->GetVectorValue(ShotsFired).Z;
-	PunchRecoil = FRotator(RecoilPitch, RecoilYaw, 0.0f);
-}
-
-void UShooterBehaviourBase::ProcessRecoilPunchRotation(const float DeltaTime) const
-{
-	if (!IsValid(Owner))
-	{
-		UE_LOG(LogShooter, Error, TEXT("UShooterBehaviourBase::ProcessRecoilPunchRotation: Owner is null in %s."), *GetName());
-		return;
-	}
-	
-	const FRotator TargetRotation = FMath::RInterpTo(FRotator::ZeroRotator, PunchRecoil, DeltaTime, GetRecoilStrength());
-	Owner->AddControllerPitchInput(-TargetRotation.Pitch);
-	Owner->AddControllerYawInput(TargetRotation.Yaw);
-}
-
 bool UShooterBehaviourBase::HandleSimultaneousShoot()
 {
 	if (!HasEnoughAmmoToShoot(ShootPoints.Num()))
@@ -438,6 +410,40 @@ void UShooterBehaviourBase::ModifyCurrentAmmo(const int32 AmmoValue)
 	SetCurrentAmmo(CurrentAmmo + AmmoValue);
 }
 
+void UShooterBehaviourBase::ApplyRecoilImpulse()
+{
+	if (!ShootData.bHasRecoil || !IsValid(ShootData.RecoilCurve))
+		return;
+
+	if (!IsValid(Owner))
+	{
+		UE_LOG(LogShooter, Error, TEXT("UShooterBehaviourBase::ApplyRecoilImpulse: Owner is null in %s."), *GetName());
+		return;
+	}
+
+	const float RecoilPitch = ShootData.RecoilCurve->GetVectorValue(ShotsFired).Y;
+	const float RecoilYaw = ShootData.RecoilCurve->GetVectorValue(ShotsFired).Z;
+	ImpulseRecoil = FRotator(RecoilPitch, RecoilYaw, 0.0f);
+	RecoilRemaining = ShootData.RecoilImpulseDuration;
+}
+
+void UShooterBehaviourBase::ProcessRecoilImpulseRotation(const float DeltaTime)
+{
+	if (!IsValid(Owner))
+	{
+		UE_LOG(LogShooter, Error, TEXT("UShooterBehaviourBase::ProcessRecoilImpulseRotation: Owner is null in %s."), *GetName());
+		return;
+	}
+
+	if (RecoilRemaining <= 0.0f)
+		return;
+	
+	const FRotator RecoilStep = ImpulseRecoil * (DeltaTime * GetRecoilStrength());
+	Owner->AddControllerPitchInput(-RecoilStep.Pitch);
+	Owner->AddControllerYawInput(RecoilStep.Yaw);
+	RecoilRemaining -= DeltaTime;
+}
+
 void UShooterBehaviourBase::StartShootCooldown()
 {
 	if (!IsValid(Shooter->GetWorld()))
@@ -445,11 +451,20 @@ void UShooterBehaviourBase::StartShootCooldown()
 		UE_LOG(LogShooter, Error, TEXT("ShooterBehaviour World is invalid in %s."), *GetName());
 		return;
 	}
-
-	bIsInCooldown = true;
-	FTimerHandle TimerHandle;
+	
 	const float Cooldown = 1.0f / (GetFireRate() / 60.0f);
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UShooterBehaviourBase::EndShootCooldown, Cooldown);
+	CooldownRemaining = Cooldown;
+	bIsInCooldown = true;
+}
+
+void UShooterBehaviourBase::ProcessCooldown(const float DeltaTime)
+{
+	if (!bIsInCooldown)
+		return;
+
+	CooldownRemaining -= DeltaTime;
+	if (CooldownRemaining <= 0.0f)
+		EndShootCooldown();
 }
 
 void UShooterBehaviourBase::EndShootCooldown()

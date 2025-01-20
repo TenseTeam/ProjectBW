@@ -81,6 +81,10 @@ private:
 	UFUNCTION()
 	void OnAnyItemUnequipped(UEquipSlotKey* EquipSlotKey, int32 SlotIndex, UItemBase* Item);
 
+	void WithdrawWeapon(AWeaponBase* Weapon) const;
+	
+	void AttachWeaponToUnequipSocket(AWeaponBase* Weapon) const;
+	
 	static void ShowWeaponActor(AWeaponBase* Weapon);
 
 	static void HideWeaponActor(AWeaponBase* Weapon);

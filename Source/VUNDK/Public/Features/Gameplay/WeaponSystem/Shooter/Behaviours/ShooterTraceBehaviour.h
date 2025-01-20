@@ -20,6 +20,8 @@ public:
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(EditDefaultsOnly)
 	bool bDrawDebugTraceLines = false;
+	UPROPERTY(EditDefaultsOnly, meta = (EditCondition = "bDrawDebugTraceLines", EditConditionHides))
+	float DebugTraceLineDuration = 5.f;
 #endif
 	
 protected:

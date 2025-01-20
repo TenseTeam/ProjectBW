@@ -66,7 +66,9 @@ private:
 	bool bIsInCooldown;
 	int32 CurrentShootPointIndex;
 	bool bIsBehaviourActive;
-	FRotator PunchRecoil;
+	FRotator ImpulseRecoil;
+	float CooldownRemaining;
+	float RecoilRemaining;
 
 public:
 	virtual void Init(UShooter* InShooter, const FShootData InShootData, const TArray<UShootPoint*> InShootPoints);
@@ -179,10 +181,6 @@ protected:
 private:
 	void TickBehaviour(float DeltaTime);
 	
-	void ApplyRecoilPunch();
-	
-	void ProcessRecoilPunchRotation(float DeltaTime) const;
-	
 	bool HandleSimultaneousShoot();
 
 	bool HandleSequentialShoot();
@@ -195,7 +193,13 @@ private:
 
 	void ModifyCurrentAmmo(const int32 AmmoValue);
 
+	void ApplyRecoilImpulse();
+	
+	void ProcessRecoilImpulseRotation(float DeltaTime);
+	
 	void StartShootCooldown();
+
+	void ProcessCooldown(float DeltaTime);
 
 	void EndShootCooldown();
 };

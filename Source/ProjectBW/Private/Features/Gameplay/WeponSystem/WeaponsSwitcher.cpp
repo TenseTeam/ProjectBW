@@ -21,7 +21,7 @@ void UWeaponsSwitcher::Init(UEquipment* InEquipment, USceneComponent* InAttachTo
 	UnequippedWeaponAttachSocketName = InUnequipppedWeaponAttachSocketName;
 	OwnerPawn = Cast<APawn>(GetOwner());
 	Equipment = InEquipment;
-	
+
 	Equipment->OnAnyItemEquipped.AddDynamic(this, &UWeaponsSwitcher::OnAnyItemEquipped);
 	Equipment->OnAnyItemUnequipped.AddDynamic(this, &UWeaponsSwitcher::OnAnyItemUnequipped);
 }
@@ -57,7 +57,7 @@ bool UWeaponsSwitcher::TryEquipWeaponAtSlot(const int32 SlotIndex)
 
 	if (CurrentEquippedWeapon == WeaponToEquip)
 		return true;
-	
+
 	TryUnequipCurrentWeapon();
 	CurrentEquippedWeapon = WeaponToEquip;
 	ShowWeaponActor(CurrentEquippedWeapon);
@@ -71,11 +71,7 @@ bool UWeaponsSwitcher::TryUnequipCurrentWeapon()
 	if (!Check() || !IsValid(CurrentEquippedWeapon))
 		return false;
 
-	if (IsValid(AttachToComponentUnequipped))
-		CurrentEquippedWeapon->AttachToComponent(AttachToComponentUnequipped, FAttachmentTransformRules::SnapToTargetNotIncludingScale, UnequippedWeaponAttachSocketName);
-	else
-		HideWeaponActor(CurrentEquippedWeapon);
-
+	WithdrawWeapon(CurrentEquippedWeapon);
 	CurrentEquippedWeapon = nullptr;
 	OnWeaponUnequipped.Broadcast();
 	return true;
@@ -90,11 +86,12 @@ void UWeaponsSwitcher::AddWeaponActor(UWeaponItem* Item, const int32 SlotIndex)
 	if (!IsValid(Weapon))
 		return;
 
-	HideWeaponActor(Weapon);
 	Weapons.Add(SlotIndex, Weapon);
 
 	if (bEquipWeaponOnFirstSlot && SlotIndex == 0)
 		TryEquipWeaponAtSlot(SlotIndex);
+	else
+		WithdrawWeapon(Weapon);
 }
 
 void UWeaponsSwitcher::RemoveWeaponActor(const int32 SlotIndex)
@@ -104,7 +101,7 @@ void UWeaponsSwitcher::RemoveWeaponActor(const int32 SlotIndex)
 
 	if (AWeaponBase* Weapon = Weapons.FindRef(SlotIndex); IsValid(Weapon))
 		Weapon->Destroy();
-	
+
 	Weapons.Remove(SlotIndex);
 }
 
@@ -136,11 +133,27 @@ void UWeaponsSwitcher::OnAnyItemUnequipped(UEquipSlotKey* EquipSlotKey, int32 Sl
 	RemoveWeaponActor(SlotIndex);
 }
 
+void UWeaponsSwitcher::WithdrawWeapon(AWeaponBase* Weapon) const
+{
+	if (IsValid(AttachToComponentUnequipped))
+		AttachWeaponToUnequipSocket(Weapon);
+	else
+		HideWeaponActor(Weapon);
+}
+
+void UWeaponsSwitcher::AttachWeaponToUnequipSocket(AWeaponBase* Weapon) const
+{
+	if (!IsValid(Weapon))
+		return;
+
+	Weapon->AttachToComponent(AttachToComponentUnequipped, FAttachmentTransformRules::SnapToTargetNotIncludingScale, UnequippedWeaponAttachSocketName);
+}
+
 void UWeaponsSwitcher::ShowWeaponActor(AWeaponBase* Weapon)
 {
 	if (!IsValid(Weapon))
 		return;
-	
+
 	Weapon->SetActorHiddenInGame(false);
 }
 
@@ -148,7 +161,7 @@ void UWeaponsSwitcher::HideWeaponActor(AWeaponBase* Weapon)
 {
 	if (!IsValid(Weapon))
 		return;
-	
+
 	Weapon->SetActorHiddenInGame(true);
 }
 

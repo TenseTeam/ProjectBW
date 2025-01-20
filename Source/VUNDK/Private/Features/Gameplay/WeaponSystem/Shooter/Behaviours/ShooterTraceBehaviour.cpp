@@ -56,7 +56,7 @@ void UShooterTraceBehaviour::TraceFromCamera(const UWorld* World, const UShootPo
 	
 #if WITH_EDITORONLY_DATA
 	if (bDrawDebugTraceLines)
-		DrawDebugLine(World, ShootPointLocation, CameraHitPoint, bIsInLine ? FColor::Green : FColor::Red, false, 5.0f, 0, 1.0f);
+		DrawDebugLine(World, ShootPointLocation, CameraHitPoint, bIsInLine ? FColor::Green : FColor::Red, false, DebugTraceLineDuration, 0, 1.0f);
 #endif
 
 	LineTraceDamage(World, TraceStartPoint, TraceEndPoint);
@@ -85,7 +85,7 @@ void UShooterTraceBehaviour::LineTraceDamage(const UWorld* World, const FVector&
 
 #if WITH_EDITORONLY_DATA
 	if (bDrawDebugTraceLines)
-		DrawDebugLine(World, TraceStartPoint, TraceEndPoint, FColor::Purple, false, 5.0f, 0, 1.0f);
+		DrawDebugLine(World, TraceStartPoint, TraceEndPoint, FColor::Purple, false, DebugTraceLineDuration, 0, 1.0f);
 #endif
 
 	TArray<FHitResult> HitResults;
@@ -113,7 +113,7 @@ void UShooterTraceBehaviour::LineTraceDamage(const UWorld* World, const FVector&
 
 #if WITH_EDITORONLY_DATA
 			if (bDrawDebugTraceLines)
-				DrawDebugBox(World, HitResult.ImpactPoint, FVector(5.0f), FColor::Red, false, 5.0f, 0, 1.0f);
+				DrawDebugBox(World, HitResult.ImpactPoint, FVector(5.0f), FColor::Red, false, DebugTraceLineDuration, 0, 1.0f);
 #endif
 		}
 
