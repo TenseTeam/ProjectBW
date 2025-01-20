@@ -14,27 +14,56 @@ UBTTask_FindRandomLocation::UBTTask_FindRandomLocation(FObjectInitializer const&
 EBTNodeResult::Type UBTTask_FindRandomLocation::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 
-	if (ANPCBaseController* const controller = Cast<ANPCBaseController>(OwnerComp.GetAIOwner()))
-	{
-		if (APawn* const enemy = controller->GetPawn())
-		{
-			//Get enemy initial location to use as origin
-			FVector const initialPosition = enemy->GetActorLocation();
+	 if (ANPCBaseController* const Controller = Cast<ANPCBaseController>(OwnerComp.GetAIOwner()))
+    {
+        if (APawn* const Enemy = Controller->GetPawn())
+        {
+            FVector InitialPosition = Enemy->GetActorLocation();
+            
+            float SearchRadius = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(SearchRadiusKey.SelectedKeyName);
+            
+            if (UNavigationSystemV1* const NavigationSystem = UNavigationSystemV1::GetCurrent(GetWorld()))
+            {
+                FNavLocation Location;
+                FVector BestLocation = InitialPosition;
 
-			if (UNavigationSystemV1* const navigationSystem = UNavigationSystemV1::GetCurrent(GetWorld()))
-			{
-				FNavLocation location;
-				if (navigationSystem->GetRandomReachablePointInRadius(initialPosition,SearchRadius,location))
-				{
-					OwnerComp.GetBlackboardComponent()->SetValueAsVector("TargetLocation", location.Location);
-				}
+                if (bWantExplore)
+                {
+                    if (NavigationSystem->GetRandomReachablePointInRadius(InitialPosition, SearchRadius, Location))
+                    {
+                        BestLocation = Location.Location;
+                    }
+                }
+                else
+                {
+                    if (NavigationSystem->GetRandomReachablePointInRadius(InitialPosition, SearchRadius, Location))
+                    {
+                        FVector CandidateLocation = Location.Location;
+                        
+                        float DistanceFromInitial = FVector::Distance(InitialPosition, CandidateLocation);
+                        if (DistanceFromInitial <= SearchRadius)
+                        {
+                            BestLocation = CandidateLocation;
+                        }
+                        else
+                        {
+                            // Se nessun punto valido è trovato entro il raggio, usa un punto casuale vicino
+                            NavigationSystem->GetRandomReachablePointInRadius(InitialPosition, SearchRadius, Location);
+                            BestLocation = Location.Location;
+                        }
+                    }
+                }
 
-				//finish with success
-				FinishLatentTask(OwnerComp,EBTNodeResult::Succeeded);
-				return EBTNodeResult::Succeeded;
-			}
-		}
-	}
-	
-	return EBTNodeResult::Failed;
+                // Imposta il punto selezionato sul Blackboard
+                OwnerComp.GetBlackboardComponent()->SetValueAsVector("TargetLocation", BestLocation);
+
+                // Concludi con successo
+                FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+                return EBTNodeResult::Succeeded;
+            }
+        }
+    }
+
+    // Concludi con un fallimento se qualcosa va storto
+    return EBTNodeResult::Failed;
 }

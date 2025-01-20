@@ -36,7 +36,9 @@ void ABaseEnemyController::InitializeBlackboardValues()
 		LGDebug::Log("blackboard NON INIZIALIZZATA",true);
 		return;
 	}
-	
+
+	Blackboard->SetValueAsFloat(TEXT("SearchRadius"), EnemyBase->GetSearchRadius());
+	Blackboard->SetValueAsFloat(TEXT("TimeBeforeNextStep"), EnemyBase->GetTimeBeforeNextStep());
 	Blackboard->SetValueAsVector(TEXT("TargetLocation"), FVector::ZeroVector);
 	Blackboard->SetValueAsObject(TEXT("AttackTarget"), nullptr);
 	Blackboard->SetValueAsFloat(TEXT("TimeBeforeInvestigating"), EnemyBase->GetTimeBeforeInvestigating());

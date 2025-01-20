@@ -18,7 +18,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FVector RandomPosition(FVector Position);
 
-	
+	UFUNCTION()
+	virtual float GetSearchRadius() const { return SearchRadius; }
+	UFUNCTION()
+	virtual float GetTimeBeforeNextStep() const { return TimeBeforeNextStep; }
 	UFUNCTION()
 	virtual int GetMinInvestigatingRadius() const { return MinInvestigatingRadius; }
 	UFUNCTION()
@@ -48,11 +51,17 @@ protected:
 	
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Patrolling")
+	float SearchRadius = 200;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Patrolling", meta = (ClampMin = "0", ClampMax = "10", UIMin = "0", UIMax = "10"))
+	float TimeBeforeNextStep = 5;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Investigating", meta = (ClampMin = "0", ClampMax = "1000", UIMin = "0", UIMax = "1000"))
-	int MinInvestigatingRadius = 200;
+	float MinInvestigatingRadius = 200;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Investigating", meta = (ClampMin = "0", ClampMax = "2000", UIMin = "0", UIMax = "2000"))
-	int MaxInvestigatingRadius = 600;
+	float MaxInvestigatingRadius = 600;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Investigating", meta = (ClampMin = "0", ClampMax = "10", UIMin = "0", UIMax = "10"))
 	float TimeBeforeInvestigating = 2.f;
