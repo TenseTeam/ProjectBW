@@ -65,16 +65,18 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "1", UIMin = "1", ToolTip = "The maximum number of items that can be stored in the inventory."))
 	int32 Capacity = 16;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TSet<UItemBase*> Items;
 
+protected:
+	UPROPERTY()
+	TSet<UItemBase*> Items;
+	
 private:
 	UPROPERTY()
 	UEquipment* RelatedEquipment;
 
 public:
 	UInventoryBase();
-	
+
 	UFUNCTION(BlueprintPure)
 	virtual USaveData* CreateSaveData() override;
 
@@ -82,29 +84,40 @@ public:
 	bool LoadSaveData(USaveData* SavedData) override;
 
 	UFUNCTION(BlueprintCallable)
-	void SetRelatedEquipment(UEquipment* Equipment);
-	
-	UFUNCTION(BlueprintCallable)
-	UItemBase* AddNewItem(UItemDataBase* ItemData);
+	void LinkEquipment(UEquipment* Equipment);
 
 	UFUNCTION(BlueprintCallable)
-	void AddItem(UItemBase* Item);
+	void UnlinkEquipment();
+
+	UFUNCTION(BlueprintPure)
+	UEquipment* GetEquipment() const;
 
 	UFUNCTION(BlueprintCallable)
-	bool RemoveItemOfType(UItemDataBase* ItemData);
+	UItemBase* AddNewItem(UItemDataBase* ItemData, int32& OutOverflow, const int32 Amount = 1);
+
+	UFUNCTION(BlueprintCallable)
+	bool TryAddItem(UItemBase* Item);
+
+	UFUNCTION(BlueprintCallable)
+	bool RemoveItemByDataID(UItemDataBase* ItemData);
 
 	UFUNCTION(BlueprintCallable)
 	void RemoveItem(UItemBase* Item);
 
+	UFUNCTION(BlueprintCallable)
+	void ConsumeItem(UItemDataBase* ItemData, const int32 AmountToConsume = 1, const bool bForceConsume = false) const;
+	
 	UFUNCTION(BlueprintCallable)
 	void ClearInventory();
 
 	UFUNCTION(BlueprintCallable)
 	UItemBase* Find(const UItemDataBase* ItemData) const;
 
-	UFUNCTION(BlueprintPure)
 	virtual bool IsFull() const;
-	
+
+	UFUNCTION(BlueprintPure)
+	bool IsCompletelyFull() const;
+
 	UFUNCTION(BlueprintPure)
 	virtual bool IsEmpty() const;
 
@@ -114,14 +127,21 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool HasItemOfTypeID(const UItemDataBase* ItemData) const;
 
+	UFUNCTION(BlueprintPure)
+	bool HasItemOfDataID(const UItemDataBase* ItemData) const;
+
+	UFUNCTION(BlueprintPure)
+	bool HasEnoughQuantityToConsume(const UItemDataBase* ItemData, const int32 QuantityToConsume) const;
+
 	UFUNCTION(BlueprintCallable)
-	UItemDataBase* GetItemDataByID(const FName ItemDataID) const;
+	UItemDataBase* GetItemDataFromRegistry(const FGuid ItemDataID) const;
+
+	UFUNCTION(BlueprintPure)
+	TArray<UItemBase*> GetItems(const bool bIncludeEquippedItems = true);
 
 protected:
-	TSet<UItemBase*> GetAllItems();
-	
 	void AddItemToList(UItemBase* Item);
-
+	
 	void RemoveItemFromList(UItemBase* Item);
 
 	UFUNCTION(BlueprintNativeEvent)
@@ -135,4 +155,13 @@ protected:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnClearedInventory();
+
+private:
+	bool TryIncreaseAvailableStackForNewItem(UItemDataBase* ItemData, const int32 Amount, UItemBase*& OutFoundItem, int32& OutOverflow);
+
+	bool TryIncreaseAvailableStackForItem(UItemBase* Item) const;
+	
+	UItemBase* FindAvailableStackForNewItem(const UItemDataBase* ItemData) const;
+
+	UItemBase* FindAvailableStackForItem(UItemBase* Item) const;
 };

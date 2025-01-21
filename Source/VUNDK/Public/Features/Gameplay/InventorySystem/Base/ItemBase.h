@@ -10,6 +10,7 @@
 class UClassicInventory;
 class UItemDataBase;
 class UEquipment;
+class AItemDropActor;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
 	FOnItemAdded,
@@ -43,6 +44,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
 	UItemBase*, Item
 );
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
+	FOnItemQuantityChanged,
+	UItemBase*, Item,
+	int32, Quantity
+);
+
 UCLASS(Abstract, Blueprintable, BlueprintType)
 class VUNDK_API UItemBase : public UObject
 {
@@ -63,6 +70,8 @@ public:
 	FOnItemEquipped OnItemEquipped;
 	UPROPERTY(BlueprintAssignable)
 	FOnItemUnequipped OnItemUnequipped;
+	UPROPERTY(BlueprintAssignable)
+	FOnItemQuantityChanged OnItemQuantityChanged;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UInventoryBase* RelatedInventory;
@@ -72,14 +81,19 @@ protected:
 	UItemDataBase* ItemData;
 
 private:
+	UPROPERTY()
+	UEquipment* RelatedEquipment;
+	UPROPERTY()
 	int32 EquipSlotIndex;
+	UPROPERTY()
+	int32 CurrentQuantity;
 
 public:
 	UItemBase();
 
 	FItemSaveData CreateItemBaseSaveData() const;
 
-	void LoadItemBaseSaveData(const FItemSaveData ItemSaveData);
+	void LoadItemBaseSaveData(UInventoryBase* LoadingInventory, const FItemSaveData ItemSaveData, bool& bOutHasBeenEquipped);
 
 	virtual void Init(UItemDataBase* Data);
 
@@ -90,9 +104,15 @@ public:
 
 	void DeassignInventory();
 
-	void Equip(const int32 SlotIndex);
+	void SetEquipSlot(UEquipment* InEquipment, const int32 SlotIndex);
 
-	void Unequip();
+	void ClearEquipSlot();
+
+	UFUNCTION(BlueprintPure)
+	bool IsEquipped() const;
+
+	UFUNCTION(BlueprintCallable)
+	bool TryDrop(APlayerController* PlayerController, FVector Location, FRotator Rotation);
 	
 	UFUNCTION(BlueprintCallable)
 	void Remove();
@@ -101,7 +121,7 @@ public:
 	void Use();
 
 	UFUNCTION(BlueprintCallable)
-	void Consume();
+	int32 Consume(const int32 AmountToConsume = 1);
 
 	UFUNCTION(BlueprintPure)
 	virtual FText GetItemFullName() const;
@@ -113,10 +133,39 @@ public:
 	virtual FText GetItemDescription() const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsEquipped() const;
-
+	virtual UStaticMesh* GetItemMesh() const;
+	
 	int32 GetEquipSlotIndex() const;
 
+	UFUNCTION(BlueprintPure)
+	bool CanStack() const;
+
+	UFUNCTION(BlueprintNativeEvent)
+	bool CanStackItem(UItemBase* OtherItem) const;
+	
+	UFUNCTION(BlueprintPure)
+	bool IsMaxStacked() const;
+	
+	UFUNCTION(BlueprintPure)
+	bool IsStackable() const;
+	
+	UFUNCTION(BlueprintPure)
+	int32 GetCurrentQuantity() const;
+
+	UFUNCTION(BlueprintCallable)
+	bool TryStackItem(UItemBase* Item, const int32 AmountToStack = 1);
+
+	UFUNCTION(BlueprintCallable)
+	bool TrySplitItem(const int32 AmountToSplit, UItemBase*& OutNewSplittedItem);
+	
+	int32 IncreaseQuantity(int32 Amount = 1);
+
+	int32 DecreaseQuantity(const int32 Amount = 1);
+
+	int32 SetQuantity(const int32 Quantity);
+
+	UItemBase* DuplicateItem() const;
+	
 protected:
 	virtual void OnPreInit(UItemDataBase* Data);
 	
@@ -149,4 +198,9 @@ protected:
 
 	UFUNCTION(BlueprintPure)
 	APlayerState* GetPlayerState(const int PlayerStateIndex) const;
+
+private:
+	bool CanDrop() const;
 };
+
+

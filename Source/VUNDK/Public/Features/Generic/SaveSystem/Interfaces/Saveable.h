@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright VUNDK, Inc. All Rights Reserved.
 
 #pragma once
 
@@ -11,8 +11,6 @@ UINTERFACE(BlueprintType)
 class VUNDK_API USaveable : public UInterface
 {
 	GENERATED_BODY()
-
-	
 };
 
 class ISaveable

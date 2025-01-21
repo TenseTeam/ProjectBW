@@ -1,8 +1,6 @@
 // Copyright VUNDK, Inc. All Rights Reserved.
 
 #include "Features/Gameplay/InventorySystem/ClassicInventory/ClassicInventory.h"
-
-#include "Features/Gameplay/EquipmentSystem/EquipmentManager.h"
 #include "Features/Gameplay/InventorySystem/ClassicInventory/ClassicItem.h"
 #include "Features/Gameplay/InventorySystem/ClassicInventory/Data/SaveData/ClassicInventorySaveData.h"
 #include "Features/Gameplay/InventorySystem/ClassicInventory/Data/ClassicItemSlotData.h"
@@ -20,11 +18,11 @@ USaveData* UClassicInventory::CreateSaveData()
 {
 	UClassicInventorySaveData* ClassicInventorySaveData = NewObject<UClassicInventorySaveData>();
 	
-	for (UItemBase* Item : GetAllItems())
+	for (UItemBase* Item : GetItems())
 	{
 		const UClassicItem* ClassicItem = Cast<UClassicItem>(Item);
 		FClassicItemSaveData ItemSaveData = ClassicItem->CreateClassicItemSaveData();
-		FName ItemID = Item->GetItemData()->GetItemDataID();
+		FGuid ItemID = Item->GetItemData()->ItemDataID;
 		ClassicInventorySaveData->SavedItems.Add(ItemID, ItemSaveData);
 	}
 
@@ -35,16 +33,15 @@ void UClassicInventory::LoadInventorySaveData_Implementation(UInventoryBaseSaveD
 {
 	const UClassicInventorySaveData* ClassicInventorySaveData = Cast<UClassicInventorySaveData>(InventorySaveData);
 	
-	for (const TPair<FName, FClassicItemSaveData>& LoadedItem : ClassicInventorySaveData->SavedItems)
+	for (const auto& LoadedItem : ClassicInventorySaveData->SavedItems)
 	{
-		const FName ItemID = LoadedItem.Key;
+		const FGuid ItemID = LoadedItem.Key;
 		const FClassicItemSaveData ItemSaveData = LoadedItem.Value;
 	
-		if (UItemDataBase* ItemData = GetItemDataByID(ItemID))
+		if (UItemDataBase* ItemData = GetItemDataFromRegistry(ItemID))
 		{
 			UClassicItem* ClassicItem = Cast<UClassicItem>(UISFactory::CreateItem(ItemData));
-			ClassicItem->LoadClassicItemSaveData(ItemSaveData);
-			Items.Add(ClassicItem);
+			ClassicItem->LoadClassicItemSaveData(this, ItemSaveData);
 		}
 		else
 		{

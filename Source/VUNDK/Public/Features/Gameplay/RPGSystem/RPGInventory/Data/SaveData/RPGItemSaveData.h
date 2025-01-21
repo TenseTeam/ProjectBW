@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Features/Gameplay/InventorySystem/TetrisInventory/Data/SaveData/TetrisItemSaveData.h"
-#include "Features/Gameplay/RPGSystem/RPGItemsGeneration/Data/RPGItemVisualDetails.h"
+#include "Features/Gameplay/RPGSystem/RPGItemsGeneration/Data/Visuals/RPGItemVisualDetails.h"
 #include "RPGItemSaveData.generated.h"
 
 USTRUCT(BlueprintType)
@@ -15,7 +15,7 @@ struct FRPGItemSaveData
 	UPROPERTY(BlueprintReadWrite)
 	FTetrisItemSaveData TetrisItemSaveData;
 	UPROPERTY(BlueprintReadWrite)
-	FName RarityID;
+	FGuid RarityID;
 	UPROPERTY(BlueprintReadWrite)
 	FRPGItemVisualDetails VisualDetails;
 };

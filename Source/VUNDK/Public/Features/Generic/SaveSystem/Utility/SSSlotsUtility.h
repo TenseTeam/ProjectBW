@@ -16,13 +16,19 @@ class VUNDK_API USSSlotsUtility : public UBlueprintFunctionLibrary
 	
 private:
 	static USaveManager* CurrentSaveManager;
-	static FString CurrentSlotName;
+	static FString SelectedSlotName;
 	
 public:
 	static void Init(USaveManager* SaveManager);
 
+	UFUNCTION(BlueprintCallable, Category = "VUNDK|Generic|Save System")
+	static void ClearSelectedSlotName();
+	
 	UFUNCTION(BlueprintPure, Category = "VUNDK|Generic|Save System")
 	static FString GetSelectedSlotName();
+
+	UFUNCTION(BlueprintPure, Category = "VUNDK|Generic|Save System")
+	static bool IsSelectedSlotValid();
 
 	UFUNCTION(BlueprintPure, Category = "VUNDK|Generic|Save System")
 	static bool DoesSlotFileExist(const FString& SlotName);
@@ -58,7 +64,7 @@ public:
 	static bool TryGetMostAncientSlotInfoData(FSlotInfoData& OutSlotData, ESaveTypeFilter Type = ESaveTypeFilter::All);
 	
 	UFUNCTION(BlueprintCallable, Category = "VUNDK|Generic|Save System")
-	static bool TrySelectSaveGameSlot(const FString& SlotName);
+	static bool TrySelectSaveGameSlot(const FString SlotName);
 
 	UFUNCTION(BlueprintCallable, Category = "VUNDK|Generic|Save System")
 	static bool TrySelectMostRecentSaveGame();

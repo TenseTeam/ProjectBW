@@ -23,7 +23,7 @@ public:
 	bool IsItemInRegistry(const UItemDataBase* ItemData) const;
 
 	UFUNCTION(BlueprintCallable)
-	UItemDataBase* GetItemDataFromRegistry(const FName& ItemDataID) const;
+	UItemDataBase* GetItemDataFromRegistry(const FGuid& ItemDataID) const;
 	
 protected:
 	virtual void BeginPlay() override;
