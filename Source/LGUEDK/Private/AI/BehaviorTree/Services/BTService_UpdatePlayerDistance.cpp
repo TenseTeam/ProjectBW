@@ -13,6 +13,8 @@ UBTService_UpdatePlayerDistance::UBTService_UpdatePlayerDistance(FObjectInitiali
 {
 	NodeName = " Update Player Distance";
 	
+	ForceInstancing(true);
+	
 	CachedAttackTarget = nullptr;
 	CachedBlackboardComp = nullptr;
 	CachedSelf = nullptr;
@@ -88,7 +90,9 @@ void UBTService_UpdatePlayerDistance::TickNode(UBehaviorTreeComponent& OwnerComp
 	CachedBlackboardComp->SetValueAsFloat(DistanceFromPlayerKey.SelectedKeyName, Distance);
 	
 	
-	// LGDebug::Log("player position " + CachedAttackTarget->GetActorLocation().ToString(), true);
+	//LGDebug::Log("player position " + CachedAttackTarget->GetActorLocation().ToString(), true);
+	LGDebug::Log("player position " + CachedSelf->GetName(), true);
+	
 	// LGDebug::Log("enemy position " + CachedSelf->GetActorLocation().ToString(), true);
 }
 

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "IA/EnemyBase/EnemyBase.h"
+#include "IA/Weapons/Melee/MeleeWeapon.h"
 #include "MeleeEnemy.generated.h"
 
 UCLASS()
@@ -12,21 +13,24 @@ class PROJECTBW_API AMeleeEnemy : public AEnemyBase
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
+	
 	AMeleeEnemy();
 
 	UFUNCTION()
 	bool GetWieldSword() const {return bWieldSword; }
+	
 	UFUNCTION()
 	void SetWieldSword(bool bHasSword) { bWieldSword = bHasSword; }
-	UFUNCTION()
-	void EquipSword();
-	UFUNCTION()
-	void UnequipSword();
 	
+	UFUNCTION(BlueprintCallable)
+	void PlayMontageWithNotify(UAnimMontage* MontageToPlay);
+	UFUNCTION(BlueprintCallable)
+	void EquipSword(FName SocketName);
 protected:
-	// Called when the game starts or when spawned
+	
 	virtual void BeginPlay() override;
+
+	virtual void PostInitProperties() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Melee")
 	bool bWieldSword;
@@ -37,18 +41,21 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "AI|Melee")
 	FName SwordSocketOnBack;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "AI|Melee")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Melee")
 	UAnimMontage* EquipSwordMontage;
 
-	UPROPERTY(EditDefaultsOnly, Category = "AI|Melee")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Melee")
 	UAnimMontage* UnequipSwordMontage;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "AI|Melee")
-	UStaticMesh* SwordMesh;
+	UPROPERTY(EditDefaultsOnly)
+	UChildActorComponent* ChildActor;
+
+	UPROPERTY()
+	AMeleeWeapon* MeleeWeapon;
+
 
 private:
 	
-	void PlayMontageWithNotify(UAnimMontage* MontageToPlay, const FName& NotifyName, const FName& TargetSocket);
-	void OnMontageNotifyReceived(const FName& NotifyName, const FName& TargetSocket);
+	void OnMontageNotifyReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
 	
 };
