@@ -23,6 +23,11 @@ class LGUEDK_API IAITargetInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	// virtual void ReleaseToken() = 0; ASTRATTO = 0;
-	UFUNCTION()
-	virtual void ReleaseToken(){};
+
+	UFUNCTION(BlueprintCallable,BlueprintNativeEvent)
+	void ReleaseToken(int ReturnToken);
+	UFUNCTION(BlueprintCallable,BlueprintNativeEvent)
+	bool TryGetToken(int TokenCost);
+	UFUNCTION(BlueprintCallable,BlueprintNativeEvent)
+	int GetTeamIndex();
 };

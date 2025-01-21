@@ -128,6 +128,10 @@ void ABaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 		
 		if (Actor->Implements<UAITargetInterface>())
 		{
+			int index = IAITargetInterface::Execute_GetTeamIndex(Actor);
+
+			if (index == EnemyBase->GetMyTeamIndex())return;
+			
 			if (GetWorld()->GetTimerManager().IsTimerActive(LostSightTimerHandle))
 			{
 				GetWorld()->GetTimerManager().ClearTimer(LostSightTimerHandle);
