@@ -3,6 +3,7 @@
 #include "Features/Gameplay/WeaponSystem/Shooter/Behaviours/ShooterTraceBehaviour.h"
 #include "Engine/DamageEvents.h"
 #include "Features/Gameplay/WeaponSystem/Shooter/Shooter.h"
+#include "Kismet/GameplayStatics.h"
 
 void UShooterTraceBehaviour::OnDeployShoot_Implementation(UShootPoint* ShootPoint, const bool bIsUsingCameraHitTargetLocation, const FVector& TargetLocation, const FVector& DirectionToTarget) const
 {
@@ -108,7 +109,7 @@ void UShooterTraceBehaviour::LineTraceDamage(const UWorld* World, const FVector&
 			PenetrationCount++;
 			FDamageEvent DamageEvent;
 			DamageEvent.DamageTypeClass = UDamageType::StaticClass();
-			HitResult.GetActor()->TakeDamage(GetDamage(), DamageEvent, Shooter->GetOwner()->GetInstigatorController(), Shooter->GetOwner());
+			UGameplayStatics::ApplyPointDamage(HitResult.GetActor(), GetDamage(), HitResult.ImpactNormal, HitResult, Shooter->GetOwner()->GetInstigatorController(), Shooter->GetOwner(), UDamageType::StaticClass());
 			DamageHitResults.Add(HitResult);
 
 #if WITH_EDITORONLY_DATA

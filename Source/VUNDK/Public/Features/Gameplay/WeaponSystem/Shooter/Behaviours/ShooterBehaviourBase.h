@@ -58,6 +58,8 @@ protected:
 	APawn* Owner;
 
 private:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = 0.0f, UIMin = 0.0f, AllowPrivateAccess = true))
+	int32 AmmoToConsumePerShot = 1;
 	UPROPERTY()
 	TArray<UShootPoint*> ShootPoints;
 	int32 CurrentAmmo;
@@ -74,10 +76,10 @@ public:
 	virtual void Init(UShooter* InShooter, const FShootData InShootData, const TArray<UShootPoint*> InShootPoints);
 
 	void SetOwner(APawn* InOwner);
-	
+
 	UFUNCTION(BlueprintCallable)
 	void EnableBehaviour();
-	
+
 	UFUNCTION(BlueprintCallable)
 	void DisableBehaviour();
 
@@ -95,7 +97,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetShootParams(const float NewDamage, const float NewFireRate, const float NewRange, const int32 NewMagSize, const int32 NewRecoilStrength);
-	
+
 	UFUNCTION(BlueprintCallable)
 	void SetDamage(const float NewDamage);
 
@@ -113,7 +115,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetCurrentAmmo(const int32 NewAmmo);
-	
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
 	float GetDamage() const;
 
@@ -131,18 +133,21 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	int32 GetCurrentAmmo() const;
+
+	UFUNCTION(BlueprintPure)
+	int32 GetAmmoToConsume() const;
 	
 	virtual UWorld* GetWorld() const override;
 
 #if WITH_EDITOR
 	virtual bool ImplementsGetWorld() const override;
 #endif
-	
+
 protected:
 	void ShootSuccess(UShootPoint* ShootPoint);
-	
+
 	void ShootFail();
-	
+
 	UFUNCTION(BlueprintNativeEvent)
 	void OnInit();
 
@@ -151,25 +156,25 @@ protected:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnBehaviourEnabled();
-	
+
 	UFUNCTION(BlueprintNativeEvent)
 	void OnBehaviourDisabled();
-	
+
 	UFUNCTION(BlueprintNativeEvent)
 	void OnDeployShoot(UShootPoint* ShootPoint, const bool bIsUsingCameraHitTargetLocation, const FVector& TargetLocation, const FVector& DirectionToTarget) const;
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnShootSuccess(UShootPoint* ShootPoint, const FVector& TargetLocation, const FVector& DirectionToTarget) const;
-	
+
 	UFUNCTION(BlueprintNativeEvent)
 	void OnShootFail();
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnRefill();
-	
+
 	UFUNCTION(BlueprintNativeEvent)
 	FVector CalculateShooterTargetLocation() const;
-	
+
 	UFUNCTION(BlueprintPure)
 	FVector GetShooterTargetLocation() const;
 
@@ -178,12 +183,12 @@ protected:
 
 	UFUNCTION(BlueprintPure)
 	bool IsInLineOfSight(const FVector& StartPoint, const FVector& TargetPoint, const float Tolerance = 50.0f) const;
-	
+
 	virtual bool Check() const;
-	
+
 private:
 	void TickBehaviour(float DeltaTime);
-	
+
 	bool HandleSimultaneousShoot();
 
 	bool HandleSequentialShoot();
@@ -191,13 +196,13 @@ private:
 	bool HasEnoughAmmoToShoot(const int32 DesiredAmmoToConsume) const;
 
 	int32 NextShootPointIndex();
-	
+
 	void ModifyCurrentAmmo(const int32 AmmoValue);
 
 	void ApplyRecoilImpulse();
-	
+
 	void ProcessRecoilImpulseRotation(float DeltaTime);
-	
+
 	void StartShootCooldown();
 
 	void ProcessCooldown(float DeltaTime);

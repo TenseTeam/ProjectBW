@@ -201,6 +201,11 @@ int32 UShooterBehaviourBase::GetCurrentAmmo() const
 	return CurrentAmmo;
 }
 
+int32 UShooterBehaviourBase::GetAmmoToConsume() const
+{
+	return AmmoToConsumePerShot;
+}
+
 UWorld* UShooterBehaviourBase::GetWorld() const
 {
 	if (!IsValid(Shooter))
@@ -343,13 +348,13 @@ bool UShooterBehaviourBase::Check() const
 
 bool UShooterBehaviourBase::HandleSimultaneousShoot()
 {
-	if (!HasEnoughAmmoToShoot(ShootPoints.Num()))
+	if (!HasEnoughAmmoToShoot(GetAmmoToConsume()))
 	{
 		ShootFail();
 		return false;
 	}
 	
-	ModifyCurrentAmmo(-ShootPoints.Num());
+	ModifyCurrentAmmo(-GetAmmoToConsume());
 	for (UShootPoint* ShootPoint : ShootPoints)
 	{
 		if (!IsValid(ShootPoint))
@@ -366,13 +371,13 @@ bool UShooterBehaviourBase::HandleSimultaneousShoot()
 
 bool UShooterBehaviourBase::HandleSequentialShoot()
 {
-	if (!HasEnoughAmmoToShoot(1))
+	if (!HasEnoughAmmoToShoot(GetAmmoToConsume()))
 	{
 		ShootFail();
 		return false;
 	}
 
-	ModifyCurrentAmmo(-1);
+	ModifyCurrentAmmo(-GetAmmoToConsume());
 	NextShootPointIndex();
 
 	if (!IsValid(ShootPoints[CurrentShootPointIndex]))
