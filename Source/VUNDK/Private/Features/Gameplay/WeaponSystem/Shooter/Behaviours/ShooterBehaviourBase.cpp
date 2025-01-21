@@ -59,19 +59,18 @@ bool UShooterBehaviourBase::Shoot(const EShootType ShootType)
 	if (bIsInCooldown)
 		return false;
 
-	StartShootCooldown();
-
+	bool bSuccess;
 	switch (ShootType)
 	{
 	case EShootType::Simultaneous:
 		{
-			HandleSimultaneousShoot();
+			bSuccess = HandleSimultaneousShoot();
 			break;
 		}
 
 	case EShootType::Sequential:
 		{
-			HandleSequentialShoot();
+			bSuccess = HandleSequentialShoot();
 			break;
 		}
 
@@ -79,6 +78,9 @@ bool UShooterBehaviourBase::Shoot(const EShootType ShootType)
 		return false;
 	}
 
+	if (bSuccess)
+		StartShootCooldown();
+	
 	return true;
 }
 
@@ -346,7 +348,7 @@ bool UShooterBehaviourBase::HandleSimultaneousShoot()
 		ShootFail();
 		return false;
 	}
-
+	
 	ModifyCurrentAmmo(-ShootPoints.Num());
 	for (UShootPoint* ShootPoint : ShootPoints)
 	{

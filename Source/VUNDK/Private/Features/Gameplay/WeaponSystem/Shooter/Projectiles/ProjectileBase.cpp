@@ -60,6 +60,9 @@ void AProjectileBase::ApplyProjectileDamage(AActor* TargetActor)
 
 void AProjectileBase::DisposeProjectile()
 {
+	if (!LifeSpanTimerHandle.IsValid())
+		return;
+	
 	const UWorld* World = GetWorld();
 
 	if (!IsValid(World))
@@ -68,6 +71,7 @@ void AProjectileBase::DisposeProjectile()
 		return;
 	}
 
+	LifeSpanTimerHandle.Invalidate();
 	World->GetTimerManager().ClearTimer(LifeSpanTimerHandle);
 	IPooledActor::Execute_ReleasePooledActor(this);
 }
