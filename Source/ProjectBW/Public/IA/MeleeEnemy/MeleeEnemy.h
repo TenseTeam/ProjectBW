@@ -7,25 +7,37 @@
 #include "IA/Weapons/Melee/MeleeWeapon.h"
 #include "MeleeEnemy.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(
+	FFinishedEquipSword);
+
+
 UCLASS()
 class PROJECTBW_API AMeleeEnemy : public AEnemyBase
 {
 	GENERATED_BODY()
 
 public:
+
+	UPROPERTY(BlueprintAssignable)
+	FFinishedEquipSword OnFinishedEquipSword;
 	
 	AMeleeEnemy();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	bool GetWieldSword() const {return bWieldSword; }
 	
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void SetWieldSword(bool bHasSword) { bWieldSword = bHasSword; }
 	
-	UFUNCTION(BlueprintCallable)
-	void PlayMontageWithNotify(UAnimMontage* MontageToPlay);
+	// UFUNCTION(BlueprintCallable)
+	// void PlayMontageWithNotify(UAnimMontage* MontageToPlay);
+	
 	UFUNCTION(BlueprintCallable)
 	void EquipSword(FName SocketName);
+
+	UFUNCTION(BlueprintCallable)
+	void FinishedEquipSword();
+	
 protected:
 	
 	virtual void BeginPlay() override;
@@ -35,10 +47,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Melee")
 	bool bWieldSword;
 
-	UPROPERTY(EditDefaultsOnly, Category = "AI|Melee")
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "AI|Melee")
 	FName SwordSocketInHand;
 
-	UPROPERTY(EditDefaultsOnly, Category = "AI|Melee")
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "AI|Melee")
 	FName SwordSocketOnBack;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Melee")
@@ -53,9 +65,8 @@ protected:
 	UPROPERTY()
 	AMeleeWeapon* MeleeWeapon;
 
-
-private:
 	
-	void OnMontageNotifyReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
+	
+	//void OnMontageNotifyReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
 	
 };
