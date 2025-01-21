@@ -81,7 +81,7 @@ bool UShooterBehaviourBase::Shoot(const EShootType ShootType)
 	if (bSuccess)
 		StartShootCooldown();
 	
-	return true;
+	return bSuccess;
 }
 
 void UShooterBehaviourBase::ResetRecoil()

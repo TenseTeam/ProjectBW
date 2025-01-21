@@ -27,8 +27,8 @@ void AProjectileGrenade::Explode()
 	IgnoredActors.Add(this);
 	IgnoredActors.Add(ProjectileInstigator);
 	UGameplayStatics::ApplyRadialDamage(World, GetDamage(), GetActorLocation(), GetExplosionRadius(), UDamageType::StaticClass(), IgnoredActors, this, ProjectileInstigator->GetInstigatorController(), true, ExplosionPreventionChannel);
-	DisposeProjectile();
 	OnExplosion();
+	DisposeProjectile();
 }
 
 void AProjectileGrenade::OnProjectileHit_Implementation(const FHitResult& ImpactResult, const FVector& ImpactVelocity)
