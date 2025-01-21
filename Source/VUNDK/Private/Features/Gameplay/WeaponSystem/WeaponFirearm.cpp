@@ -7,6 +7,17 @@ AWeaponFirearm::AWeaponFirearm()
 	Shooter = CreateDefaultSubobject<UShooter>(TEXT("Shooter"));
 }
 
+void AWeaponFirearm::Init(APawn* InOwner)
+{
+	Super::Init(InOwner);
+	Shooter->SetOwner(InOwner);
+}
+
+void AWeaponFirearm::ResetRecoil() const
+{
+	Shooter->ResetRecoil();
+}
+
 void AWeaponFirearm::SetWeaponDamage(const float NewDamage)
 {
 	Super::SetWeaponDamage(NewDamage);

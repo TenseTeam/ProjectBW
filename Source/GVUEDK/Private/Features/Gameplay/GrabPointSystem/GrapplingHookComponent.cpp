@@ -88,11 +88,32 @@ void UGrapplingHookComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	{
 		TargetGrabPoint = GetNearestGrabPoint(InRangeGrabPoints);
 		bTargetAcquired = TargetGrabPoint != nullptr;
+		if (bTargetAcquired)
+		{
+			if (LastTargetGrabPoint != nullptr && LastTargetGrabPoint != TargetGrabPoint)
+			{
+				LastTargetGrabPoint->Execute_Unhighlight(LastTargetGrabPoint->_getUObject());
+			}
+			if (LastTargetGrabPoint != TargetGrabPoint)
+				TargetGrabPoint->Execute_Highlight(TargetGrabPoint->_getUObject());
+			
+			LastTargetGrabPoint = TargetGrabPoint;
+		}
+		else
+		{
+			if (LastTargetGrabPoint != nullptr)
+			{
+				LastTargetGrabPoint->Execute_Unhighlight(LastTargetGrabPoint->_getUObject());
+				LastTargetGrabPoint = nullptr;
+			}
+		}
 		return;
 	}
 	// if there are no grab points in range, reset the target
-	if (bTargetAcquired)
+	if (TargetGrabPoint != nullptr)
 	{
+		TargetGrabPoint->Execute_Unhighlight(TargetGrabPoint->_getUObject());
+		LastTargetGrabPoint = nullptr;
 		TargetGrabPoint = nullptr;
 		bTargetAcquired = false;
 	}
@@ -111,6 +132,7 @@ void UGrapplingHookComponent::StartHooking()
 		OwnerCharacter->GetCharacterMovement()->GravityScale = 0.f;
 		OwnerCharacter->GetCharacterMovement()->Velocity = FVector::ZeroVector;
 	}
+	TargetGrabPoint->Execute_Unhighlight(TargetGrabPoint->_getUObject());
 	OnStartHooking.Broadcast();
 }
 

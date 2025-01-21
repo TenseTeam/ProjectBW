@@ -3,24 +3,34 @@
 #include "Features/Gameplay/WeponSystem/Factories/BWWeaponsFactory.h"
 #include "Features/Gameplay/InventorySystem/Data/WeaponItemData.h"
 
-AWeaponBase* UBWWeaponsFactory::CreateWeapon(UObject* Instigator, UWeaponItem* WeaponItem)
+AWeaponBase* UBWWeaponsFactory::CreateWeaponBase(APawn* Owner, UWeaponItem* WeaponItem)
 {
-	AWeaponBase* WeaponBase = Cast<AWeaponBase>(SpawnWeaponActor(Instigator, WeaponItem));
+	AWeaponBase* WeaponBase = Cast<AWeaponBase>(SpawnWeaponActor(Owner, WeaponItem));
 
 	if (!IsValid(WeaponBase))
 		return nullptr;
-	
+
+	WeaponBase->Init(Owner);
 	WeaponBase->SetWeaponDamage(WeaponItem->GetWeaponDamage());
 	return WeaponBase;
 }
 
-AWeaponFirearm* UBWWeaponsFactory::CreateWeaponFirearm(UObject* Instigator, UWeaponFirearmItem* WeaponItem)
+AWeaponBase* UBWWeaponsFactory::CreateWeapon(APawn* Owner, UWeaponItem* WeaponItem)
 {
-	AWeaponFirearm* WeaponFirearm = Cast<AWeaponFirearm>(SpawnWeaponActor(Instigator, WeaponItem));
+	if (WeaponItem->IsA(UWeaponFirearmItem::StaticClass()))
+		return CreateWeaponFirearm(Owner, Cast<UWeaponFirearmItem>(WeaponItem));
+	
+	return CreateWeaponBase(Owner, WeaponItem);
+}
+
+AWeaponFirearm* UBWWeaponsFactory::CreateWeaponFirearm(APawn* Owner, UWeaponFirearmItem* WeaponItem)
+{
+	AWeaponFirearm* WeaponFirearm = Cast<AWeaponFirearm>(SpawnWeaponActor(Owner, WeaponItem));
 
 	if (!IsValid(WeaponFirearm))
 		return nullptr;
-	
+
+	WeaponFirearm->Init(Owner);
 	WeaponFirearm->SetWeaponDamage(WeaponItem->GetWeaponDamage());
 	WeaponFirearm->SetWeaponFireRate(WeaponItem->GetWeaponFireRate());
 	WeaponFirearm->SetWeaponRange(WeaponItem->GetWeaponRange());

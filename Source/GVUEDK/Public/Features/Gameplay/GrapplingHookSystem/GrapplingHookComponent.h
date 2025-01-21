@@ -52,6 +52,7 @@ private:
 	
 	TSet<IGrabPoint*> InRangeGrabPoints;
 	IGrabPoint* TargetGrabPoint;
+	IGrabPoint* LastTargetGrabPoint;
 
 	FVector StartHookLocation;
 	FVector EndHookLocation;
