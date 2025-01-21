@@ -6,6 +6,7 @@
 #include "Features/Gameplay/InventorySystem/Items/WeaponFirearmItem.h"
 #include "Features/Gameplay/InventorySystem/Items/WeaponItem.h"
 #include "Features/Gameplay/WeaponSystem/WeaponFirearm.h"
+#include "Features/Gameplay/WeponSystem/BWWeaponFirearm.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "BWWeaponsFactory.generated.h"
 
@@ -21,7 +22,7 @@ public:
 	static AWeaponBase* CreateWeapon(APawn* Owner, UWeaponItem* WeaponItem);
 	
 	UFUNCTION(BlueprintCallable, Category = "ProjectBW|WeaponSystem")
-	static AWeaponFirearm* CreateWeaponFirearm(APawn* Owner, UWeaponFirearmItem* WeaponItem);
+	static ABWWeaponFirearm* CreateWeaponFirearm(APawn* Owner, UWeaponFirearmItem* WeaponItem);
 
 private:
 	static AActor* SpawnWeaponActor(const UObject* Instigator, const UWeaponItem* WeaponItem);

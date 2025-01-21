@@ -145,6 +145,12 @@ protected:
 	void RemoveItemFromList(UItemBase* Item);
 
 	UFUNCTION(BlueprintNativeEvent)
+	USaveData* CreateSaveDataObject();
+	
+	UFUNCTION(BlueprintNativeEvent)
+	USaveData* CreateInventorySaveData(USaveData* SaveData, TArray<UItemBase*>& ItemsToSave);
+	
+	UFUNCTION(BlueprintNativeEvent)
 	void LoadInventorySaveData(UInventoryBaseSaveData* InventorySaveData);
 	
 	UFUNCTION(BlueprintNativeEvent)

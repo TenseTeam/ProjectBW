@@ -9,50 +9,6 @@
 
 UTetrisInventory::UTetrisInventory(): GridSize()
 {
-	PrimaryComponentTick.bCanEverTick = false;
-}
-
-USaveData* UTetrisInventory::CreateSaveData()
-{
-	UTetrisInventorySaveData* TetrisInventorySaveData = NewObject<UTetrisInventorySaveData>();
-
-	for (UItemBase* Item : GetItems())
-	{
-		const UTetrisItem* TetrisItem = Cast<UTetrisItem>(Item);
-		FTetrisItemSaveData ItemSaveData = TetrisItem->CreateTetrisSaveData();
-
-		FGuid ItemID = Item->GetItemData()->ItemDataID;
-
-		if (!TetrisInventorySaveData->TetrisItems.Contains(ItemID))
-			TetrisInventorySaveData->TetrisItems.Add(ItemID, FTetrisItemsSaveArray());
-
-		TetrisInventorySaveData->TetrisItems[ItemID].Items.Add(ItemSaveData);
-	}
-
-	return TetrisInventorySaveData;
-}
-
-void UTetrisInventory::LoadInventorySaveData_Implementation(UInventoryBaseSaveData* InventorySaveData)
-{
-	UTetrisInventorySaveData* TetrisInventorySaveData = Cast<UTetrisInventorySaveData>(InventorySaveData);
-
-	for (const auto& LoadedItem : TetrisInventorySaveData->TetrisItems)
-	{
-		auto [ItemID, ItemsSaveArray] = LoadedItem;
-
-		if (UItemDataBase* ItemData = GetItemDataFromRegistry(ItemID))
-		{
-			for (FTetrisItemSaveData& ItemSaveData : ItemsSaveArray.Items)
-			{
-				UTetrisItem* CreatedItem = Cast<UTetrisItem>(UISFactory::CreateItem(ItemData));
-				CreatedItem->LoadTetrisSaveData(this, ItemSaveData);
-			}
-		}
-		else
-		{
-			UE_LOG(LogInventorySystem, Warning, TEXT("Item with ID %s not found in the inventory registry %s."), *ItemID.ToString(), *GetName());
-		}
-	}
 }
 
 bool UTetrisInventory::CanContainItem(const UItemDataBase* ItemData) const
@@ -162,6 +118,54 @@ void UTetrisInventory::BeginPlay()
 {
 	Super::BeginPlay();
 	ConstructGrid();
+}
+
+USaveData* UTetrisInventory::CreateSaveDataObject_Implementation()
+{
+	return NewObject<UTetrisInventorySaveData>();
+}
+
+USaveData* UTetrisInventory::CreateInventorySaveData_Implementation(USaveData* SaveData, TArray<UItemBase*>& ItemsToSave)
+{
+	UTetrisInventorySaveData* TetrisInventorySaveData = Cast<UTetrisInventorySaveData>(SaveData);
+
+	for (UItemBase* Item : ItemsToSave)
+	{
+		const UTetrisItem* TetrisItem = Cast<UTetrisItem>(Item);
+		FTetrisItemSaveData ItemSaveData = TetrisItem->CreateTetrisSaveData();
+
+		FGuid ItemID = Item->GetItemData()->ItemDataID;
+
+		if (!TetrisInventorySaveData->TetrisItems.Contains(ItemID))
+			TetrisInventorySaveData->TetrisItems.Add(ItemID, FTetrisItemsSaveArray());
+
+		TetrisInventorySaveData->TetrisItems[ItemID].Items.Add(ItemSaveData);
+	}
+
+	return TetrisInventorySaveData;
+}
+
+void UTetrisInventory::LoadInventorySaveData_Implementation(UInventoryBaseSaveData* InventorySaveData)
+{
+	UTetrisInventorySaveData* TetrisInventorySaveData = Cast<UTetrisInventorySaveData>(InventorySaveData);
+
+	for (const auto& LoadedItem : TetrisInventorySaveData->TetrisItems)
+	{
+		auto [ItemID, ItemsSaveArray] = LoadedItem;
+
+		if (UItemDataBase* ItemData = GetItemDataFromRegistry(ItemID))
+		{
+			for (FTetrisItemSaveData& ItemSaveData : ItemsSaveArray.Items)
+			{
+				UTetrisItem* CreatedItem = Cast<UTetrisItem>(UISFactory::CreateItem(ItemData));
+				CreatedItem->LoadTetrisSaveData(this, ItemSaveData);
+			}
+		}
+		else
+		{
+			UE_LOG(LogInventorySystem, Warning, TEXT("Item with ID %s not found in the inventory registry %s."), *ItemID.ToString(), *GetName());
+		}
+	}
 }
 
 void UTetrisInventory::OnItemAdded_Implementation(UItemBase* Item)

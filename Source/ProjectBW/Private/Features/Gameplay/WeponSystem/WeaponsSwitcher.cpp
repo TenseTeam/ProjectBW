@@ -51,7 +51,7 @@ bool UWeaponsSwitcher::TryEquipWeaponAtSlot(const int32 SlotIndex)
 
 	if (!IsValid(WeaponToEquip))
 	{
-		UE_LOG(LogWeaponsSwitcher, Error, TEXT("WeaponsSwitcher::TryEquipWeaponAtSlot: WeaponToEquip is nullptr"));
+		UE_LOG(LogBWWeapons, Error, TEXT("WeaponsSwitcher::TryEquipWeaponAtSlot: WeaponToEquip is nullptr"));
 		return false;
 	}
 
@@ -118,7 +118,7 @@ void UWeaponsSwitcher::OnAnyItemEquipped(UEquipSlotKey* EquipSlotKey, int32 Slot
 	UWeaponItem* WeaponItem = Cast<UWeaponItem>(Item);
 	if (!IsValid(WeaponItem))
 	{
-		UE_LOG(LogWeaponsSwitcher, Error, TEXT("WeaponSwitccher::OnAnyItemEquipped: WeaponItem is nullptr"));
+		UE_LOG(LogBWWeapons, Error, TEXT("WeaponSwitccher::OnAnyItemEquipped: WeaponItem is nullptr"));
 		return;
 	}
 

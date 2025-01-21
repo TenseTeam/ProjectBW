@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Features/Gameplay/InventorySystem/BWInventory.h"
+#include "Features/Gameplay/InventorySystem/Data/SaveData/WeaponItemSaveData.h"
 #include "Features/Gameplay/RPGSystem/RPGInventory/Items/RPGGearItem.h"
 #include "WeaponItem.generated.h"
 
@@ -14,6 +16,10 @@ class PROJECTBW_API UWeaponItem : public URPGGearItem
 	GENERATED_BODY()
 
 public:
+	FWeaponItemSaveData CreateWeaponItemSaveData() const;
+
+	void LoadWeaponItemSaveData(UBWInventory* LoadingInventory, FWeaponItemSaveData& WeaponItemSaveData);
+	
 	UFUNCTION(BlueprintPure)
 	UWeaponItemData* GetWeaponItemData() const;
 

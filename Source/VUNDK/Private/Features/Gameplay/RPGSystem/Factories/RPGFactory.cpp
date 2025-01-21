@@ -11,9 +11,7 @@ URPGItem* URPGFactory::CreateRPGGenericItem(URPGItemData* Data, const URPGItemBa
 	if (Data == nullptr)
 		return nullptr;
 
-	int32 Overflow = 0;
-	URPGItem* Item = Cast<URPGItem>(UISFactory::CreateItemInQuantity(Data, Overflow, Quantity));
-	Item->Init(Data);
+	URPGItem* Item = Cast<URPGItem>(UISFactory::CreateItem(Data));
 
 	if (bBuildItem)
 	{
@@ -29,9 +27,7 @@ URPGGearItem* URPGFactory::CreateRPGGearItem(URPGGearItemData* Data, const URPGG
 	if (Data == nullptr)
 		return nullptr;
 
-	int32 Overflow = 0;
-	URPGGearItem* GearItem = Cast<URPGGearItem>(UISFactory::CreateItemInQuantity(Data, Overflow));
-	GearItem->Init(Data);
+	URPGGearItem* GearItem = Cast<URPGGearItem>(UISFactory::CreateItem(Data));
 
 	if (bBuildItem)
 	{

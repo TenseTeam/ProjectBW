@@ -19,7 +19,7 @@ float AProjectileGrenade::GetExplosionRadius() const
 	return GetRange() / 2.f;
 }
 
-void AProjectileGrenade::ApplyExplosionDamage()
+void AProjectileGrenade::Explode()
 {
 	const UWorld* World = GetWorld();
 
@@ -27,6 +27,7 @@ void AProjectileGrenade::ApplyExplosionDamage()
 	IgnoredActors.Add(this);
 	IgnoredActors.Add(ProjectileInstigator);
 	UGameplayStatics::ApplyRadialDamage(World, GetDamage(), GetActorLocation(), GetExplosionRadius(), UDamageType::StaticClass(), IgnoredActors, this, ProjectileInstigator->GetInstigatorController(), true, ExplosionPreventionChannel);
+	DisposeProjectile();
 	OnExplosion();
 }
 
@@ -36,7 +37,7 @@ void AProjectileGrenade::OnProjectileHit_Implementation(const FHitResult& Impact
 
 void AProjectileGrenade::OnProjectileLifeSpanEnd_Implementation()
 {
-	ApplyExplosionDamage();
+	Explode();
 }
 
 void AProjectileGrenade::OnExplosion_Implementation()
