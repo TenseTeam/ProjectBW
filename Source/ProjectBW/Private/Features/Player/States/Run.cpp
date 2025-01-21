@@ -49,8 +49,9 @@ void URun::Update(AActor* Context, float DeltaTime)
 	}
 	
 	Super::Update(Context, DeltaTime);
+	Character->OnRunning.Broadcast();
 
-	if (!Character->IsRunning())
+	if (!Character->IsRunning() || !Character->CanRun())
 	{
 		InterruptRun();
 	}

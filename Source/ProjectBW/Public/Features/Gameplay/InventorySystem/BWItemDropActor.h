@@ -20,6 +20,8 @@ class PROJECTBW_API ABWItemDropActor : public AItemDropActor, public IInteractab
 public:
 	virtual void BeginPlay() override;
 	virtual void Interact_Implementation() override;
+	virtual void Highlight_Implementation() override{};
+	virtual void Unhighlight_Implementation() override{};
 	virtual bool CanBeInteracted_Implementation(AActor* Caller) const override;
 	virtual FVector GetInteractableLocation_Implementation() const override;
 };

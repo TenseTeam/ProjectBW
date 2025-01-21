@@ -6,6 +6,12 @@
 #include <string>
 
 #include "Features/Gameplay/InteractionSystem/Components/InteractableDetectorComponent.h"
+#include "Features/Gameplay/ResourceAttributeSystem/HealthAttribute.h"
+#include "Features/Gameplay/ResourceAttributeSystem/ShieldAttribute.h"
+#include "Features/Gameplay/ResourceAttributeSystem/StaminaAttribute.h"
+#include "Features/Gameplay/ResourceAttributeSystem/Base/ResourceAttributeBase.h"
+#include "Features/Gameplay/ResourceAttributeSystem/Components/ResourceAttributeManager.h"
+#include "Features/Gameplay/WeponSystem/WeaponsSwitcher.h"
 #include "Features/Player/States/Base/CharacterState.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "UGameFramework/Controllers/GameplayController.h"
@@ -36,6 +42,10 @@ ABWCharacter::ABWCharacter()
 	DodgerComponent = CreateDefaultSubobject<UDodgerComponent>("DodgerComponent");
 
 	InteractableDetector = CreateDefaultSubobject<UInteractableDetectorComponent>("InteractableDetector");
+
+	AttributeManager = CreateDefaultSubobject<UResourceAttributeManager>("AttributeManager");
+
+	WeaponsSwitcher = CreateDefaultSubobject<UWeaponsSwitcher>("WeaponsSwitcher");
 	
 	bCanMove = true;
 	bCanLook = true;
@@ -64,7 +74,8 @@ void ABWCharacter::BeginPlay()
 	DodgerComponent->OnDodge.AddDynamic(this, &ABWCharacter::Dodging);
 	DodgerComponent->OnStopDodge.AddDynamic(this, &ABWCharacter::StopDodging);
 
-	InitStats();
+	InitAttributes();
+	UpdateCharacterData();
 }
 
 void ABWCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -72,13 +83,6 @@ void ABWCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 	GrapplingHook->OnStartHooking.RemoveDynamic(this, &ABWCharacter::StartHooking);
 	GrapplingHook->OnStopHooking.RemoveDynamic(this, &ABWCharacter::StopHooking);
-}
-
-void ABWCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-	//IInteractable* Interactable = nullptr;
-	//InteractableDetector->TryGetInteractable(Interactable);
 }
 
 void ABWCharacter::HandleMotionInput(const EInputActionType InputAction, const FInputActionValue& Value) const
@@ -260,6 +264,11 @@ bool ABWCharacter::CanRun() const
 	return bCanRun;
 }
 
+void ABWCharacter::SetCanRun(bool Value)
+{
+	bCanRun = Value;
+}
+
 void ABWCharacter::SetCanDodge(bool Value)
 {
 	bCanDodge = Value;
@@ -267,7 +276,7 @@ void ABWCharacter::SetCanDodge(bool Value)
 
 bool ABWCharacter::CanDodge() const
 {
-	return bCanDodge && !DodgerComponent->IsCoolingDown();
+	return bCanDodge && !DodgerComponent->IsCoolingDown() && Stamina->GetCurrentValue() >= 30.f;
 }
 
 void ABWCharacter::SetCanHook(bool Value)
@@ -349,12 +358,82 @@ void ABWCharacter::StopDodging()
 	OnStopDodging.Broadcast();
 }
 
-void ABWCharacter::InitStats()
+void ABWCharacter::LostHealth()
 {
-	UpdateStats();
+	OnLostHealth.Broadcast();
 }
 
-void ABWCharacter::UpdateStats()
+void ABWCharacter::GainedHealth()
+{
+	OnGainedHealth.Broadcast();
+}
+
+void ABWCharacter::Death()
+{
+	OnDeath.Broadcast();
+}
+
+void ABWCharacter::LostStamina()
+{
+	if (CanRun() && Stamina->GetCurrentValue() <= KINDA_SMALL_NUMBER)
+		SetCanRun(false);
+	OnLostStamina.Broadcast();
+}
+
+void ABWCharacter::GainedStamina()
+{
+	if (!CanRun() && Stamina->GetCurrentValue() > 30.f)
+		SetCanRun(true);
+	OnGainedStamina.Broadcast();
+}
+
+void ABWCharacter::StaminaEmptied()
+{
+	SetCanRun(false);
+	OnStaminaEmptied.Broadcast();
+}
+
+void ABWCharacter::LostShield()
+{
+	OnLostShield.Broadcast();
+}
+
+void ABWCharacter::GainedShield()
+{
+	OnGainedShield.Broadcast();
+}
+
+void ABWCharacter::ShieldEmptied()
+{
+	OnShieldEmptied.Broadcast();
+}
+
+void ABWCharacter::UpdateCharacterData() const
 {
 	GetCharacterMovement()->MaxWalkSpeed = Data->WalkSpeed;
+}
+
+void ABWCharacter::InitAttributes()
+{
+	if (IsValid(Health))
+	{
+		Health->OnReachedMinValue.AddDynamic(this, &ABWCharacter::Death);
+		Health->OnDecreasedAttribute.AddDynamic(this, &ABWCharacter::LostHealth);
+		Health->OnIncreasedAttribute.AddDynamic(this, &ABWCharacter::GainedHealth);
+		Health->SetValue(Health->MaxValue);
+	}
+	if (IsValid(Stamina))
+	{
+		Stamina->OnReachedMinValue.AddDynamic(this, &ABWCharacter::StaminaEmptied);
+		Stamina->OnDecreasedAttribute.AddDynamic(this, &ABWCharacter::LostStamina);
+		Stamina->OnIncreasedAttribute.AddDynamic(this, &ABWCharacter::GainedStamina);
+		Stamina->SetValue(Stamina->MaxValue);
+	}
+	if (IsValid(Shield))
+	{
+		Shield->OnReachedMinValue.AddDynamic(this, &ABWCharacter::ShieldEmptied);
+		Shield->OnDecreasedAttribute.AddDynamic(this, &ABWCharacter::LostShield);
+		Shield->OnIncreasedAttribute.AddDynamic(this, &ABWCharacter::GainedShield);
+		Shield->SetValue(Shield->MaxValue);
+	}
 }

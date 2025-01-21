@@ -18,7 +18,7 @@ class GVUEDK_API UResourceAttributeBase : public UObject
 
 public:
 	UResourceAttributeBase();
-	void Initialize(AActor* InOwner, const FName InName);
+	virtual void Initialize(AActor* InOwner, const FName InName);
 
 	UFUNCTION(BlueprintCallable)
 	float GetCurrentValue() const { return CurrentValue; }
@@ -45,32 +45,34 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FReachedMinValue OnReachedMinValue;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bCanRegen;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bCanRegen"))
+	bool bStopRegenOnValueDecrease;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MaxValue;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MinValue;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bCanRegen"))
+	float RegenSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bCanRegen"))
+	float RegenDelay;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bCanRegen", ToolTip = "Regen starts when the current value is below this threshold"))
+	float StartRegenValue;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bCanRegen", ToolTip = "Regen stops when the current value is above this threshold"))
+	float StopRegenValue;
+
 protected:
 	UPROPERTY()
 	AActor* Owner;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	bool bCanRegen;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", EditCondition = "bCanRegen"))
-	bool bStopRegenOnValueDecrease;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	float MaxValue;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	float MinValue;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", EditCondition = "bCanRegen"))
-	float RegenSpeed;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", EditCondition = "bCanRegen"))
-	float RegenDelay;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", EditCondition = "bCanRegen", ToolTip = "Regen starts when the current value is below this threshold"))
-	float StartRegenValue;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", EditCondition = "bCanRegen", ToolTip = "Regen stops when the current value is above this threshold"))
-	float StopRegenValue;
+	
+	FName Name;
 	
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float CurrentValue;
-	
+
+private:
 	bool bMustRegen;
-	
-	FName Name;
 	FTimerHandle RegenTimer;
 	FTimerHandle RegenDelayTimer;
 	

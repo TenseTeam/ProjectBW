@@ -13,6 +13,11 @@
 #include "Patterns/State/StateMachineComponent.h"
 #include "BWCharacter.generated.h"
 
+class UWeaponsSwitcher;
+class UShieldAttribute;
+class UStaminaAttribute;
+class UHealthAttribute;
+class UResourceAttributeManager;
 class UInteractableDetectorComponent;
 class UCharacterState;
 class AGameplayController;
@@ -65,6 +70,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopAiming);
 
 //Running events
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartRunning);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRunning);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopRunning);
 
 //Dodge events
@@ -78,6 +84,19 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopHook);
 
 //Interaction events
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInteract, AActor*, Interactable);
+
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLostHealth);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGainedHealth);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDeath);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLostStamina);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGainedStamina);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStaminaEmptied);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLostShield);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGainedShield);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FShieldEmptied);
 
 
 UCLASS()
@@ -106,6 +125,8 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
 	FStartRunning OnStartRunning;
 	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FRunning OnRunning;
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
 	FStopRunning OnStopRunning;
 
 	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
@@ -122,6 +143,27 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
 	FInteract OnInteract;
+
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FLostHealth OnLostHealth;
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FGainedHealth OnGainedHealth;
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FDeath OnDeath;
+
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FLostStamina OnLostStamina;
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FGainedStamina OnGainedStamina;
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FStaminaEmptied OnStaminaEmptied;
+
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FLostShield OnLostShield;
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FGainedShield OnGainedShield;
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FShieldEmptied OnShieldEmptied;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UCharacterData* Data;
@@ -155,9 +197,19 @@ private:
 	UDodgerComponent* DodgerComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UInteractableDetectorComponent* InteractableDetector;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UResourceAttributeManager* AttributeManager;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UWeaponsSwitcher* WeaponsSwitcher;
 	
 	UPROPERTY()
 	AGameplayController* BWController;
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UHealthAttribute* Health; //initialized in blueprint event graph
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UShieldAttribute* Shield; //initialized in blueprint event graph
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UStaminaAttribute* Stamina; //initialized in blueprint event graph
 
 	bool bWantRunning;
     bool bWantShooting;
@@ -180,7 +232,6 @@ private:
 
 public:
 	ABWCharacter();
-	virtual void Tick(float DeltaTime) override;
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	
@@ -255,6 +306,8 @@ public:
 	bool CanLook() const;
 	UFUNCTION(BlueprintCallable)
 	bool CanRun() const;
+	UFUNCTION(BlueprintCallable)
+	void SetCanRun(bool Value);
 
 	UFUNCTION(BlueprintCallable)
 	void SetCanDodge(bool Value);
@@ -292,6 +345,27 @@ private:
 	UFUNCTION()
 	void StopDodging();
 
-	void InitStats();
-	void UpdateStats();
+	UFUNCTION()
+	void LostHealth();
+	UFUNCTION()
+	void GainedHealth();
+	UFUNCTION()
+	void Death();
+
+	UFUNCTION()
+	void LostStamina();
+	UFUNCTION()
+	void GainedStamina();
+	UFUNCTION()
+	void StaminaEmptied();
+
+	UFUNCTION()
+	void LostShield();
+	UFUNCTION()
+	void GainedShield();
+	UFUNCTION()
+	void ShieldEmptied();
+	
+	void UpdateCharacterData() const;
+	void InitAttributes();
 };

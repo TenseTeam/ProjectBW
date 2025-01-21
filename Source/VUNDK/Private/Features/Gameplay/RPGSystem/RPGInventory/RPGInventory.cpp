@@ -8,46 +8,63 @@
 
 URPGInventory::URPGInventory()
 {
-	PrimaryComponentTick.bCanEverTick = false;
 }
 
-USaveData* URPGInventory::CreateSaveData()
+USaveData* URPGInventory::CreateSaveDataObject_Implementation()
 {
-	URPGInventorySaveData* SaveData = NewObject<URPGInventorySaveData>();
+	return NewObject<URPGInventorySaveData>();
+}
 
-	for (UItemBase* Item : GetItems())
-	{
-		if (Item->IsA(URPGGearItem::StaticClass()))
-		{
-			const URPGGearItem* GearItem = Cast<URPGGearItem>(Item);
-			FGuid ItemID = Item->GetItemData()->ItemDataID;
-
-			if (!SaveData->ItemsSaveData.GearItems.Contains(ItemID))
-				SaveData->ItemsSaveData.GearItems.Add(ItemID, FRPGGearItemsSaveArray());
-
-			FRPGGearItemSaveData GearItemSaveData = GearItem->CreateRPGGearItemSaveData();
-			SaveData->ItemsSaveData.GearItems[ItemID].GearItems.Add(GearItemSaveData);
-			continue;
-		}
-
-		const URPGItem* RPGItem = Cast<URPGItem>(Item);
-		FGuid ItemID = Item->GetItemData()->ItemDataID;
-
-		if (!SaveData->ItemsSaveData.GenericItems.Contains(ItemID))
-			SaveData->ItemsSaveData.GenericItems.Add(ItemID, FRPGItemsSaveArray());
-
-		FRPGItemSaveData ItemSaveData = RPGItem->CreateRPGItemSaveData();
-		SaveData->ItemsSaveData.GenericItems[ItemID].Items.Add(ItemSaveData);
-	}
-
+USaveData* URPGInventory::CreateInventorySaveData_Implementation(USaveData* SaveData, TArray<UItemBase*>& ItemsToSave)
+{
+	URPGInventorySaveData* RPGInventorySaveData = Cast<URPGInventorySaveData>(SaveData);
+	CreateRPGInventorySaveData(RPGInventorySaveData->RPGItemsSaveData, ItemsToSave);
 	return SaveData;
 }
 
 void URPGInventory::LoadInventorySaveData_Implementation(UInventoryBaseSaveData* InventorySaveData)
 {
 	URPGInventorySaveData* RPGInventorySaveData = Cast<URPGInventorySaveData>(InventorySaveData);
+	LoadRPGInventorySaveData(RPGInventorySaveData->RPGItemsSaveData);
+}
 
-	for (auto& GenericItems : RPGInventorySaveData->ItemsSaveData.GenericItems)
+void URPGInventory::CreateRPGInventorySaveData(FRPGInventoryItemsSaveData& RPGItemsSaveData, TArray<UItemBase*>& ItemsToSave)
+{
+	TArray<UItemBase*> RemaingToSave = ItemsToSave;
+	for (UItemBase* Item : ItemsToSave)
+	{
+		RemaingToSave.Remove(Item);
+		
+		if (Item->IsA(URPGGearItem::StaticClass()))
+		{
+			const URPGGearItem* GearItem = Cast<URPGGearItem>(Item);
+			FGuid ItemID = Item->GetItemData()->ItemDataID;
+
+			if (!RPGItemsSaveData.GearItems.Contains(ItemID))
+				RPGItemsSaveData.GearItems.Add(ItemID, FRPGGearItemsSaveArray());
+
+			FRPGGearItemSaveData GearItemSaveData = GearItem->CreateRPGGearItemSaveData();
+			RPGItemsSaveData.GearItems[ItemID].GearItems.Add(GearItemSaveData);
+			continue;
+		}
+
+		// All items that are not gear items are considered generic items
+		const URPGItem* RPGItem = Cast<URPGItem>(Item);
+		FGuid ItemID = Item->GetItemData()->ItemDataID;
+
+		if (!RPGItemsSaveData.GenericItems.Contains(ItemID))
+			RPGItemsSaveData.GenericItems.Add(ItemID, FRPGItemsSaveArray());
+
+		FRPGItemSaveData ItemSaveData = RPGItem->CreateRPGItemSaveData();
+		RPGItemsSaveData.GenericItems[ItemID].Items.Add(ItemSaveData);
+	}
+
+	ItemsToSave = RemaingToSave;
+}
+
+void URPGInventory::LoadRPGInventorySaveData(FRPGInventoryItemsSaveData& RPGItemsSaveData)
+{
+	for (auto& GenericItems : RPGItemsSaveData.GenericItems)
 	{
 		const FGuid ItemID = GenericItems.Key;
 
@@ -69,7 +86,7 @@ void URPGInventory::LoadInventorySaveData_Implementation(UInventoryBaseSaveData*
 		}
 	}
 	
-	for (auto& GearItems : RPGInventorySaveData->ItemsSaveData.GearItems)
+	for (auto& GearItems : RPGItemsSaveData.GearItems)
 	{
 		const FGuid ItemID = GearItems.Key;
 

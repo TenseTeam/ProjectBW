@@ -42,12 +42,18 @@ void UInteractableDetectorComponent::CheckInteractablesInRange()
 	{
 		if (OutInteractable.GetObject() != LastDetectedInteractable.GetObject())
 		{
+			if (IsValid(LastDetectedInteractable.GetObject()))
+				IInteractable::Execute_Unhighlight(LastDetectedInteractable.GetObject());
+			
 			LastDetectedInteractable = OutInteractable;
+			IInteractable::Execute_Highlight(OutInteractable.GetObject());
+			
 			OnInteractableDetected.Broadcast(OutInteractable);
 		}
 	}
 	else if (LastDetectedInteractable.GetObject() != nullptr)
 	{
+		IInteractable::Execute_Unhighlight(LastDetectedInteractable.GetObject());
 		LastDetectedInteractable = nullptr;
 		OnInteractableLost.Broadcast();
 	}

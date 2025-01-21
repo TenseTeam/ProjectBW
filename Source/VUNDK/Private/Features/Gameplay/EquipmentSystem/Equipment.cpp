@@ -30,16 +30,22 @@ void UEquipment::BeginPlay()
 bool UEquipment::TryEquipItem(UItemBase* Item, UEquipSlotKey* TargetSlotKey, const int32 SlotIndex, const bool bRemoveFromInventory)
 {
 	if (!IsValid(Item) || !IsValid(Item->GetItemData()) || !IsValid(TargetSlotKey))
+	{
+		UE_LOG(LogEquipment, Warning, TEXT("UEquipment::TryEquipItem: Item or TargetSlotKey is not valid."));
 		return false;
+	}
 
 	UEquipSlotKey* ItemSlotKey = Item->GetItemData()->EquipSlotKey;
 
 	if (!CanEquipItem(Item, ItemSlotKey, SlotIndex))
+	{
+		UE_LOG(LogEquipment, Warning, TEXT("UEquipment::TryEquipItem: Item cannot be equipped."));
 		return false;
+	}
 
 	if (Item->IsEquipped())
 	{
-		ChangeItemEquipSlot(Item, ItemSlotKey, SlotIndex); // If the item is already equipped, unequip it first
+		ChangeItemEquipSlot(Item, ItemSlotKey, SlotIndex); // If the item is already equipped, change the slot
 		return true;
 	}
 	
@@ -90,6 +96,9 @@ void UEquipment::ClearEquipment()
 
 bool UEquipment::CanEquipItem(const UItemBase* Item, const UEquipSlotKey* TargetSlotKey, const int32 SlotIndex) const
 {
+	if (!IsValid(Item) || !IsValid(Item->GetItemData()) || !IsValid(TargetSlotKey))
+		return false;
+	
 	if (Item->GetItemData()->EquipSlotKey != TargetSlotKey || !EquipSlots.Contains(TargetSlotKey->EquipSlotKey))
 		return false;
 
@@ -155,11 +164,10 @@ void UEquipment::ChangeItemEquipSlot(UItemBase* Item, UEquipSlotKey* EquipSlotKe
 		return;
 	}
 	
-	AddItemInEquipSlot(nullptr, EquipSlotKey, *OldSlotKeyRef);
-	AddItemInEquipSlot(Item, EquipSlotKey, NewSlotIndex);
-	Item->SetEquipSlot(this, NewSlotIndex);
-
+	UnequipItem(Item, EquipSlotKey);
+	EquipItem(Item, EquipSlotKey, NewSlotIndex);
 	OnAnyItemEquipSlotChanged.Broadcast(EquipSlotKey, Item, NewSlotIndex, *OldSlotKeyRef);
+	OnEquipChanged.Broadcast();
 }
 
 void UEquipment::OnItemAddedToAnyInventory(UItemBase* Item, UInventoryBase* Inventory)

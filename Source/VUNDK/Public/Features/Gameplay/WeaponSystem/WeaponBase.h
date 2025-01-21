@@ -29,7 +29,16 @@ public:
 	AWeaponBase();
 
 	UFUNCTION(BlueprintCallable)
+	virtual void Init(APawn* InOwner);
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void SetWeaponDamage(const float NewDamage);
+	
+	UFUNCTION(BlueprintCallable)
 	bool WeaponAttack();
+
+	UFUNCTION(BlueprintPure)
+	FWeaponData GetWeaponData() const;
 
 protected:
 	UFUNCTION(BlueprintNativeEvent)
