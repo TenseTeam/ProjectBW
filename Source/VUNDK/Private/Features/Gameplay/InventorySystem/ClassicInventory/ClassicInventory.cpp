@@ -14,11 +14,16 @@ UClassicInventory::UClassicInventory()
 {
 }
 
-USaveData* UClassicInventory::CreateSaveData()
+USaveData* UClassicInventory::CreateSaveDataObject_Implementation()
 {
-	UClassicInventorySaveData* ClassicInventorySaveData = NewObject<UClassicInventorySaveData>();
+	return NewObject<UClassicInventorySaveData>();
+}
+
+USaveData* UClassicInventory::CreateInventorySaveData_Implementation(USaveData* SaveData, TArray<UItemBase*>& ItemsToSave)
+{
+	UClassicInventorySaveData* ClassicInventorySaveData = Cast<UClassicInventorySaveData>(SaveData);
 	
-	for (UItemBase* Item : GetItems())
+	for (UItemBase* Item : ItemsToSave)
 	{
 		const UClassicItem* ClassicItem = Cast<UClassicItem>(Item);
 		FClassicItemSaveData ItemSaveData = ClassicItem->CreateClassicItemSaveData();

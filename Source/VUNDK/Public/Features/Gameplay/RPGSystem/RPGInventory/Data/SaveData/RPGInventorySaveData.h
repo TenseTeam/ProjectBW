@@ -14,5 +14,5 @@ class VUNDK_API URPGInventorySaveData : public UInventoryBaseSaveData
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = true))
-	FRPGInventoryItemsSaveData ItemsSaveData;
+	FRPGInventoryItemsSaveData RPGItemsSaveData;
 };

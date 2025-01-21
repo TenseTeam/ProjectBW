@@ -60,9 +60,9 @@ protected:
 private:
 	UPROPERTY()
 	TArray<UShootPoint*> ShootPoints;
-	FShootData ShootData;
 	int32 CurrentAmmo;
 	int32 ShotsFired;
+	FShootData ShootData;
 	bool bIsInCooldown;
 	int32 CurrentShootPointIndex;
 	bool bIsBehaviourActive;
@@ -110,6 +110,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetRecoilStrength(float NewRecoilStrength);
+
+	UFUNCTION(BlueprintCallable)
+	void SetCurrentAmmo(const int32 NewAmmo);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
 	float GetDamage() const;
@@ -127,7 +130,7 @@ public:
 	float GetRecoilStrength() const;
 
 	UFUNCTION(BlueprintPure)
-	virtual int32 GetCurrentAmmo() const override;
+	int32 GetCurrentAmmo() const;
 	
 	virtual UWorld* GetWorld() const override;
 
@@ -188,9 +191,7 @@ private:
 	bool HasEnoughAmmoToShoot(const int32 DesiredAmmoToConsume) const;
 
 	int32 NextShootPointIndex();
-
-	void SetCurrentAmmo(const int32 NewAmmoValue);
-
+	
 	void ModifyCurrentAmmo(const int32 AmmoValue);
 
 	void ApplyRecoilImpulse();

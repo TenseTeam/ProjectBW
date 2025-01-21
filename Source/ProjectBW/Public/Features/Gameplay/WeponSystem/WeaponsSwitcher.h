@@ -9,8 +9,6 @@
 #include "Features/Gameplay/WeaponSystem/WeaponBase.h"
 #include "WeaponsSwitcher.generated.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogWeaponsSwitcher, All, All);
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
 	FOnNewWeaponEquipped,
 	AWeaponBase*, Weapon

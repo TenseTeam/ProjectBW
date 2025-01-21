@@ -17,7 +17,7 @@ void UShooterBehaviourBase::Init(UShooter* InShooter, const FShootData InShootDa
 		UE_LOG(LogShooter, Error, TEXT("ShootPoints in %s is empty."), *GetName());
 		return;
 	}
-	
+
 	ShootData = InShootData;
 	Shooter = InShooter;
 	ShootPoints = InShootPoints;
@@ -32,7 +32,7 @@ void UShooterBehaviourBase::SetOwner(APawn* InOwner)
 		UE_LOG(LogShooter, Error, TEXT("Owner in %s is null."), *GetName());
 		return;
 	}
-	
+
 	Owner = InOwner;
 }
 
@@ -164,6 +164,11 @@ void UShooterBehaviourBase::SetRecoilStrength(float NewRecoilStrength)
 	ShootData.RecoilStrength = NewRecoilStrength;
 }
 
+void UShooterBehaviourBase::SetCurrentAmmo(const int32 NewAmmo)
+{
+	CurrentAmmo = FMath::Clamp(NewAmmo, 0, GetMagSize());
+}
+
 float UShooterBehaviourBase::GetRange_Implementation() const
 {
 	return ShootData.Range * RangeMultiplier;
@@ -198,7 +203,7 @@ UWorld* UShooterBehaviourBase::GetWorld() const
 {
 	if (!IsValid(Shooter))
 		return Super::GetWorld();
-	
+
 	return Shooter->GetWorld();
 }
 
@@ -306,7 +311,7 @@ bool UShooterBehaviourBase::TryGetCameraPoints(FVector& OutStartPoint, FVector& 
 	OutStartPoint = CameraManager->GetCameraCacheView().Location;
 	OutEndPoint = OutStartPoint + CameraManager->GetCameraCacheView().Rotation.Vector() * GetRange();
 	OutHitPoint = OutEndPoint;
-	
+
 	if (FHitResult HitResult; World->LineTraceSingleByChannel(HitResult, OutStartPoint, OutEndPoint, SightTraceChannel))
 		OutHitPoint = HitResult.ImpactPoint;
 
@@ -325,7 +330,7 @@ bool UShooterBehaviourBase::IsInLineOfSight(const FVector& StartPoint, const FVe
 
 	if (FHitResult HitResult; World->LineTraceSingleByChannel(HitResult, StartPoint, TargetPoint, SightTraceChannel))
 		return HitResult.ImpactPoint.Equals(TargetPoint, Tolerance);
-	
+
 	return true;
 }
 
@@ -397,14 +402,6 @@ int32 UShooterBehaviourBase::NextShootPointIndex()
 	return CurrentShootPointIndex;
 }
 
-void UShooterBehaviourBase::SetCurrentAmmo(const int32 NewAmmoValue)
-{
-	if (bHasInfiniteAmmo)
-		return;
-
-	CurrentAmmo = FMath::Clamp(NewAmmoValue, 0, GetMagSize());
-}
-
 void UShooterBehaviourBase::ModifyCurrentAmmo(const int32 AmmoValue)
 {
 	SetCurrentAmmo(CurrentAmmo + AmmoValue);
@@ -429,13 +426,7 @@ void UShooterBehaviourBase::ApplyRecoilImpulse()
 
 void UShooterBehaviourBase::ProcessRecoilImpulseRotation(const float DeltaTime)
 {
-	if (!IsValid(Owner))
-	{
-		UE_LOG(LogShooter, Error, TEXT("UShooterBehaviourBase::ProcessRecoilImpulseRotation: Owner is null in %s."), *GetName());
-		return;
-	}
-
-	if (RecoilRemaining <= 0.0f)
+	if (!IsValid(Owner) || RecoilRemaining <= 0.0f)
 		return;
 	
 	const FRotator RecoilStep = ImpulseRecoil * (DeltaTime * GetRecoilStrength());
@@ -451,7 +442,7 @@ void UShooterBehaviourBase::StartShootCooldown()
 		UE_LOG(LogShooter, Error, TEXT("ShooterBehaviour World is invalid in %s."), *GetName());
 		return;
 	}
-	
+
 	const float Cooldown = 1.0f / (GetFireRate() / 60.0f);
 	CooldownRemaining = Cooldown;
 	bIsInCooldown = true;
