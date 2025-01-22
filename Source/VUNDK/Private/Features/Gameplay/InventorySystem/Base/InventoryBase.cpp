@@ -14,8 +14,9 @@ UInventoryBase::UInventoryBase(): RelatedEquipment(nullptr)
 USaveData* UInventoryBase::CreateSaveData()
 {
 	UE_LOG(LogInventorySystem, Display, TEXT("Creating Save Data for inventory %s."), *GetName());
-	UInventoryBaseSaveData* InventorySaveData = NewObject<UInventoryBaseSaveData>();
-	return Cast<USaveData>(InventorySaveData);
+	USaveData* SaveData = CreateSaveDataObject();
+	TArray<UItemBase*> ItemsToSave = GetItems();
+	return CreateInventorySaveData_Implementation(SaveData, ItemsToSave);
 }
 
 bool UInventoryBase::LoadSaveData(USaveData* SavedData)
@@ -318,6 +319,16 @@ void UInventoryBase::RemoveItemFromList(UItemBase* Item)
 		Item->DeassignInventory();
 
 	OnInventoryModified.Broadcast();
+}
+
+USaveData* UInventoryBase::CreateSaveDataObject_Implementation()
+{
+	return NewObject<UInventoryBaseSaveData>();
+}
+
+USaveData* UInventoryBase::CreateInventorySaveData_Implementation(USaveData* SaveData, TArray<UItemBase*>& ItemsToSave)
+{
+	return SaveData;
 }
 
 void UInventoryBase::LoadInventorySaveData_Implementation(UInventoryBaseSaveData* InventorySaveData)

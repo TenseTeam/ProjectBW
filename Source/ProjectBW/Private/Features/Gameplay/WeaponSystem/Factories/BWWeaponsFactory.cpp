@@ -2,6 +2,7 @@
 
 #include "Features/Gameplay/WeponSystem/Factories/BWWeaponsFactory.h"
 #include "Features/Gameplay/InventorySystem/Data/WeaponItemData.h"
+#include "Features/Gameplay/WeponSystem/BWWeaponFirearm.h"
 
 AWeaponBase* UBWWeaponsFactory::CreateWeaponBase(APawn* Owner, UWeaponItem* WeaponItem)
 {
@@ -23,18 +24,23 @@ AWeaponBase* UBWWeaponsFactory::CreateWeapon(APawn* Owner, UWeaponItem* WeaponIt
 	return CreateWeaponBase(Owner, WeaponItem);
 }
 
-AWeaponFirearm* UBWWeaponsFactory::CreateWeaponFirearm(APawn* Owner, UWeaponFirearmItem* WeaponItem)
+ABWWeaponFirearm* UBWWeaponsFactory::CreateWeaponFirearm(APawn* Owner, UWeaponFirearmItem* WeaponItem)
 {
-	AWeaponFirearm* WeaponFirearm = Cast<AWeaponFirearm>(SpawnWeaponActor(Owner, WeaponItem));
+	ABWWeaponFirearm* WeaponFirearm = Cast<ABWWeaponFirearm>(SpawnWeaponActor(Owner, WeaponItem));
 
 	if (!IsValid(WeaponFirearm))
+	{
+		UE_LOG(LogBWWeapons, Error, TEXT("UBWWeaponsFactory::CreateWeaponFirearm: WeaponFirearm is nullptr"));
 		return nullptr;
+	}
 
 	WeaponFirearm->Init(Owner);
 	WeaponFirearm->SetWeaponDamage(WeaponItem->GetWeaponDamage());
 	WeaponFirearm->SetWeaponFireRate(WeaponItem->GetWeaponFireRate());
 	WeaponFirearm->SetWeaponRange(WeaponItem->GetWeaponRange());
 	WeaponFirearm->SetWeaponMagSize(WeaponItem->GetWeaponMagSize());
+	WeaponFirearm->SetWeaponFirearmItem(WeaponItem);
+	WeaponFirearm->SetAmmoRemaining(WeaponItem->GetAmmoRemaining()); // Important: Use a function to get ammo remaining cause getting it from the item caused a bug that set the ammo to 0
 	return WeaponFirearm;
 }
 
@@ -42,13 +48,13 @@ AActor* UBWWeaponsFactory::SpawnWeaponActor(const UObject* Instigator, const UWe
 {
 	if (!IsValid(Instigator))
 	{
-		UE_LOG(LogTemp, Error, TEXT("UBWWeaponsFactory::SpawnWeaponActor: Instigator is not valid."));
+		UE_LOG(LogBWWeapons, Error, TEXT("UBWWeaponsFactory::SpawnWeaponActor: Instigator is not valid."));
 		return nullptr;
 	}
 	
 	if (!IsValid(WeaponItem))
 	{
-		UE_LOG(LogTemp, Error, TEXT("UBWWeaponsFactory::SpawnWeaponActor: WeaponItem is nullptr"));
+		UE_LOG(LogBWWeapons, Error, TEXT("UBWWeaponsFactory::SpawnWeaponActor: WeaponItem is nullptr"));
 		return nullptr;
 	}
 	
@@ -56,14 +62,14 @@ AActor* UBWWeaponsFactory::SpawnWeaponActor(const UObject* Instigator, const UWe
 	
 	if (!IsValid(WeaponItemData))
 	{
-		UE_LOG(LogTemp, Error, TEXT("UBWWeaponsFactory::SpawnWeaponActor: WeaponItemData is nullptr"));
+		UE_LOG(LogBWWeapons, Error, TEXT("UBWWeaponsFactory::SpawnWeaponActor: WeaponItemData is nullptr"));
 		return nullptr;
 	}
 
 	UWorld* World = Instigator->GetWorld();
 	if (!IsValid(World))
 	{
-		UE_LOG(LogTemp, Error, TEXT("UBWWeaponsFactory::SpawnWeaponActor: World is nullptr"));
+		UE_LOG(LogBWWeapons, Error, TEXT("UBWWeaponsFactory::SpawnWeaponActor: World is nullptr"));
 		return nullptr;
 	}
 	
@@ -71,7 +77,7 @@ AActor* UBWWeaponsFactory::SpawnWeaponActor(const UObject* Instigator, const UWe
 
 	if (!IsValid(WeaponActor))
 	{
-		UE_LOG(LogTemp, Error, TEXT("UBWWeaponsFactory::SpawnWeaponActor: WeaponActor is nullptr"));
+		UE_LOG(LogBWWeapons, Error, TEXT("UBWWeaponsFactory::SpawnWeaponActor: WeaponActor is nullptr"));
 		return nullptr;
 	}
 

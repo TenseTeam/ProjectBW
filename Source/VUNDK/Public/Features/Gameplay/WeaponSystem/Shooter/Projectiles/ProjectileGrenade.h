@@ -26,7 +26,8 @@ protected:
 	UFUNCTION(BlueprintPure)
 	float GetExplosionRadius() const;
 
-	void ApplyExplosionDamage();
+	UFUNCTION(BlueprintCallable)
+	void Explode();
 
 	virtual void OnProjectileHit_Implementation(const FHitResult& ImpactResult, const FVector& ImpactVelocity) override;
 		

@@ -39,6 +39,11 @@ void AWeaponFirearm::SetWeaponRange(const float NewRange) const
 	Shooter->ShooterBehaviour->SetRange(NewRange);
 }
 
+void AWeaponFirearm::SetAmmoRemaining(const int32 NewAmmoRemaining) const
+{
+	Shooter->ShooterBehaviour->SetCurrentAmmo(NewAmmoRemaining);
+}
+
 void AWeaponFirearm::SetWeaponShootType(const EShootType NewShootType)
 {
 	WeaponShootType = NewShootType;

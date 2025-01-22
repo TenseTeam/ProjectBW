@@ -33,6 +33,8 @@ public:
 	void SetWeaponMagSize(const int32 NewMagSize) const;
 
 	void SetWeaponRange(const float NewRange) const;
+
+	void SetAmmoRemaining(const int32 NewAmmoRemaining) const;
 	
 	UFUNCTION(BlueprintCallable)
 	void SetWeaponShootType(const EShootType NewShootType);
