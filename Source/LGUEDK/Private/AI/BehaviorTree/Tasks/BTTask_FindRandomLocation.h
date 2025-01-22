@@ -21,9 +21,12 @@ public:
 	
 private:
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="AI", meta=(AllowPrivateAccess = "true"))
+	
 	bool bWantExplore;
 
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
 	FBlackboardKeySelector SearchRadiusKey;
+
+	UPROPERTY(EditAnywhere, Category = "Blackboard")
+	FBlackboardKeySelector InitialPositionKey;
 };

@@ -23,6 +23,8 @@ public:
 	UFUNCTION()
 	virtual float GetTimeBeforeNextStep() const { return TimeBeforeNextStep; }
 	UFUNCTION()
+	virtual bool GetWantExplore() const{return bWantExplore;}
+	UFUNCTION()
 	virtual int GetMinInvestigatingRadius() const { return MinInvestigatingRadius; }
 	UFUNCTION()
 	virtual int GetMaxInvestigatingRadius() const { return MaxInvestigatingRadius; }
@@ -36,7 +38,7 @@ public:
 	UFUNCTION()
 	virtual float GetMaxRadius() {return MaxAttackRadius; }
 	UFUNCTION()
-	virtual float GetRandomStrafeRadius() {return FMath::RandRange(MinStrafeRadius, MaxStrafeRadius); }
+	virtual float GetStrafeRadius() {return MaxStrafeRadius; }
 	
 	UFUNCTION()
 	virtual float GetJumpHeight() const {return MaxJumpingHeight; }
@@ -56,6 +58,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Patrolling", meta = (ClampMin = "0", ClampMax = "10", UIMin = "0", UIMax = "10"))
 	float TimeBeforeNextStep = 5;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Patrolling")
+	bool bWantExplore;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Investigating", meta = (ClampMin = "0", ClampMax = "1000", UIMin = "0", UIMax = "1000"))
 	float MinInvestigatingRadius = 200;
@@ -80,9 +85,6 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Attack Ranges")
 	float MaxAttackRadius = 1000.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Attack Ranges")
-	float MinStrafeRadius = 1000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Attack Ranges")
 	float MaxStrafeRadius = 1000.f;

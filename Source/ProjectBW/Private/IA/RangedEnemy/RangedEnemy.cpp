@@ -11,10 +11,6 @@ ARangedEnemy::ARangedEnemy()
 	
 }
 
-void ARangedEnemy::BaseAttack_Implementation()
-{
-	
-}
 
 void ARangedEnemy::BeginPlay()
 {

@@ -91,7 +91,7 @@ void UBTService_UpdatePlayerDistance::TickNode(UBehaviorTreeComponent& OwnerComp
 	
 	
 	//LGDebug::Log("player position " + CachedAttackTarget->GetActorLocation().ToString(), true);
-	LGDebug::Log("player position " + CachedSelf->GetName(), true);
+	//LGDebug::Log("player position " + CachedSelf->GetName(), true);
 	
 	// LGDebug::Log("enemy position " + CachedSelf->GetActorLocation().ToString(), true);
 }

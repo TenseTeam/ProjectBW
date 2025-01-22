@@ -17,9 +17,6 @@ public:
 
 	ARangedEnemy();
 
-	UFUNCTION(BlueprintCallable,BlueprintNativeEvent, Category = "AI|Shooter")
-	void BaseAttack();
-
 protected:
 
 	virtual void BeginPlay() override;

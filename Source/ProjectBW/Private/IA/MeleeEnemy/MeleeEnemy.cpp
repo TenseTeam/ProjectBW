@@ -47,10 +47,10 @@ void AMeleeEnemy::EquipSword(FName SocketName)
 	}
 }
 
-void AMeleeEnemy::FinishedEquipSword()
+void AMeleeEnemy::FinishedAnimation()
 {
-	OnFinishedEquipSword.Broadcast();
-	SetWieldSword(true);
+	OnFinishedAnimation.Broadcast();
+
 }
 
 // void AMeleeEnemy::PlayMontageWithNotify(UAnimMontage* MontageToPlay)

@@ -36,7 +36,8 @@ void ABaseEnemyController::InitializeBlackboardValues()
 		LGDebug::Log("blackboard NON INIZIALIZZATA",true);
 		return;
 	}
-
+	
+	Blackboard->SetValueAsVector("InitialPosition",EnemyBase->GetActorLocation());
 	Blackboard->SetValueAsFloat(TEXT("SearchRadius"), EnemyBase->GetSearchRadius());
 	Blackboard->SetValueAsFloat(TEXT("TimeBeforeNextStep"), EnemyBase->GetTimeBeforeNextStep());
 	Blackboard->SetValueAsVector(TEXT("TargetLocation"), FVector::ZeroVector);
@@ -45,7 +46,7 @@ void ABaseEnemyController::InitializeBlackboardValues()
 	Blackboard->SetValueAsFloat(TEXT("RandomInvestigatingTimeDeviation"), EnemyBase->GetRandomInvestigatingTimeDeviation());
 	Blackboard->SetValueAsFloat(TEXT("MaxAttackRadius"), EnemyBase->GetMaxRadius());
 	Blackboard->SetValueAsFloat(TEXT("MinAttackRadius"), EnemyBase->GetMinRadius());
-	Blackboard->SetValueAsFloat(TEXT("StrafeRadius"), EnemyBase->GetRandomStrafeRadius());
+	Blackboard->SetValueAsFloat(TEXT("StrafeRadius"), EnemyBase->GetStrafeRadius());
 	Blackboard->SetValueAsFloat(TEXT("JumpHeight"), EnemyBase->GetJumpHeight());
 	Blackboard->SetValueAsFloat(TEXT("JumpDistance"), EnemyBase->GetJumpDistance());
 	
@@ -181,7 +182,6 @@ void ABaseEnemyController::HandleHear(AActor* Actor, FAIStimulus Stimulus)
 
 		if (GetBlackboardComponent()->GetValueAsBool("HasBeenInvestigating") == false)
 		{
-			GetBlackboardComponent()->SetValueAsVector("InitialPosition",ControlledPawn->GetActorLocation());
 			GetBlackboardComponent()->SetValueAsBool("HasBeenInvestigating",true);
 		}
 			

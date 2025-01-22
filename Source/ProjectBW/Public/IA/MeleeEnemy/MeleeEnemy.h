@@ -8,7 +8,7 @@
 #include "MeleeEnemy.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(
-	FFinishedEquipSword);
+	FFinishedAnimation);
 
 
 UCLASS()
@@ -19,7 +19,7 @@ class PROJECTBW_API AMeleeEnemy : public AEnemyBase
 public:
 
 	UPROPERTY(BlueprintAssignable)
-	FFinishedEquipSword OnFinishedEquipSword;
+	FFinishedAnimation OnFinishedAnimation;
 	
 	AMeleeEnemy();
 
@@ -36,16 +36,13 @@ public:
 	void EquipSword(FName SocketName);
 
 	UFUNCTION(BlueprintCallable)
-	void FinishedEquipSword();
+	void FinishedAnimation();
 	
 protected:
 	
 	virtual void BeginPlay() override;
 
 	virtual void PostInitProperties() override;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Melee")
-	bool bWieldSword;
 
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "AI|Melee")
 	FName SwordSocketInHand;
@@ -61,11 +58,14 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly)
 	UChildActorComponent* ChildActor;
-
-	UPROPERTY()
+	
+	UPROPERTY(BlueprintReadOnly, Category = "AI|Melee")
 	AMeleeWeapon* MeleeWeapon;
 
+private:
 	
+	UPROPERTY(EditAnywhere, Category = "AI|Melee")
+	bool bWieldSword;
 	
 	//void OnMontageNotifyReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
 	
