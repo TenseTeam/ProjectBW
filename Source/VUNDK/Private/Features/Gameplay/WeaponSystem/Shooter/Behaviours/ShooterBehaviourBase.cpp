@@ -4,7 +4,7 @@
 #include "Features/Gameplay/WeaponSystem/Shooter/Shooter.h"
 #include "Kismet/GameplayStatics.h"
 
-void UShooterBehaviourBase::Init(UShooter* InShooter, const FShootData InShootData, const TArray<UShootPoint*> InShootPoints)
+void UShooterBehaviourBase::Init(UShooter* InShooter, const FShootData InShootData, const UShootBarrel* InShootBarrel)
 {
 	if (!IsValid(InShooter))
 	{
@@ -12,15 +12,15 @@ void UShooterBehaviourBase::Init(UShooter* InShooter, const FShootData InShootDa
 		return;
 	}
 
-	if (InShootPoints.Num() == 0)
+	if (!IsValid(InShootBarrel))
 	{
-		UE_LOG(LogShooter, Error, TEXT("ShootPoints in %s is empty."), *GetName());
+		UE_LOG(LogShooter, Error, TEXT("ShootBarrel in %s is null."), *GetName());
 		return;
 	}
 
 	ShootData = InShootData;
 	Shooter = InShooter;
-	ShootPoints = InShootPoints;
+	ShootPoints = InShootBarrel->GetShootPointsChildren();
 	EnableBehaviour();
 	OnInit();
 }
@@ -279,26 +279,16 @@ void UShooterBehaviourBase::OnRefill_Implementation()
 {
 }
 
-FVector UShooterBehaviourBase::CalculateShooterTargetLocation_Implementation() const
+FVector UShooterBehaviourBase::GetShooterTargetLocation_Implementation() const
 {
-	return FVector::ZeroVector;
-}
-
-FVector UShooterBehaviourBase::GetShooterTargetLocation() const
-{
-	if (!bUseCameraTargetLocation)
-		return CalculateShooterTargetLocation();
-
-	FVector CameraStartPoint;
-	FVector CameraEndPoint;
-	FVector CameraHitPoint;
-	if (TryGetCameraPoints(CameraStartPoint, CameraEndPoint, CameraHitPoint))
+	FRotator Rotation;
+	if (FVector CameraStartPoint, CameraEndPoint, CameraHitPoint; TryGetCameraPoints(CameraStartPoint, CameraEndPoint, CameraHitPoint, Rotation))
 		return CameraHitPoint;
-
+	
 	return FVector::ZeroVector;
 }
 
-bool UShooterBehaviourBase::TryGetCameraPoints(FVector& OutStartPoint, FVector& OutEndPoint, FVector& OutHitPoint) const
+bool UShooterBehaviourBase::TryGetCameraPoints(FVector& OutStartPoint, FVector& OutEndPoint, FVector& OutHitPoint, FRotator& OutRotation, const FVector StartPointOffset) const
 {
 	const UWorld* World = Shooter->GetWorld();
 
@@ -315,8 +305,12 @@ bool UShooterBehaviourBase::TryGetCameraPoints(FVector& OutStartPoint, FVector& 
 		return false;
 	}
 
-	OutStartPoint = CameraManager->GetCameraCacheView().Location;
-	OutEndPoint = OutStartPoint + CameraManager->GetCameraCacheView().Rotation.Vector() * GetRange();
+	const FVector CameraLocation = CameraManager->GetCameraCacheView().Location;
+	OutRotation = CameraManager->GetCameraCacheView().Rotation;
+
+	const FVector WorldOffset = OutRotation.RotateVector(StartPointOffset);
+	OutStartPoint = CameraLocation + WorldOffset;
+	OutEndPoint = OutStartPoint + OutRotation.Vector() * GetRange();
 	OutHitPoint = OutEndPoint;
 
 	if (FHitResult HitResult; World->LineTraceSingleByChannel(HitResult, OutStartPoint, OutEndPoint, SightTraceChannel))

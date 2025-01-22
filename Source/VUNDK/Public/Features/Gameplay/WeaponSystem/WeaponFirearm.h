@@ -16,11 +16,17 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UShooter* Shooter;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UShootBarrel* ShootBarrel;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FName ShootBarrelSocketName = "Barrel";
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EShootType WeaponShootType;
 	
 public:
 	AWeaponFirearm();
 
+	virtual void PostInitProperties() override;
+	
 	virtual void Init(APawn* InOwner) override;
 
 	UFUNCTION(BlueprintCallable)
@@ -51,5 +57,5 @@ protected:
 	UFUNCTION(BlueprintNativeEvent)
 	void OnReload();
 	
-	virtual bool OnWeaponAttack_Implementation() override;
+	virtual bool DeployWeaponAttack_Implementation() override;
 };

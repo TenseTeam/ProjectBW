@@ -5,6 +5,13 @@
 AWeaponFirearm::AWeaponFirearm()
 {
 	Shooter = CreateDefaultSubobject<UShooter>(TEXT("Shooter"));
+	ShootBarrel = CreateDefaultSubobject<UShootBarrel>(TEXT("ShootBarrel"));
+}
+
+void AWeaponFirearm::PostInitProperties()
+{
+	Super::PostInitProperties();
+	ShootBarrel->AttachToComponent(MeshComponent, FAttachmentTransformRules::SnapToTargetIncludingScale, ShootBarrelSocketName);
 }
 
 void AWeaponFirearm::Init(APawn* InOwner)
@@ -65,6 +72,7 @@ void AWeaponFirearm::ReloadAllMagazine()
 void AWeaponFirearm::BeginPlay()
 {
 	Super::BeginPlay();
+	Shooter->Init(ShootBarrel);
 	SetWeaponDamage(WeaponData.Damage);
 }
 
@@ -72,8 +80,8 @@ void AWeaponFirearm::OnReload_Implementation()
 {
 }
 
-bool AWeaponFirearm::OnWeaponAttack_Implementation()
+bool AWeaponFirearm::DeployWeaponAttack_Implementation()
 {
-	Super::OnWeaponAttack_Implementation();
+	Super::DeployWeaponAttack_Implementation();
 	return Shooter->Shoot(WeaponShootType);
 }

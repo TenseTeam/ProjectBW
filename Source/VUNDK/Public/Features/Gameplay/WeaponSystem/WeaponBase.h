@@ -8,7 +8,11 @@
 #include "WeaponBase.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(
-	FOnWeaponAttack
+	FOnWeaponAttackSuccess
+);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(
+	FOnWeaponAttackFail
 );
 
 UCLASS(Abstract, Blueprintable, BlueprintType)
@@ -18,8 +22,10 @@ class VUNDK_API AWeaponBase : public AActor
 
 protected:
 	UPROPERTY(BlueprintAssignable)
-	FOnWeaponAttack OnWeaponAttackEvent;
-	
+	FOnWeaponAttackSuccess OnWeaponAttackSuccessEvent;
+	UPROPERTY(BlueprintAssignable)
+	FOnWeaponAttackFail OnWeaponAttackFailEvent;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FWeaponData WeaponData;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -30,10 +36,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Init(APawn* InOwner);
-	
+
 	UFUNCTION(BlueprintCallable)
 	virtual void SetWeaponDamage(const float NewDamage);
-	
+
 	UFUNCTION(BlueprintCallable)
 	bool WeaponAttack();
 
@@ -42,5 +48,11 @@ public:
 
 protected:
 	UFUNCTION(BlueprintNativeEvent)
-	bool OnWeaponAttack();
+	bool DeployWeaponAttack();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnWeaponAttackSuccess();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnWeaponAttackFail();
 };

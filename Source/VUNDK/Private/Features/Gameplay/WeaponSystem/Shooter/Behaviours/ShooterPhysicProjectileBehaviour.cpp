@@ -9,10 +9,10 @@ UShooterPhysicProjectileBehaviour::UShooterPhysicProjectileBehaviour(): Projecti
 {
 }
 
-void UShooterPhysicProjectileBehaviour::Init(UShooter* InShooter, const FShootData InShootData, const TArray<UShootPoint*> InShootPoints)
+void UShooterPhysicProjectileBehaviour::Init(UShooter* InShooter, const FShootData InShootData, const UShootBarrel* InShootBarrel)
 {
 	ProjectilePool = UPoolsUtility::GetPool(ProjectilesPoolName);
-	Super::Init(InShooter, InShootData, InShootPoints);
+	Super::Init(InShooter, InShootData, InShootBarrel);
 }
 
 void UShooterPhysicProjectileBehaviour::OnDeployShoot_Implementation(UShootPoint* ShootPoint, const bool bIsUsingCameraHitTargetLocation, const FVector& TargetLocation, const FVector& DirectionToTarget) const

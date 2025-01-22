@@ -13,6 +13,8 @@ class VUNDK_API AProjectileGrenade : public AProjectileBase
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bDoFullDamage = true;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float TimeToExplosion = 5.0f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TEnumAsByte<ECollisionChannel> ExplosionPreventionChannel = ECC_Visibility;

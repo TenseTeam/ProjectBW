@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Features/Gameplay/WeaponSystem/Shooter/ShootBarrel.h"
 #include "Features/Gameplay/WeaponSystem/Shooter/ShootPoint.h"
 #include "Features/Gameplay/WeaponSystem/Shooter/Data/ShootData.h"
 #include "Features/Gameplay/WeaponSystem/Shooter/Interfaces/ShooterBehaviour.h"
@@ -73,7 +74,7 @@ private:
 	float RecoilRemaining;
 
 public:
-	virtual void Init(UShooter* InShooter, const FShootData InShootData, const TArray<UShootPoint*> InShootPoints);
+	virtual void Init(UShooter* InShooter, const FShootData InShootData, const UShootBarrel* InShootBarrel);
 
 	void SetOwner(APawn* InOwner);
 
@@ -172,14 +173,15 @@ protected:
 	UFUNCTION(BlueprintNativeEvent)
 	void OnRefill();
 
-	UFUNCTION(BlueprintNativeEvent)
-	FVector CalculateShooterTargetLocation() const;
-
-	UFUNCTION(BlueprintPure)
+	/**
+	 * Gets the location of the target the shooter is aiming at. By default, it returns the location of the camera hit point.
+	 * @return The location of the target the shooter is aiming at.
+	 */
+	UFUNCTION(BlueprintNativeEvent, meta = (ToolTip = "Get the location of the target the shooter is aiming at. By default, it returns the location of the camera hit point."))
 	FVector GetShooterTargetLocation() const;
 
 	UFUNCTION(BlueprintCallable)
-	bool TryGetCameraPoints(FVector& OutStartPoint, FVector& OutEndPoint, FVector& OutHitPoint) const;
+	bool TryGetCameraPoints(FVector& OutStartPoint, FVector& OutEndPoint, FVector& OutHitPoint, FRotator& OutRotation, FVector StartPointOffset = FVector::ZeroVector) const;
 
 	UFUNCTION(BlueprintPure)
 	bool IsInLineOfSight(const FVector& StartPoint, const FVector& TargetPoint, const float Tolerance = 50.0f) const;

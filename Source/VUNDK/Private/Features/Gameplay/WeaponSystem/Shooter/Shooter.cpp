@@ -8,14 +8,12 @@ UShooter::UShooter(): ShooterBehaviour(nullptr),
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-void UShooter::Init(const TArray<UShootPoint*> InShootPoints)
+void UShooter::Init(const UShootBarrel* InShootBarrel)
 {
-	ShootPoints = InShootPoints;
-	
 	if (!Check())
 		return;
 	
-	ShooterBehaviour->Init(this, ShootData, ShootPoints);
+	ShooterBehaviour->Init(this, ShootData, InShootBarrel);
 }
 
 void UShooter::SetOwner(APawn* InOwner) const

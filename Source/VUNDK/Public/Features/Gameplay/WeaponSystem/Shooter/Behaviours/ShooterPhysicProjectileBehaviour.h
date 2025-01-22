@@ -25,7 +25,7 @@ private:
 public:
 	UShooterPhysicProjectileBehaviour();
 
-	virtual void Init(UShooter* InShooter, const FShootData InShootData, const TArray<UShootPoint*> InShootPoints) override;
+	virtual void Init(UShooter* InShooter, const FShootData InShootData, const UShootBarrel* InShootBarrel) override;
 
 protected:
 	virtual void OnDeployShoot_Implementation(UShootPoint* ShootPoint, const bool bIsUsingCameraHitTargetLocation, const FVector& TargetLocation, const FVector& DirectionToTarget) const override;

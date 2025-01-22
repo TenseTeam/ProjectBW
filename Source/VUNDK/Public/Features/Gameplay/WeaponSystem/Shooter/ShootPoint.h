@@ -25,5 +25,14 @@ public:
 	FVector GetShootPointLocation() const;
 
 	UFUNCTION(BlueprintPure)
+	FVector GetShootPointRelativeLocation() const;
+
+	UFUNCTION(BlueprintPure)
 	FVector GetShootPointDirection() const;
+
+	UFUNCTION(BlueprintPure)
+	FVector GetShootPointRelativeDirection() const;
+
+protected:
+	virtual void OnRegister() override;
 };

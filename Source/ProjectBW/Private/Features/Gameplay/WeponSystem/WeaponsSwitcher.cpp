@@ -33,6 +33,11 @@ void UWeaponsSwitcher::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Equipment->OnAnyItemUnequipped.RemoveDynamic(this, &UWeaponsSwitcher::OnAnyItemUnequipped);
 }
 
+bool UWeaponsSwitcher::IsAnyWeaponEquipped() const
+{
+	return IsValid(CurrentEquippedWeapon);
+}
+
 bool UWeaponsSwitcher::TryGetEquippedWeapon(AWeaponBase*& OutWeapon) const
 {
 	if (!Check())
@@ -88,7 +93,7 @@ void UWeaponsSwitcher::AddWeaponActor(UWeaponItem* Item, const int32 SlotIndex)
 
 	Weapons.Add(SlotIndex, Weapon);
 
-	if (bEquipWeaponOnFirstSlot && SlotIndex == 0)
+	if (!IsAnyWeaponEquipped())
 		TryEquipWeaponAtSlot(SlotIndex);
 	else
 		WithdrawWeapon(Weapon);

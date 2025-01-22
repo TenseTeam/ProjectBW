@@ -17,8 +17,8 @@ void ABWWeaponFirearm::OnReload_Implementation()
 	WeaponFirearmItem->SetAmmoRemaining(Shooter->ShooterBehaviour->GetCurrentAmmo());
 }
 
-bool ABWWeaponFirearm::OnWeaponAttack_Implementation()
+bool ABWWeaponFirearm::DeployWeaponAttack_Implementation()
 {
 	WeaponFirearmItem->SetAmmoRemaining(Shooter->ShooterBehaviour->GetCurrentAmmo());
-	return Super::OnWeaponAttack_Implementation();
+	return Super::DeployWeaponAttack_Implementation();
 }

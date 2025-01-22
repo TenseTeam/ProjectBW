@@ -27,5 +27,5 @@ public:
 protected:
 	virtual void OnReload_Implementation() override;
 	
-	virtual bool OnWeaponAttack_Implementation() override;
+	virtual bool DeployWeaponAttack_Implementation() override;
 };

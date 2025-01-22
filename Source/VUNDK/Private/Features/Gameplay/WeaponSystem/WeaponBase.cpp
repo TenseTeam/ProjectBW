@@ -21,12 +21,15 @@ void AWeaponBase::SetWeaponDamage(const float NewDamage)
 
 bool AWeaponBase::WeaponAttack()
 {
-	if (OnWeaponAttack())
+	if (DeployWeaponAttack())
 	{
-		OnWeaponAttackEvent.Broadcast();
+		OnWeaponAttackSuccess();
+		OnWeaponAttackSuccessEvent.Broadcast();
 		return true;
 	}
 
+	OnWeaponAttackFail();
+	OnWeaponAttackFailEvent.Broadcast();
 	return false;
 }
 
@@ -35,7 +38,15 @@ FWeaponData AWeaponBase::GetWeaponData() const
 	return WeaponData;
 }
 
-bool AWeaponBase::OnWeaponAttack_Implementation()
+bool AWeaponBase::DeployWeaponAttack_Implementation()
 {
 	return true;
+}
+
+void AWeaponBase::OnWeaponAttackSuccess_Implementation()
+{
+}
+
+void AWeaponBase::OnWeaponAttackFail_Implementation()
+{
 }

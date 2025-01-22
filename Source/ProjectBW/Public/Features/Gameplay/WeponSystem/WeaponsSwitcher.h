@@ -31,8 +31,6 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UEquipSlotKey* WeaponEquipSlotKey;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	bool bEquipWeaponOnFirstSlot = true;
 
 private:
 	UPROPERTY()
@@ -57,6 +55,9 @@ public:
 	void Init(UEquipment* InEquipment, USceneComponent* InAttachToComponentEquipped, FName InEquipppedWeaponAttachSocketName, USceneComponent* InAttachToComponentUnequipped, FName InUnequipppedWeaponAttachSocketName);
 	
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+	UFUNCTION(BlueprintPure)
+	bool IsAnyWeaponEquipped() const;
 	
 	UFUNCTION(BlueprintPure)
 	bool TryGetEquippedWeapon(AWeaponBase*& OutWeapon) const;
