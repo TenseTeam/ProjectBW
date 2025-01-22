@@ -126,18 +126,19 @@ void ABaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 	if (Stimulus.WasSuccessfullySensed())
 	{
 		if (Stimulus.Type != UAISense::GetSenseID<UAISense_Sight>())return;
+		if (EnemyBase->GetState() == EEnemyState::Attacking)return;
 		
 		if (Actor->Implements<UAITargetInterface>())
 		{
 			int index = IAITargetInterface::Execute_GetTeamIndex(Actor);
-
-			if (index == EnemyBase->GetMyTeamIndex())return;
 			
 			if (GetWorld()->GetTimerManager().IsTimerActive(LostSightTimerHandle))
 			{
 				GetWorld()->GetTimerManager().ClearTimer(LostSightTimerHandle);
 				LGDebug::Log("TIMER PERSO ANNULLATO", true);
 			}
+			
+			if (index == EnemyBase->GetMyTeamIndex())return;
 			
 			SetStateAsAttacking(Actor);
 			LGDebug::Log("SEE PLAYER ",true);
@@ -157,7 +158,7 @@ void ABaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 		);
 		LGDebug::Log("LOST SIGHT PLAYER", true);
 		
-		ClearFocus(EAIFocusPriority::Gameplay);
+		// ClearFocus(EAIFocusPriority::Gameplay);
 	}		
 	
 }

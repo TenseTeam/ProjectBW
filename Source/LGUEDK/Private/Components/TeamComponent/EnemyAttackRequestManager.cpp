@@ -8,14 +8,14 @@
 
 UEnemyAttackRequestManager::UEnemyAttackRequestManager()
 {
-	CurrentTokens = MaxTokens;
+	
 }
 
 
 void UEnemyAttackRequestManager::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	CurrentTokens = MaxTokens;
 }
 
 
@@ -23,7 +23,7 @@ bool UEnemyAttackRequestManager::TryGetToken(int TokenCost)
 {
 	if (CurrentTokens < TokenCost)
 	{
-		LGDebug::Log("Not enough tokens. Current tokens: %d" + CurrentTokens, true);
+		LGDebug::Log("Not enough tokens. Current tokens:" + CurrentTokens, true);
 		return false;
 	}
 	
