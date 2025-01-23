@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/ArrowComponent.h"
 #include "Data/WeaponData.h"
 #include "GameFramework/Actor.h"
 #include "WeaponBase.generated.h"
@@ -29,7 +30,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FWeaponData WeaponData;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	USkeletalMeshComponent* MeshComponent;
+	USceneComponent* WeaponMeshRoot;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	USkeletalMeshComponent* WeaponMesh;
+
+private:
+#if WITH_EDITORONLY_DATA
+	UPROPERTY()
+	UArrowComponent* ArrowComponent;
+#endif
 
 public:
 	AWeaponBase();

@@ -11,7 +11,11 @@ AWeaponFirearm::AWeaponFirearm()
 void AWeaponFirearm::PostInitProperties()
 {
 	Super::PostInitProperties();
-	ShootBarrel->AttachToComponent(MeshComponent, FAttachmentTransformRules::SnapToTargetIncludingScale, ShootBarrelSocketName);
+
+	if (WeaponMesh->DoesSocketExist(ShootBarrelSocketName))
+		ShootBarrel->AttachToComponent(WeaponMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, ShootBarrelSocketName);
+	else
+		ShootBarrel->SetupAttachment(WeaponMesh);
 }
 
 void AWeaponFirearm::Init(APawn* InOwner)
