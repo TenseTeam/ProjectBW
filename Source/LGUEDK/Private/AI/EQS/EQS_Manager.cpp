@@ -39,7 +39,7 @@ void AEQS_Manager::UpdateStrafePoints()
 	TArray<FVector> MeleePoints;
 	FNavLocation NavLocation;
 	float GridRadius = MaxRadius;
-	float StepSize = 400;
+	float StepSize = 300;
 	int32 GridSize = FMath::CeilToInt(GridRadius / StepSize);
 
 	// for (int32 i = 0; i < NumberOfPoints; i++)
@@ -65,7 +65,6 @@ void AEQS_Manager::UpdateStrafePoints()
 			
 			if (NavSystem->ProjectPointToNavigation(CandidatePoint, NavLocation, FVector(StepSize, StepSize, 200.0f)))
 			{
-				
 				
 				if (IsInRange(TargetLocation,NavLocation.Location,MinRadius,MaxRadius) && !IsHittingSomething(NavLocation.Location,TargetLocation))
 					MeleePoints.Add(NavLocation.Location);
@@ -102,8 +101,21 @@ void AEQS_Manager::UpdateStrafePoints()
 	{
 		for (int32 Y = -GridSize; Y <= GridSize; ++Y)
 		{
-			FVector CandidatePoint = TargetLocation + FVector(X * StepSize, Y * StepSize, 0.0f);
+			// Punto base della griglia
+			FVector GridPoint = TargetLocation + FVector(X * StepSize, Y * StepSize, 0.0f);
 
+			// Aggiunta di randomizzazione attorno al punto base
+			float Angle = FMath::DegreesToRadians(FMath::RandRange(0.0f, 360.0f));
+			float Radius = FMath::RandRange(0.0f, StepSize); // Randomizzazione entro la dimensione della griglia
+			FVector RandomOffset = FVector(
+				FMath::Cos(Angle) * Radius,
+				FMath::Sin(Angle) * Radius,
+				0.0f
+			);
+
+			// Somma il punto randomizzato al punto della griglia
+			FVector CandidatePoint = GridPoint + RandomOffset;
+			
 			// FNavLocation NavLocation;
 			if (NavSystem->ProjectPointToNavigation(CandidatePoint, NavLocation, FVector(StepSize, StepSize, 200.0f)))
 			{
