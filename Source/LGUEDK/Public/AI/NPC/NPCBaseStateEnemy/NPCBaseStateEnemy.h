@@ -52,6 +52,9 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, Category = "AI|EQS")
 	AEQS_Manager* EQS_Manager;
+
+	UPROPERTY(VisibleAnywhere, Category = "AI|")
+	EEnemyType EnemyType;
 	
 protected:
 	

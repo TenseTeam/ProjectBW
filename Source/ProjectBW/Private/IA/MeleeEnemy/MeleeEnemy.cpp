@@ -10,7 +10,7 @@ AMeleeEnemy::AMeleeEnemy()
 {
 	ChildActor = CreateDefaultSubobject<UChildActorComponent>(TEXT("ChildActor"));
 	ChildActor->SetChildActorClass(AMeleeWeapon::StaticClass());
-	
+	EnemyType = EEnemyType::Melee;
 }
 
 void AMeleeEnemy::BeginPlay()

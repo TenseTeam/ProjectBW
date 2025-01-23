@@ -27,7 +27,8 @@ EBTNodeResult::Type UBTTask_GetNavMeshPoint::ExecuteTask(UBehaviorTreeComponent&
 	if (!ControlledPawn)return EBTNodeResult::Failed;
 
 	ControlledPawn->EQS_Manager->CanSearchPoint = true;
-	FVector TargetLocation = ControlledPawn->EQS_Manager->GetPoint(EEnemyType::Melee);
+	EEnemyType EnemyType = ControlledPawn->EnemyType;
+	FVector TargetLocation = ControlledPawn->EQS_Manager->GetPoint(EnemyType);
 	
 	OwnerComp.GetBlackboardComponent()->SetValueAsVector(TargetLocationKey.SelectedKeyName,TargetLocation);
 

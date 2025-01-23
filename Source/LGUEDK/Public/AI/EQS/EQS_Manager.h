@@ -18,7 +18,7 @@ public:
 
 	
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "AI|")
-	bool CanSearchPoint ;
+	bool CanSearchPoint;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -55,10 +55,20 @@ protected:
 
 	
 private:
+
+	UPROPERTY()
+	ACharacter* AttackTarget;
+	
 	float CurrentTime = 0;
 
 	UFUNCTION(BlueprintCallable)
 	void Initi();
+
+	UFUNCTION(BlueprintCallable)
+	bool IsHittingSomething(const FVector& Start, const FVector& End);
+
+	UFUNCTION(BlueprintCallable)
+	bool IsInRange(FVector TargetPosition,FVector CurrentPosition, const float MinDistance, const float MaxDistance);
 };
 
 

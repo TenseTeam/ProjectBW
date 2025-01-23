@@ -8,7 +8,7 @@
 ARangedEnemy::ARangedEnemy()
 {
 	Shooter = CreateDefaultSubobject<UShooter>(TEXT("ShooterComponent"));
-	
+	EnemyType = EEnemyType::Ranged;
 }
 
 
