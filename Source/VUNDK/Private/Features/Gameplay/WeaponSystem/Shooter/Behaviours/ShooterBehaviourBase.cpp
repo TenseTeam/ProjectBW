@@ -445,12 +445,6 @@ void UShooterBehaviourBase::ProcessRecoilImpulseRotation(const float DeltaTime)
 
 void UShooterBehaviourBase::StartShootCooldown()
 {
-	if (!IsValid(Shooter->GetWorld()))
-	{
-		UE_LOG(LogShooter, Error, TEXT("ShooterBehaviour World is invalid in %s."), *GetName());
-		return;
-	}
-
 	const float Cooldown = 1.0f / (GetFireRate() / 60.0f);
 	CooldownRemaining = Cooldown;
 	bIsInCooldown = true;
