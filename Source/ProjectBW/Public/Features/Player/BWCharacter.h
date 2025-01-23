@@ -9,7 +9,7 @@
 #include "Components/EnvironmentTracing/GroundCheckComponent.h"
 #include "Data/CharacterData.h"
 #include "Features/Gameplay/DynamicCameraSystem/GvSpringArmComponent.h"
-#include "Features/Gameplay/GrapplingHookSystem/GrapplingHookComponent.h"
+#include "Features/Gameplay/GrapplingHookSystem/Components/GrapplingHookComponent.h"
 #include "Patterns/State/StateMachineComponent.h"
 #include "BWCharacter.generated.h"
 

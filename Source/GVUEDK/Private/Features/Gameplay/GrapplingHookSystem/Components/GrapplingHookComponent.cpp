@@ -1,7 +1,7 @@
 // Copyright Villains, Inc. All Rights Reserved.
 
 
-#include "GVUEDK/Public/Features/Gameplay/GrapplingHookSystem/GrapplingHookComponent.h"
+#include "GVUEDK/Public/Features/Gameplay/GrapplingHookSystem/Components/GrapplingHookComponent.h"
 
 #include <string>
 #include "GameFramework/Character.h"
