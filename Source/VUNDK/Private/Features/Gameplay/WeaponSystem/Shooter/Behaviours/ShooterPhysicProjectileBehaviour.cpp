@@ -9,7 +9,7 @@ UShooterPhysicProjectileBehaviour::UShooterPhysicProjectileBehaviour(): Projecti
 {
 }
 
-void UShooterPhysicProjectileBehaviour::Init(UShooter* InShooter, const FShootData InShootData, const UShootBarrel* InShootBarrel)
+void UShooterPhysicProjectileBehaviour::Init(UShooter* InShooter, const FShootData InShootData, UShootBarrel* InShootBarrel)
 {
 	ProjectilePool = UPoolsUtility::GetPool(ProjectilesPoolName);
 	Super::Init(InShooter, InShootData, InShootBarrel);

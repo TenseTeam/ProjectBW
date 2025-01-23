@@ -8,7 +8,7 @@ UShooter::UShooter(): ShooterBehaviour(nullptr),
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-void UShooter::Init(const UShootBarrel* InShootBarrel)
+void UShooter::Init(UShootBarrel* InShootBarrel)
 {
 	if (!Check())
 		return;

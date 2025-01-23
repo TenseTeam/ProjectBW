@@ -28,7 +28,7 @@ public:
 	UShooter();
 
 	UFUNCTION(BlueprintCallable)
-	void Init(const UShootBarrel* InShootBarrel);
+	void Init(UShootBarrel* InShootBarrel);
 
 	UFUNCTION(BlueprintCallable)
 	void SetOwner(APawn* InOwner) const;

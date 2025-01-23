@@ -6,6 +6,7 @@
 #include "Features/Gameplay/WeaponSystem/Shooter/ShootBarrel.h"
 #include "Features/Gameplay/WeaponSystem/Shooter/ShootPoint.h"
 #include "Features/Gameplay/WeaponSystem/Shooter/Data/ShootData.h"
+#include "Features/Gameplay/WeaponSystem/Shooter/Data/ShootFailReason.h"
 #include "Features/Gameplay/WeaponSystem/Shooter/Interfaces/ShooterBehaviour.h"
 #include "UObject/Object.h"
 #include "ShooterBehaviourBase.generated.h"
@@ -13,17 +14,18 @@
 class UShooter;
 enum class EShootType : uint8;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
-	FOnShootSuccess,
-	UShootPoint*, ShootPoint
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
+	FOnBehaviourShootSuccess,
+	UShootBarrel*, ShootBarrel,
+	int32, ShotIndex
 );
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(
-	FOnShootFail
+	FOnBehaviourShootFail
 );
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
-	FOnRefill,
+	FOnBehaviourRefill,
 	int32, CurrentAmmo
 );
 
@@ -40,11 +42,11 @@ class VUNDK_API UShooterBehaviourBase : public UObject, public IShooterBehaviour
 
 public:
 	UPROPERTY(BlueprintAssignable)
-	FOnShootSuccess OnBehaviourShootSuccess;
+	FOnBehaviourShootSuccess OnBehaviourShootSuccess;
 	UPROPERTY(BlueprintAssignable)
-	FOnShootFail OnBehaviourShootFail;
+	FOnBehaviourShootFail OnBehaviourShootFail;
 	UPROPERTY(BlueprintAssignable)
-	FOnRefill OnBehaviourRefill;
+	FOnBehaviourRefill OnBehaviourRefill;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TEnumAsByte<ECollisionChannel> SightTraceChannel = ECollisionChannel::ECC_Visibility;
@@ -58,24 +60,27 @@ protected:
 	UShooter* Shooter;
 	UPROPERTY(BlueprintReadOnly)
 	APawn* Owner;
+	UPROPERTY(BlueprintReadOnly)
+	TArray<UShootPoint*> ShootPoints;
 
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = 0.0f, UIMin = 0.0f, AllowPrivateAccess = true))
 	int32 AmmoToConsumePerShot = 1;
 	UPROPERTY()
-	TArray<UShootPoint*> ShootPoints;
+	UShootBarrel* ShootBarrel;
+	FShootData ShootData;
 	int32 CurrentAmmo;
 	int32 ShotsFired;
-	FShootData ShootData;
-	bool bIsInCooldown;
 	int32 CurrentShootPointIndex;
+	bool bIsInCooldown;
 	bool bIsBehaviourActive;
-	FRotator ImpulseRecoil;
-	float CooldownRemaining;
 	float RecoilRemaining;
+	float CooldownRemaining;
+	FRotator ImpulseRecoil;
+	FRotator BaselineControlRotation;
 
 public:
-	virtual void Init(UShooter* InShooter, const FShootData InShootData, const UShootBarrel* InShootBarrel);
+	virtual void Init(UShooter* InShooter, const FShootData InShootData, UShootBarrel* InShootBarrel);
 
 	void SetOwner(APawn* InOwner);
 
@@ -87,7 +92,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
 	virtual bool Shoot() override;
-
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
 	void ResetRecoil();
 
@@ -155,9 +160,13 @@ public:
 #endif
 
 protected:
-	void ShootSuccess(UShootPoint* ShootPoint);
-
-	void ShootFail();
+	virtual void HandleShoot();
+	
+	void ShootFromShootPoint(UShootPoint* ShootPoint) const;
+	
+	void ShootSuccess();
+	
+	void ShootFail(const EShootFailReason FailReason);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnInit();
@@ -175,10 +184,13 @@ protected:
 	void OnDeployShoot(UShootPoint* ShootPoint, const bool bIsUsingCameraHitTargetLocation, const FVector& TargetLocation, const FVector& DirectionToTarget) const;
 
 	UFUNCTION(BlueprintNativeEvent)
-	void OnShootSuccess(UShootPoint* ShootPoint, const FVector& TargetLocation, const FVector& DirectionToTarget) const;
+	void OnShootFromShootPoint(UShootPoint* ShootPoint, const FVector& TargetLocation, const FVector& DirectionToTarget) const;
 
 	UFUNCTION(BlueprintNativeEvent)
-	void OnShootFail();
+	void OnShootSuccess(const UShootBarrel* OutShootBarrel);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnShootFail(const EShootFailReason FailReason);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnRefill();
@@ -200,14 +212,16 @@ protected:
 
 private:
 	void TickBehaviour(float DeltaTime);
+	
+	void HandleSimultaneousShoot();
 
-	bool HandleSimultaneousShoot();
-
-	bool HandleSequentialShoot();
-
-	bool HasEnoughAmmoToShoot(const int32 DesiredAmmoToConsume) const;
-
+	void HandleSequentialShoot();
+	
 	int32 NextShootPointIndex();
+	
+	bool TryConsumeAmmoForShoot();
+	
+	bool HasEnoughAmmoToShoot() const;
 
 	void ModifyCurrentAmmo(const int32 AmmoValue);
 
