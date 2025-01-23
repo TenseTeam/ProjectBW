@@ -3,7 +3,8 @@
 #include "Patterns/ObjectPool/ActorPool.h"
 #include "Patterns/ObjectPool/Interfaces/PooledActor.h"
 
-UActorPool::UActorPool(): bIsCapped(false)
+UActorPool::UActorPool(): bIsCapped(false),
+                          bHasBeenDestroyed(false)
 {
 }
 
