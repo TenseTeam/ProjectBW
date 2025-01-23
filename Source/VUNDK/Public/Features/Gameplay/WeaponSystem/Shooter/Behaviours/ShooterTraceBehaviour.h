@@ -28,7 +28,7 @@ public:
 #endif
 
 protected:
-	virtual void OnDeployShoot_Implementation(UShootPoint* ShootPoint, const bool bIsUsingCameraHitTargetLocation, const FVector& TargetLocation, const FVector& DirectionToTarget) const override;
+	virtual void OnDeployShoot_Implementation(UShootPoint* ShootPoint, const FVector& TargetLocation, const FVector& DirectionToTarget) const override;
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnHitResults(const FVector& HitLocation, const TArray<FHitResult>& TraceHitResults, const TArray<FHitResult>& DamageHitResults) const;
@@ -37,6 +37,8 @@ private:
 	void CameraSightTrace(const UWorld* World, const UShootPoint* ShootPoint) const;
 	
 	void ShootPointTrace(const UWorld* World, const UShootPoint* ShootPoint) const;
+	
+	void TargetTrace(const UWorld* World, const FVector& ShootPointLocation, const FVector& DirectionToTarget) const;
 
 	void LineTraceDamage(const UWorld* World, const FVector& TraceStartPoint, const FVector& TraceEndPoint) const;
 };

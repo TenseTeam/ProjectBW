@@ -223,7 +223,7 @@ void UShooterBehaviourBase::ShootFromShootPoint(UShootPoint* ShootPoint) const
 	FVector ShootPointDirToTarget = ShooterTargetLocation - ShootPoint->GetShootPointLocation();
 	ShootPointDirToTarget.Normalize();
 	ShootPoint->SetSpread(GenerateSpread());
-	OnDeployShoot(ShootPoint, bUseCameraTargetLocation, ShooterTargetLocation, ShootPointDirToTarget);
+	OnDeployShoot(ShootPoint, ShooterTargetLocation, ShootPointDirToTarget);
 	OnShootFromShootPoint(ShootPoint, ShooterTargetLocation, ShootPointDirToTarget);
 }
 
@@ -267,7 +267,7 @@ void UShooterBehaviourBase::OnBehaviourDisabled_Implementation()
 {
 }
 
-void UShooterBehaviourBase::OnDeployShoot_Implementation(UShootPoint* ShootPoint, const bool bIsUsingCameraHitTargetLocation, const FVector& TargetLocation, const FVector& DirectionToTarget) const
+void UShooterBehaviourBase::OnDeployShoot_Implementation(UShootPoint* ShootPoint, const FVector& TargetLocation, const FVector& DirectionToTarget) const
 {
 }
 
