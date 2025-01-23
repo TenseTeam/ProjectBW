@@ -130,7 +130,8 @@ void ABaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 		
 		if (Actor->Implements<UAITargetInterface>())
 		{
-			int index = IAITargetInterface::Execute_GetTeamIndex(Actor);
+			int Playerindex = IAITargetInterface::Execute_GetTeamIndex(Actor);
+			int MyIndex = IAITargetInterface::Execute_GetTeamIndex(EnemyBase);
 			
 			if (GetWorld()->GetTimerManager().IsTimerActive(LostSightTimerHandle))
 			{
@@ -138,7 +139,7 @@ void ABaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 				LGDebug::Log("TIMER PERSO ANNULLATO", true);
 			}
 			
-			if (index == EnemyBase->GetMyTeamIndex())return;
+			if (Playerindex == MyIndex)return;
 			
 			SetStateAsAttacking(Actor);
 			LGDebug::Log("SEE PLAYER ",true);

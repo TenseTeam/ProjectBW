@@ -33,7 +33,7 @@ FVector ANPCBaseStateEnemy::RandomPosition(FVector Position)
 void ANPCBaseStateEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	EQS_Manager = Cast<AEQS_Manager>(UGameplayStatics::GetActorOfClass(GetWorld(),AEQS_Manager::StaticClass()));
 }
 
 

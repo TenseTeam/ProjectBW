@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AI/EQS/EQS_Manager.h"
 #include "AI/NPC/NPCBaseEnemy/NPCBaseEnemy.h"
 #include "NPCBaseStateEnemy.generated.h"
 
@@ -48,6 +49,9 @@ public:
 	void SetAttackTarget(AActor* Target) { AttackTarget = Target; }
 	UFUNCTION(BlueprintPure)
 	AActor* GetAttackTarget() const { return AttackTarget; }
+	
+	UPROPERTY(VisibleAnywhere, Category = "AI|EQS")
+	AEQS_Manager* EQS_Manager;
 	
 protected:
 	
