@@ -13,6 +13,7 @@
 #include "Patterns/State/StateMachineComponent.h"
 #include "BWCharacter.generated.h"
 
+class ABWWeaponFirearm;
 class UWeaponsSwitcher;
 class UShieldAttribute;
 class UStaminaAttribute;
@@ -98,6 +99,11 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLostShield);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGainedShield);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FShieldEmptied);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartReloading);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FReloading);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopReloading);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FReloadInterrupted);
+
 
 UCLASS()
 class PROJECTBW_API ABWCharacter : public ABWCharacterBase
@@ -164,6 +170,16 @@ public:
 	FGainedShield OnGainedShield;
 	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
 	FShieldEmptied OnShieldEmptied;
+
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FStartReloading OnStartReloading;
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FReloading OnReloading;
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FStopReloading OnStopReloading;
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FReloadInterrupted OnReloadInterrupted;
+	
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UCharacterData* Data;
@@ -211,6 +227,9 @@ private:
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UStaminaAttribute* Stamina; //initialized in blueprint event graph
 
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	ABWWeaponFirearm* HoldedWeapon;
+
 	bool bWantRunning;
     bool bWantShooting;
 	bool bWantAiming;
@@ -220,6 +239,7 @@ private:
 	bool bIsAiming;
 	bool bIsHooking;
 	bool bIsDodging;
+	bool bIsReloading;
 	
 	bool bCanMove;
 	bool bCanLook;
@@ -228,6 +248,7 @@ private:
 	bool bCanShoot;
 	bool bCanHook;
 	bool bCanInteract;
+	bool bCanReload;
 	
 
 public:
@@ -257,6 +278,8 @@ public:
 	UCameraComponent* GetFollowCamera() const;
 	UFUNCTION(BlueprintCallable)
 	UInteractableDetectorComponent* GetInteractableDetector() const;
+	UFUNCTION(BlueprintCallable)
+	ABWWeaponFirearm* GetHoldedWeapon() const;
 
 	UFUNCTION(BlueprintCallable)
 	float GetGroundDistance() const;
@@ -328,6 +351,17 @@ public:
 	void SetCanInteract(bool Value);
 	UFUNCTION(BlueprintCallable)
 	bool CanInteract() const;
+
+	UFUNCTION(BlueprintCallable)
+	bool IsReloading() const;
+	UFUNCTION(BlueprintCallable)
+	void SetIsReloading(bool Value);
+	UFUNCTION(BlueprintCallable)
+	bool CanReload() const;
+	UFUNCTION(BlueprintCallable)
+	void SetCanReload(bool Value);
+	UFUNCTION(BlueprintCallable)
+	bool IsHoldingWeapon() const;
 
 private:
 	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode) override;
