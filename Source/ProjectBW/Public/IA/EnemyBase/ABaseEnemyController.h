@@ -17,11 +17,11 @@ class PROJECTBW_API ABaseEnemyController : public ANPCBaseStateEnemyController
 public:
 
 	ABaseEnemyController();
-	
+
 	virtual void SetStateAsPassive() override;
-	
+
 	virtual void SetStateAsPatrolling() override;
-	
+
 	virtual void SetStateAsAttacking(AActor* Actor) override;
 	
 	virtual void SetStateAsInvestigating() override;
