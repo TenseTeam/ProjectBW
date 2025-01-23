@@ -20,7 +20,7 @@ public:
 	 * @brief Starts the shooter behaviour.
 	 * @return True if the shoot was successful, false otherwise.
 	 */
-	virtual bool Shoot(EShootType ShootType) = 0;
+	virtual bool Shoot() = 0;
 
 	/**
 	 * @brief Refills an amount of ammo.

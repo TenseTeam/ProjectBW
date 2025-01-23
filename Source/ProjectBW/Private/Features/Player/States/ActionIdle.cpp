@@ -47,6 +47,12 @@ void UActionIdle::HandleInput(AActor* Context, const EInputActionType InputActio
 		Character->ChangeActionState(2); // interact
 		return;
 	}
+
+	if (InputAction == EInputActionType::Reload)
+	{
+		Character->ChangeActionState(3); // reload
+		return;
+	}
 }
 
 void UActionIdle::CheckWantShootOrAim()

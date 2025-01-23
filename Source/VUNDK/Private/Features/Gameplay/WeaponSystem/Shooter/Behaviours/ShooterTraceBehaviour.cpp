@@ -3,6 +3,7 @@
 #include "Features/Gameplay/WeaponSystem/Shooter/Behaviours/ShooterTraceBehaviour.h"
 #include "Engine/DamageEvents.h"
 #include "Features/Gameplay/WeaponSystem/Shooter/Shooter.h"
+#include "Kismet/GameplayStatics.h"
 
 void UShooterTraceBehaviour::OnDeployShoot_Implementation(UShootPoint* ShootPoint, const bool bIsUsingCameraHitTargetLocation, const FVector& TargetLocation, const FVector& DirectionToTarget) const
 {
@@ -14,64 +15,71 @@ void UShooterTraceBehaviour::OnDeployShoot_Implementation(UShootPoint* ShootPoin
 		return;
 	}
 
-	if (bIsUsingCameraHitTargetLocation)
-		TraceFromCamera(World, ShootPoint);
-	else
-		TraceFromShootPoint(World, ShootPoint);
+	switch (ShootTraceMode)
+	{
+	case EShootTraceMode::CameraSightTrace:
+		CameraSightTrace(World, ShootPoint);
+		return;
+	case EShootTraceMode::ShootPointTrace:
+		ShootPointTrace(World, ShootPoint);
+	default:
+		break;
+	}
 }
 
 void UShooterTraceBehaviour::OnHitResults_Implementation(const FVector& HitLocation, const TArray<FHitResult>& TraceHitResults, const TArray<FHitResult>& DamageHitResults) const
 {
 }
 
-void UShooterTraceBehaviour::TraceFromCamera(const UWorld* World, const UShootPoint* ShootPoint) const
+void UShooterTraceBehaviour::CameraSightTrace(const UWorld* World, const UShootPoint* ShootPoint) const
 {
 	if (!IsValid(ShootPoint))
 	{
-		UE_LOG(LogShooter, Error, TEXT("UShooterTraceBehaviour::TraceFromCamera: ShootPoint is not valid."));
+		UE_LOG(LogShooter, Error, TEXT("UShooterTraceBehaviour::CameraOriginTrace: ShootPoint is not valid."));
 		return;
 	}
 
 	FVector CameraStartPoint;
-	FVector CameraEndPoint;
 	FVector CameraHitPoint;
-
-	if (!TryGetCameraPoints(CameraStartPoint, CameraEndPoint, CameraHitPoint))
+	FVector CameraEndPoint;
+	FRotator CameraRotation;
+	if (!TryGetCameraPoints(CameraStartPoint, CameraEndPoint, CameraHitPoint, CameraRotation, ShootPoint->GetShootPointRelativeLocation()))
 	{
-		UE_LOG(LogShooter, Error, TEXT("UShooterTraceBehaviour::TraceFromCamera: TryGetCameraPoints failed, using Fallback option."));
-		TraceFromShootPoint(World, ShootPoint); // Fallback option
+		UE_LOG(LogShooter, Error, TEXT("UShooterTraceBehaviour::CameraOriginTrace: TryGetCameraPoints failed, using Fallback option."));
+		ShootPointTrace(World, ShootPoint); // Fallback option
 		return;
 	}
 
 	const FVector ShootPointLocation = ShootPoint->GetShootPointLocation();
+	const FVector WorldShootDirection = CameraRotation.RotateVector(ShootPoint->GetShootPointRelativeDirection());
 	FVector TraceStartPoint = CameraStartPoint;
-	FVector TraceEndPoint = CameraEndPoint;
+	FVector TraceEndPoint = TraceStartPoint + WorldShootDirection * GetMaxRange();
 
-	bool bIsInLine;
-	if (bIsInLine = IsInLineOfSight(ShootPointLocation, CameraHitPoint); !bIsInLine)
+	const bool bIsInLineOfSight = IsInLineOfSight(ShootPointLocation, CameraHitPoint);
+	if (!bIsInLineOfSight)
 	{
 		TraceStartPoint = ShootPointLocation;
-		TraceEndPoint = CameraHitPoint;
+		TraceEndPoint = ShootPointLocation + ShootPoint->GetShootPointDirection() * GetMaxRange();
 	}
-	
+
 #if WITH_EDITORONLY_DATA
 	if (bDrawDebugTraceLines)
-		DrawDebugLine(World, ShootPointLocation, CameraHitPoint, bIsInLine ? FColor::Green : FColor::Red, false, DebugTraceLineDuration, 0, 1.0f);
+		DrawDebugLine(World, ShootPointLocation, CameraHitPoint, bIsInLineOfSight ? FColor::Green : FColor::Red, false, DebugTraceLineDuration, 0, 1.0f);
 #endif
-
+	
 	LineTraceDamage(World, TraceStartPoint, TraceEndPoint);
 }
 
-void UShooterTraceBehaviour::TraceFromShootPoint(const UWorld* World, const UShootPoint* ShootPoint) const
+void UShooterTraceBehaviour::ShootPointTrace(const UWorld* World, const UShootPoint* ShootPoint) const
 {
 	if (!IsValid(ShootPoint))
 	{
-		UE_LOG(LogShooter, Error, TEXT("UShooterTraceBehaviour::TraceFromShootPoint: ShootPoint is not valid."));
+		UE_LOG(LogShooter, Error, TEXT("UShooterTraceBehaviour::ShootPointTrace: ShootPoint is not valid."));
 		return;
 	}
 
 	const FVector TraceStartPoint = ShootPoint->GetShootPointLocation();
-	const FVector TraceEndPoint = TraceStartPoint + ShootPoint->GetShootPointDirection() * GetRange();
+	const FVector TraceEndPoint = TraceStartPoint + ShootPoint->GetShootPointDirection() * GetMaxRange();
 
 	LineTraceDamage(World, TraceStartPoint, TraceEndPoint);
 }
@@ -108,7 +116,7 @@ void UShooterTraceBehaviour::LineTraceDamage(const UWorld* World, const FVector&
 			PenetrationCount++;
 			FDamageEvent DamageEvent;
 			DamageEvent.DamageTypeClass = UDamageType::StaticClass();
-			HitResult.GetActor()->TakeDamage(GetDamage(), DamageEvent, Shooter->GetOwner()->GetInstigatorController(), Shooter->GetOwner());
+			UGameplayStatics::ApplyPointDamage(HitResult.GetActor(), GetDamage(), HitResult.ImpactNormal, HitResult, Shooter->GetOwner()->GetInstigatorController(), Shooter->GetOwner(), UDamageType::StaticClass());
 			DamageHitResults.Add(HitResult);
 
 #if WITH_EDITORONLY_DATA

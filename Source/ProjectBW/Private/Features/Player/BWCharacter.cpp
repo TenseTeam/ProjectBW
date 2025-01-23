@@ -11,7 +11,8 @@
 #include "Features/Gameplay/ResourceAttributeSystem/StaminaAttribute.h"
 #include "Features/Gameplay/ResourceAttributeSystem/Base/ResourceAttributeBase.h"
 #include "Features/Gameplay/ResourceAttributeSystem/Components/ResourceAttributeManager.h"
-#include "Features/Gameplay/WeponSystem/WeaponsSwitcher.h"
+#include "Features/Gameplay/WeaponSystem/BWWeaponFirearm.h"
+#include "ProjectBW/Public/Features/Gameplay/WeaponSystem/WeaponsSwitcher.h"
 #include "Features/Player/States/Base/CharacterState.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "UGameFramework/Controllers/GameplayController.h"
@@ -54,6 +55,7 @@ ABWCharacter::ABWCharacter()
 	bCanHook = true;
 	bCanShoot = true;
 	bCanInteract = true;
+	bCanReload = true;
 
 }
 
@@ -155,6 +157,11 @@ UCameraComponent* ABWCharacter::GetFollowCamera() const
 UInteractableDetectorComponent* ABWCharacter::GetInteractableDetector() const
 {
 	return InteractableDetector;
+}
+
+ABWWeaponFirearm* ABWCharacter::GetHoldedWeapon() const
+{
+	return HoldedWeapon;
 }
 
 float ABWCharacter::GetGroundDistance() const
@@ -307,6 +314,31 @@ void ABWCharacter::SetCanInteract(bool Value)
 bool ABWCharacter::CanInteract() const
 {
 	return bCanInteract;
+}
+
+bool ABWCharacter::IsReloading() const
+{
+	return bIsReloading;
+}
+
+void ABWCharacter::SetIsReloading(bool Value)
+{
+	bIsReloading = Value;
+}
+
+bool ABWCharacter::CanReload() const
+{
+	return bCanReload && IsHoldingWeapon() && !IsDodging() && !IsHooking();
+}
+
+void ABWCharacter::SetCanReload(bool Value)
+{
+	bCanReload = Value;
+}
+
+bool ABWCharacter::IsHoldingWeapon() const
+{
+	return IsValid(HoldedWeapon);
 }
 
 void ABWCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)

@@ -165,6 +165,12 @@ void UShoot::HandleInput(AActor* Context, const EInputActionType InputAction, co
 		Character->ChangeActionState(2);
 		return;
 	}
+
+	if (InputAction == EInputActionType::Reload)
+	{
+		Character->ChangeActionState(3);
+		return;
+	}
 }
 
 void UShoot::InterruptShoot()

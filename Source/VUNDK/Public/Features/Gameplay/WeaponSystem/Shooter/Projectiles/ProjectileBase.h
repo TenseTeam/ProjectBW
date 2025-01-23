@@ -32,7 +32,8 @@ protected:
 private:
 	float Damage;
 	float Range;
-	FTimerHandle LifeSpanTimerHandle;
+	float RemainingLifeSpan;
+	bool bIsProjectileAlive;
 
 public:
 	AProjectileBase();
@@ -63,8 +64,10 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-	
-	void SetProjectileLifeSpan(float InLifeSpan);
+
+	virtual void Tick(float DeltaSeconds) override;
+
+	void StartProjectileLifeSpan(const float InLifeSpan);
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void OnProjectileHit(const FHitResult& ImpactResult, const FVector& ImpactVelocity);
@@ -73,8 +76,10 @@ protected:
 	void OnProjectileLifeSpanEnd();
 	
 private:
+	void ProcessProjectileLifeSpan(const float DeltaSeconds);
+	
 	UFUNCTION()
-	void ProjectileLifeSpanEnd();
+	void EndProjectileLifeSpan();
 	
 	UFUNCTION()
 	void ProjectileHit(const FHitResult& ImpactResult, const FVector& ImpactVelocity);

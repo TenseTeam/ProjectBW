@@ -13,6 +13,7 @@ class VUNDK_API UShootPoint : public USceneComponent
 	GENERATED_BODY()
 
 private:
+	float Spread;
 #if WITH_EDITORONLY_DATA
 	UPROPERTY()
 	UArrowComponent* ArrowComponent;
@@ -21,9 +22,21 @@ private:
 public:
 	UShootPoint();
 
+	UFUNCTION(BlueprintCallable)
+	void SetSpread(const float NewSpread);
+	
 	UFUNCTION(BlueprintPure)
 	FVector GetShootPointLocation() const;
 
 	UFUNCTION(BlueprintPure)
+	FVector GetShootPointRelativeLocation() const;
+
+	UFUNCTION(BlueprintPure)
 	FVector GetShootPointDirection() const;
+
+	UFUNCTION(BlueprintPure)
+	FVector GetShootPointRelativeDirection() const;
+
+protected:
+	virtual void OnRegister() override;
 };

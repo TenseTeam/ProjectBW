@@ -47,4 +47,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Shooting")
 	float AimingRotationSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shooting", meta = (ClampMin = 0))
+	float ReloadDuratioin;
 };

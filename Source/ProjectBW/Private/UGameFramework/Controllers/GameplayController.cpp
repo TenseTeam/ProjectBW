@@ -43,6 +43,7 @@ void AGameplayController::SetupInputComponent()
 		enhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &AGameplayController::Aim);
 		enhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &AGameplayController::StopAim);
 		enhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AGameplayController::Interact);
+		enhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &AGameplayController::Reload);
 		EnhancedInputComponent = enhancedInputComponent;
 	}
 }
@@ -127,5 +128,11 @@ void AGameplayController::Interact(const FInputActionValue& Value)
 {
 	if (!BWCharacter->CanInteract()) return;
 	BWCharacter->HandleActionInput(EInputActionType::Interact, Value);
+}
+
+void AGameplayController::Reload(const FInputActionValue& Value)
+{
+	if (!BWCharacter->CanReload()) return;
+	BWCharacter->HandleActionInput(EInputActionType::Reload, Value);
 }
 
