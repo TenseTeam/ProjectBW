@@ -3,35 +3,36 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "WeaponItem.h"
+#include "BWWeaponItem.h"
 #include "Features/Gameplay/InventorySystem/Data/SaveData/WeaponFirearmSaveData.h"
-#include "WeaponFirearmItem.generated.h"
+#include "BWWeaponFirearmItem.generated.h"
 
 UCLASS()
-class PROJECTBW_API UWeaponFirearmItem : public UWeaponItem
+class PROJECTBW_API UBWWeaponFirearmItem : public UBWWeaponItem
 {
 	GENERATED_BODY()
 
 protected:
 	int32 AmmoRemaining;
+	bool bHasNewMag = true;
 	
 public:
 	FWeaponFirearmSaveData CreateWeaponFirearmSaveData() const;
 
 	void LoadWeaponFirearmItemSaveData(UBWInventory* LoadingInventory, FWeaponFirearmSaveData& WeaponItemSaveData);
+	
+	void SetWeaponItemAmmoRemaining(const int32 NewAmmoRemaining);
 
-	UFUNCTION(BlueprintCallable)
-	void SetAmmoRemaining(const int32 NewAmmoRemaining);
-
-	UFUNCTION(BlueprintPure)
-	int32 GetAmmoRemaining() const;
+	bool TryConsumeWeaponItemNewMagazine(const int MagSize);
+	
+	int32 GetWeaponItemAmmoRemaining() const;
 	
 	UFUNCTION(BlueprintNativeEvent)
-	float GetWeaponFireRate();
+	float GetWeaponItemFireRate();
+	
+	UFUNCTION(BlueprintNativeEvent)
+	float GetWeaponItemMaxRange();
 
 	UFUNCTION(BlueprintNativeEvent)
-	int32 GetWeaponMagSize();
-
-	UFUNCTION(BlueprintNativeEvent)
-	float GetWeaponRange();
+	int32 GetWeaponItemMagSize();
 };

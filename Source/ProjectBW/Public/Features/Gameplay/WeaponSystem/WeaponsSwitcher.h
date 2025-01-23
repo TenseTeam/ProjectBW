@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Features/Gameplay/EquipmentSystem/Equipment.h"
-#include "Features/Gameplay/InventorySystem/Items/WeaponItem.h"
+#include "Features/Gameplay/InventorySystem/Items/BWWeaponItem.h"
 #include "Features/Gameplay/WeaponSystem/WeaponBase.h"
 #include "WeaponsSwitcher.generated.h"
 
@@ -69,7 +69,7 @@ public:
 	bool TryUnequipCurrentWeapon();
 
 protected:
-	void AddWeaponActor(UWeaponItem* Item, int32 SlotIndex);
+	void AddWeaponActor(UBWWeaponItem* Item, int32 SlotIndex);
 
 	void RemoveWeaponActor(int32 SlotIndex);
 

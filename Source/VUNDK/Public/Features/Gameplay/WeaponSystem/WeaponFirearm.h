@@ -31,19 +31,26 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ResetRecoil() const;
-
+	
 	virtual void SetWeaponDamage(const float NewDamage) override;
 
+	UFUNCTION(BlueprintCallable)
 	void SetWeaponFireRate(const float NewFireRate) const;
 
+	UFUNCTION(BlueprintCallable)
 	void SetWeaponMagSize(const int32 NewMagSize) const;
 
-	void SetWeaponRange(const float NewRange) const;
+	UFUNCTION(BlueprintCallable)
+	void SetWeaponMaxRange(const float NewRange) const;
 
-	void SetAmmoRemaining(const int32 NewAmmoRemaining) const;
+	UFUNCTION(BlueprintCallable)
+	void SetWeaponAmmoRemaining(const int32 NewAmmoRemaining) const;
 	
 	UFUNCTION(BlueprintCallable)
 	void SetWeaponShootType(const EShootType NewShootType);
+
+	UFUNCTION(BlueprintCallable)
+	void SetWeaponMaxSpread(const float NewSpread) const;
 	
 	UFUNCTION(BlueprintCallable)
 	int32 Reload(int32 Ammo);

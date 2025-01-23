@@ -6,8 +6,8 @@
 #include "Features/Gameplay/InventorySystem/Data/SaveData/BWInventorySaveData.h"
 #include "Features/Gameplay/InventorySystem/Data/SaveData/WeaponItemsSaveArray.h"
 #include "Features/Gameplay/InventorySystem/Factories/BWItemsFactory.h"
-#include "Features/Gameplay/InventorySystem/Items/WeaponFirearmItem.h"
-#include "Features/Gameplay/InventorySystem/Items/WeaponItem.h"
+#include "Features/Gameplay/InventorySystem/Items/BWWeaponFirearmItem.h"
+#include "Features/Gameplay/InventorySystem/Items/BWWeaponItem.h"
 #include "Features/Gameplay/RPGSystem/Factories/RPGFactory.h"
 
 UBWInventory::UBWInventory()
@@ -41,9 +41,9 @@ void UBWInventory::CreateBWInventorySaveData(FBWInventoryItemsSaveData& BWItemsS
 	{
 		RemaingItemsToSave.Remove(Item);
 		
-		if (Item->IsA(UWeaponFirearmItem::StaticClass()))
+		if (Item->IsA(UBWWeaponFirearmItem::StaticClass()))
 		{
-			const UWeaponFirearmItem* WeaponItem = Cast<UWeaponFirearmItem>(Item);
+			const UBWWeaponFirearmItem* WeaponItem = Cast<UBWWeaponFirearmItem>(Item);
 			FGuid ItemID = Item->GetItemData()->ItemDataID;
 
 			if (!BWItemsSaveData.WeaponFirearmItems.Contains(ItemID))
@@ -54,9 +54,9 @@ void UBWInventory::CreateBWInventorySaveData(FBWInventoryItemsSaveData& BWItemsS
 			continue;
 		}
 
-		if (Item->IsA(UWeaponItem::StaticClass()))
+		if (Item->IsA(UBWWeaponItem::StaticClass()))
 		{
-			const UWeaponItem* WeaponItem = Cast<UWeaponItem>(Item);
+			const UBWWeaponItem* WeaponItem = Cast<UBWWeaponItem>(Item);
 			FGuid ItemID = Item->GetItemData()->ItemDataID;
 
 			if (!BWItemsSaveData.GenericWeaponItems.Contains(ItemID))
@@ -88,7 +88,7 @@ void UBWInventory::LoadBWInventorySaveData(FBWInventoryItemsSaveData& BWItemsSav
 
 			if (UWeaponItemData* WeaponFirearmItemData = Cast<UWeaponItemData>(ItemData))
 			{
-				UWeaponFirearmItem* WeaponFirearmItem = Cast<UWeaponFirearmItem>(UBWItemsFactory::CreateWeaponItem(WeaponFirearmItemData));
+				UBWWeaponFirearmItem* WeaponFirearmItem = Cast<UBWWeaponFirearmItem>(UBWItemsFactory::CreateWeaponItem(WeaponFirearmItemData));
 				WeaponFirearmItem->LoadWeaponFirearmItemSaveData(this, WeaponFirearmSaveData);
 			}
 		}
@@ -110,7 +110,7 @@ void UBWInventory::LoadBWInventorySaveData(FBWInventoryItemsSaveData& BWItemsSav
 
 			if (UWeaponItemData* WeaponItemData = Cast<UWeaponItemData>(ItemData))
 			{
-				UWeaponItem* WeaponItem = UBWItemsFactory::CreateWeaponItem(WeaponItemData);
+				UBWWeaponItem* WeaponItem = UBWItemsFactory::CreateWeaponItem(WeaponItemData);
 				WeaponItem->LoadWeaponItemSaveData(this, WeaponItemSaveData);
 			}
 		}

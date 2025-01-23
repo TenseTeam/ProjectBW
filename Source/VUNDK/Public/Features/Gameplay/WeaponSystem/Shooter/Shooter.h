@@ -34,7 +34,7 @@ public:
 	void SetOwner(APawn* InOwner) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
-	bool Shoot(const EShootType ShootType = EShootType::Simultaneous) const;
+	bool Shoot() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
 	void ResetRecoil() const;

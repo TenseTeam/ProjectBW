@@ -15,6 +15,11 @@ UShootPoint::UShootPoint()
 #endif
 }
 
+void UShootPoint::SetSpread(const float NewSpread)
+{
+	Spread = NewSpread;
+}
+
 FVector UShootPoint::GetShootPointLocation() const
 {
 	return GetComponentLocation();
@@ -27,12 +32,12 @@ FVector UShootPoint::GetShootPointRelativeLocation() const
 
 FVector UShootPoint::GetShootPointDirection() const
 {
-	return GetForwardVector();
+	return GetForwardVector() + FMath::VRandCone(GetForwardVector(), Spread);
 }
 
 FVector UShootPoint::GetShootPointRelativeDirection() const
 {
-	return GetRelativeRotation().Vector();
+	return GetRelativeRotation().Vector() + FMath::VRandCone(GetRelativeRotation().Vector(), Spread);
 }
 
 void UShootPoint::OnRegister()

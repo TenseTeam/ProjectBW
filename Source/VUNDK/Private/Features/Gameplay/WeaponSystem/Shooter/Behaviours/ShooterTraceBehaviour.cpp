@@ -53,13 +53,13 @@ void UShooterTraceBehaviour::CameraSightTrace(const UWorld* World, const UShootP
 	const FVector ShootPointLocation = ShootPoint->GetShootPointLocation();
 	const FVector WorldShootDirection = CameraRotation.RotateVector(ShootPoint->GetShootPointRelativeDirection());
 	FVector TraceStartPoint = CameraStartPoint;
-	FVector TraceEndPoint = TraceStartPoint + WorldShootDirection * GetRange();
+	FVector TraceEndPoint = TraceStartPoint + WorldShootDirection * GetMaxRange();
 
 	const bool bIsInLineOfSight = IsInLineOfSight(ShootPointLocation, CameraHitPoint);
 	if (!bIsInLineOfSight)
 	{
 		TraceStartPoint = ShootPointLocation;
-		TraceEndPoint = ShootPointLocation + ShootPoint->GetShootPointDirection() * GetRange();
+		TraceEndPoint = ShootPointLocation + ShootPoint->GetShootPointDirection() * GetMaxRange();
 	}
 
 #if WITH_EDITORONLY_DATA
@@ -79,7 +79,7 @@ void UShooterTraceBehaviour::ShootPointTrace(const UWorld* World, const UShootPo
 	}
 
 	const FVector TraceStartPoint = ShootPoint->GetShootPointLocation();
-	const FVector TraceEndPoint = TraceStartPoint + ShootPoint->GetShootPointDirection() * GetRange();
+	const FVector TraceEndPoint = TraceStartPoint + ShootPoint->GetShootPointDirection() * GetMaxRange();
 
 	LineTraceDamage(World, TraceStartPoint, TraceEndPoint);
 }

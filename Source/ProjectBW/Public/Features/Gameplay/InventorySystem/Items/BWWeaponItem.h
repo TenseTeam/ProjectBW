@@ -6,12 +6,12 @@
 #include "Features/Gameplay/InventorySystem/BWInventory.h"
 #include "Features/Gameplay/InventorySystem/Data/SaveData/WeaponItemSaveData.h"
 #include "Features/Gameplay/RPGSystem/RPGInventory/Items/RPGGearItem.h"
-#include "WeaponItem.generated.h"
+#include "BWWeaponItem.generated.h"
 
 class UWeaponItemData;
 
 UCLASS()
-class PROJECTBW_API UWeaponItem : public URPGGearItem
+class PROJECTBW_API UBWWeaponItem : public URPGGearItem
 {
 	GENERATED_BODY()
 

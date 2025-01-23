@@ -41,12 +41,12 @@ void AWeaponFirearm::SetWeaponMagSize(const int32 NewMagSize) const
 	Shooter->ShooterBehaviour->SetMagSize(NewMagSize);
 }
 
-void AWeaponFirearm::SetWeaponRange(const float NewRange) const
+void AWeaponFirearm::SetWeaponMaxRange(const float NewRange) const
 {
-	Shooter->ShooterBehaviour->SetRange(NewRange);
+	Shooter->ShooterBehaviour->SetMaxRange(NewRange);
 }
 
-void AWeaponFirearm::SetAmmoRemaining(const int32 NewAmmoRemaining) const
+void AWeaponFirearm::SetWeaponAmmoRemaining(const int32 NewAmmoRemaining) const
 {
 	Shooter->ShooterBehaviour->SetCurrentAmmo(NewAmmoRemaining);
 }
@@ -54,6 +54,11 @@ void AWeaponFirearm::SetAmmoRemaining(const int32 NewAmmoRemaining) const
 void AWeaponFirearm::SetWeaponShootType(const EShootType NewShootType)
 {
 	WeaponShootType = NewShootType;
+}
+
+void AWeaponFirearm::SetWeaponMaxSpread(const float NewSpread) const
+{
+	Shooter->ShooterBehaviour->SetMaxSpread(NewSpread);
 }
 
 int32 AWeaponFirearm::Reload(const int32 Ammo)
@@ -83,5 +88,5 @@ void AWeaponFirearm::OnReload_Implementation()
 bool AWeaponFirearm::DeployWeaponAttack_Implementation()
 {
 	Super::DeployWeaponAttack_Implementation();
-	return Shooter->Shoot(WeaponShootType);
+	return Shooter->Shoot();
 }

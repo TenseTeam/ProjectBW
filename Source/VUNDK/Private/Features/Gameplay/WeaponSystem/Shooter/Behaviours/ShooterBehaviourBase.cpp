@@ -48,7 +48,7 @@ void UShooterBehaviourBase::DisableBehaviour()
 	OnBehaviourDisabled();
 }
 
-bool UShooterBehaviourBase::Shoot(const EShootType ShootType)
+bool UShooterBehaviourBase::Shoot()
 {
 	if (!Check())
 	{
@@ -60,7 +60,7 @@ bool UShooterBehaviourBase::Shoot(const EShootType ShootType)
 		return false;
 
 	bool bSuccess;
-	switch (ShootType)
+	switch (GetShootType())
 	{
 	case EShootType::Simultaneous:
 		{
@@ -107,57 +107,29 @@ void UShooterBehaviourBase::SetShootParams(const float NewDamage, const float Ne
 {
 	SetDamage(NewDamage);
 	SetFireRate(NewFireRate);
-	SetRange(NewRange);
+	SetMaxRange(NewRange);
 	SetMagSize(NewMagSize);
 	SetRecoilStrength(NewRecoilStrength);
 }
 
 void UShooterBehaviourBase::SetDamage(const float NewDamage)
 {
-	if (NewDamage < 0.0f)
-	{
-		UE_LOG(LogShooter, Warning, TEXT("Trying to set negative damage in %s. New Damage set to zero."), *GetName());
-		ShootData.Damage = 0.0f;
-		return;
-	}
-
-	ShootData.Damage = NewDamage;
+	ShootData.Damage = FMath::Clamp(NewDamage, 0.f, MAX_FLT);
 }
 
 void UShooterBehaviourBase::SetFireRate(const float NewFireRate)
 {
-	if (NewFireRate < 0.0f)
-	{
-		UE_LOG(LogShooter, Warning, TEXT("Trying to set negative fire rate in %s. New Fire Rate set to zero."), *GetName());
-		ShootData.FireRate = 0.0f;
-		return;
-	}
-
-	ShootData.FireRate = NewFireRate;
+	ShootData.FireRate = FMath::Clamp(NewFireRate, 0.f, MAX_FLT);
 }
 
-void UShooterBehaviourBase::SetRange(const float NewRange)
+void UShooterBehaviourBase::SetMaxRange(const float NewRange)
 {
-	if (NewRange < 0.0f)
-	{
-		UE_LOG(LogShooter, Warning, TEXT("Trying to set negative range in %s. New Range set to zero."), *GetName());
-		ShootData.Range = 0.0f;
-		return;
-	}
-
-	ShootData.Range = NewRange;
+	ShootData.MaxRange = FMath::Clamp(NewRange, 0.f, MAX_FLT);
 }
 
 void UShooterBehaviourBase::SetMagSize(const int32 NewMagSize)
 {
-	if (NewMagSize < 0)
-	{
-		UE_LOG(LogShooter, Warning, TEXT("Trying to set negative mag size in %s. New Mag Size set to zero."), *GetName());
-		ShootData.MagSize = 0;
-		return;
-	}
-
-	ShootData.MagSize = NewMagSize;
+	ShootData.MagSize = FMath::Clamp(NewMagSize, 0, MAX_int32);
 }
 
 void UShooterBehaviourBase::SetRecoilStrength(float NewRecoilStrength)
@@ -166,14 +138,19 @@ void UShooterBehaviourBase::SetRecoilStrength(float NewRecoilStrength)
 	ShootData.RecoilStrength = NewRecoilStrength;
 }
 
+void UShooterBehaviourBase::SetMaxSpread(const float NewSpread)
+{
+	ShootData.MaxSpread = FMath::Clamp(NewSpread, 0.f, 1.f);
+}
+
 void UShooterBehaviourBase::SetCurrentAmmo(const int32 NewAmmo)
 {
 	CurrentAmmo = FMath::Clamp(NewAmmo, 0, GetMagSize());
 }
 
-float UShooterBehaviourBase::GetRange_Implementation() const
+float UShooterBehaviourBase::GetMaxRange_Implementation() const
 {
-	return ShootData.Range * RangeMultiplier;
+	return ShootData.MaxRange * RangeMultiplier;
 }
 
 float UShooterBehaviourBase::GetFireRate_Implementation() const
@@ -194,6 +171,16 @@ int32 UShooterBehaviourBase::GetMagSize_Implementation() const
 float UShooterBehaviourBase::GetRecoilStrength_Implementation() const
 {
 	return ShootData.RecoilStrength * RecoilStrengthMultiplier;
+}
+
+float UShooterBehaviourBase::GetMaxSpread_Implementation() const
+{
+	return ShootData.MaxSpread * MaxSpreadMultiplier;
+}
+
+EShootType UShooterBehaviourBase::GetShootType() const
+{
+	return ShootData.ShootType;
 }
 
 int32 UShooterBehaviourBase::GetCurrentAmmo() const
@@ -227,6 +214,7 @@ void UShooterBehaviourBase::ShootSuccess(UShootPoint* ShootPoint)
 	const FVector ShooterTargetLocation = GetShooterTargetLocation();
 	FVector ShootPointDirToTarget = ShooterTargetLocation - ShootPoint->GetShootPointLocation();
 	ShootPointDirToTarget.Normalize();
+	ShootPoint->SetSpread(GenerateSpread());
 	OnDeployShoot(ShootPoint, bUseCameraTargetLocation, ShooterTargetLocation, ShootPointDirToTarget);
 	OnShootSuccess(ShootPoint, ShooterTargetLocation, ShootPointDirToTarget);
 	ApplyRecoilImpulse();
@@ -310,7 +298,7 @@ bool UShooterBehaviourBase::TryGetCameraPoints(FVector& OutStartPoint, FVector& 
 
 	const FVector WorldOffset = OutRotation.RotateVector(StartPointOffset);
 	OutStartPoint = CameraLocation + WorldOffset;
-	OutEndPoint = OutStartPoint + OutRotation.Vector() * GetRange();
+	OutEndPoint = OutStartPoint + OutRotation.Vector() * GetMaxRange();
 	OutHitPoint = OutEndPoint;
 
 	if (FHitResult HitResult; World->LineTraceSingleByChannel(HitResult, OutStartPoint, OutEndPoint, SightTraceChannel))
@@ -462,4 +450,9 @@ void UShooterBehaviourBase::ProcessCooldown(const float DeltaTime)
 void UShooterBehaviourBase::EndShootCooldown()
 {
 	bIsInCooldown = false;
+}
+
+float UShooterBehaviourBase::GenerateSpread() const
+{
+	return FMath::RandRange(0.f, GetMaxSpread());
 }

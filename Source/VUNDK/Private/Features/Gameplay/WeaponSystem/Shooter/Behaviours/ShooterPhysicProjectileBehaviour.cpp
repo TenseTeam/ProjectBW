@@ -28,7 +28,7 @@ void UShooterPhysicProjectileBehaviour::OnDeployShoot_Implementation(UShootPoint
 	FVector ProjectileDirection = DirectionToTarget;
 	AProjectileBase* Projectile = Cast<AProjectileBase>(ActorPrj);
 	Projectile->SetActorLocation(ShootPoint->GetShootPointLocation());
-	Projectile->Init(Shooter->GetOwner(), GetDamage(), GetRange(), ProjectileSpeed, DirectionToTarget);
+	Projectile->Init(Shooter->GetOwner(), GetDamage(), GetMaxRange(), ProjectileSpeed, DirectionToTarget);
 }
 
 bool UShooterPhysicProjectileBehaviour::Check() const

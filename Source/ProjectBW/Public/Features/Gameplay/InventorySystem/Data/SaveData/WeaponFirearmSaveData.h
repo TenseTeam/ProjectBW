@@ -15,6 +15,8 @@ struct FWeaponFirearmSaveData
 	FWeaponItemSaveData WeaponItemSaveData;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 AmmoRemaining;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bHasNewMag;
 
 	FWeaponFirearmSaveData() : WeaponItemSaveData()
 	{

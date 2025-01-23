@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Features/Gameplay/InventorySystem/Items/WeaponFirearmItem.h"
+#include "Features/Gameplay/InventorySystem/Items/BWWeaponFirearmItem.h"
 #include "Features/Gameplay/WeaponSystem/WeaponFirearm.h"
 #include "BWWeaponFirearm.generated.h"
 
@@ -16,14 +16,13 @@ class PROJECTBW_API ABWWeaponFirearm : public AWeaponFirearm
 
 public:
 	UPROPERTY(BlueprintReadOnly)
-	UWeaponFirearmItem* WeaponFirearmItem;
+	UBWWeaponFirearmItem* WeaponFirearmItem;
 	
 public:
 	ABWWeaponFirearm();
 
-	UFUNCTION(BlueprintCallable)
-	void SetWeaponFirearmItem(UWeaponFirearmItem* NewWeaponFirearmItem);
-
+	void InitBWWeapon(APawn* InOwner, UBWWeaponFirearmItem* InWeaponItem);
+	
 protected:
 	virtual void OnReload_Implementation() override;
 	

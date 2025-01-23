@@ -21,12 +21,12 @@ void UShooter::SetOwner(APawn* InOwner) const
 	ShooterBehaviour->SetOwner(InOwner);
 }
 
-bool UShooter::Shoot(const EShootType ShootType) const
+bool UShooter::Shoot() const
 {
 	if (!Check())
 		return false;
 	
-	return ShooterBehaviour->Shoot(ShootType);
+	return ShooterBehaviour->Shoot();
 }
 
 void UShooter::ResetRecoil() const

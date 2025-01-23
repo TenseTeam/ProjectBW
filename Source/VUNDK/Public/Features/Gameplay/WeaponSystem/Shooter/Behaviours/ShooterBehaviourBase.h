@@ -29,6 +29,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
 
 constexpr float RecoilStrengthMultiplier = 100.f;
 constexpr float RangeMultiplier = 100.f;
+constexpr float MaxSpreadMultiplier = .1f;
 
 UCLASS(Abstract, Blueprintable, BlueprintType, EditInlineNew)
 class VUNDK_API UShooterBehaviourBase : public UObject, public IShooterBehaviour
@@ -85,7 +86,7 @@ public:
 	void DisableBehaviour();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
-	virtual bool Shoot(const EShootType ShootType = EShootType::Simultaneous) override;
+	virtual bool Shoot() override;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
 	void ResetRecoil();
@@ -106,13 +107,16 @@ public:
 	void SetFireRate(const float NewFireRate);
 
 	UFUNCTION(BlueprintCallable)
-	void SetRange(const float NewRange);
+	void SetMaxRange(const float NewRange);
 
 	UFUNCTION(BlueprintCallable)
 	void SetMagSize(const int32 NewMagSize);
 
 	UFUNCTION(BlueprintCallable)
 	void SetRecoilStrength(float NewRecoilStrength);
+
+	UFUNCTION(BlueprintCallable)
+	void SetMaxSpread(const float NewSpread);
 
 	UFUNCTION(BlueprintCallable)
 	void SetCurrentAmmo(const int32 NewAmmo);
@@ -124,13 +128,19 @@ public:
 	float GetFireRate() const;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
-	float GetRange() const;
+	float GetMaxRange() const;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
 	int32 GetMagSize() const;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
 	float GetRecoilStrength() const;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
+	float GetMaxSpread() const;
+
+	UFUNCTION(BlueprintPure)
+	EShootType GetShootType() const;
 
 	UFUNCTION(BlueprintPure)
 	int32 GetCurrentAmmo() const;
@@ -210,4 +220,6 @@ private:
 	void ProcessCooldown(float DeltaTime);
 
 	void EndShootCooldown();
+
+	float GenerateSpread() const;
 };

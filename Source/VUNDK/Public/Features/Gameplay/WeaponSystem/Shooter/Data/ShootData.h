@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ShootType.h"
 #include "Curves/CurveVector.h"
 #include "Engine/DataAsset.h"
 #include "ShootData.generated.h"
@@ -16,8 +17,12 @@ struct VUNDK_API FShootData
 	float Damage;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0", UIMin = "0", ToolTip = "rounds/min"))
 	float FireRate;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	EShootType ShootType;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float MaxSpread;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0", UIMin = "0", ToolTip = "meters"))
-	float Range;
+	float MaxRange;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0", UIMin = "0"))
 	int32 MagSize;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
