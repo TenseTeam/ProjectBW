@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Features/Gameplay/InventorySystem/Items/WeaponItem.h"
+#include "Features/Gameplay/InventorySystem/Items/BWWeaponItem.h"
 #include "Features/Gameplay/RPGSystem/RPGInventory/Data/RPGGearItemData.h"
 #include "Features/Gameplay/WeaponSystem/WeaponBase.h"
 #include "WeaponItemData.generated.h"
@@ -20,6 +20,6 @@ public:
 public:
 	UWeaponItemData()
 	{
-		ItemClass = UWeaponItem::StaticClass();
+		ItemClass = UBWWeaponItem::StaticClass();
 	}
 };

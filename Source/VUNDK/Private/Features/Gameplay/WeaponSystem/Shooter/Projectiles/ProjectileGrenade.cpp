@@ -11,7 +11,7 @@ AProjectileGrenade::AProjectileGrenade()
 void AProjectileGrenade::InitVelocityAndLifeSpan_Implementation(float InRange, float InSpeed, const FVector& InDirection)
 {
 	SetVelocity(InDirection * InSpeed);
-	SetProjectileLifeSpan(TimeToExplosion);
+	StartProjectileLifeSpan(TimeToExplosion);
 }
 
 float AProjectileGrenade::GetExplosionRadius() const
@@ -21,13 +21,10 @@ float AProjectileGrenade::GetExplosionRadius() const
 
 void AProjectileGrenade::Explode()
 {
-	const UWorld* World = GetWorld();
-
 	TArray<AActor*> IgnoredActors;
 	IgnoredActors.Add(this);
 	IgnoredActors.Add(ProjectileInstigator);
-	UGameplayStatics::ApplyRadialDamage(World, GetDamage(), GetActorLocation(), GetExplosionRadius(), UDamageType::StaticClass(), IgnoredActors, this, ProjectileInstigator->GetInstigatorController(), true, ExplosionPreventionChannel);
-	DisposeProjectile();
+	UGameplayStatics::ApplyRadialDamage(GetWorld(), GetDamage(), GetActorLocation(), GetExplosionRadius(), UDamageType::StaticClass(), IgnoredActors, this, ProjectileInstigator->GetInstigatorController(), bDoFullDamage, ExplosionPreventionChannel);
 	OnExplosion();
 }
 
@@ -42,4 +39,5 @@ void AProjectileGrenade::OnProjectileLifeSpanEnd_Implementation()
 
 void AProjectileGrenade::OnExplosion_Implementation()
 {
+	DisposeProjectile();
 }

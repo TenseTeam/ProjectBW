@@ -11,7 +11,7 @@
 #include "Features/Gameplay/ResourceAttributeSystem/StaminaAttribute.h"
 #include "Features/Gameplay/ResourceAttributeSystem/Base/ResourceAttributeBase.h"
 #include "Features/Gameplay/ResourceAttributeSystem/Components/ResourceAttributeManager.h"
-#include "Features/Gameplay/WeponSystem/WeaponsSwitcher.h"
+#include "ProjectBW/Public/Features/Gameplay/WeaponSystem/WeaponsSwitcher.h"
 #include "Features/Player/States/Base/CharacterState.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "UGameFramework/Controllers/GameplayController.h"

@@ -5,9 +5,9 @@
 #include "Features/Gameplay/InventorySystem/Factories/ISFactory.h"
 #include "Features/Gameplay/RPGSystem/Factories/RPGFactory.h"
 
-UWeaponItem* UBWItemsFactory::CreateWeaponItem(UWeaponItemData* Data)
+UBWWeaponItem* UBWItemsFactory::CreateWeaponItem(UWeaponItemData* Data)
 {
-	UWeaponItem* WeaponItem = Cast<UWeaponItem>(UISFactory::CreateItem(Data));
+	UBWWeaponItem* WeaponItem = Cast<UBWWeaponItem>(UISFactory::CreateItem(Data));
 
 	if (!IsValid(WeaponItem))
 	{
@@ -16,4 +16,17 @@ UWeaponItem* UBWItemsFactory::CreateWeaponItem(UWeaponItemData* Data)
 	}
 
 	return WeaponItem;
+}
+
+UBWWeaponFirearmItem* UBWItemsFactory::CreateWeaponFirearmItem(UWeaponItemData* Data)
+{
+	UBWWeaponFirearmItem* WeaponFirearmItem = Cast<UBWWeaponFirearmItem>(CreateWeaponItem(Data));
+
+	if (!IsValid(WeaponFirearmItem))
+	{
+		UE_LOG(LogInventorySystem, Error, TEXT("Failed to create Weapon Firearm Item."));
+		return nullptr;
+	}
+
+	return WeaponFirearmItem;
 }

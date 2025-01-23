@@ -28,7 +28,7 @@ void AProjectileBase::Init(AActor* InInstigator, const float InDamage, const flo
 void AProjectileBase::InitVelocityAndLifeSpan_Implementation(float InRange, float InSpeed, const FVector& InDirection)
 {
 	SetVelocity(InDirection * InSpeed);
-	SetProjectileLifeSpan(InRange / InSpeed);
+	StartProjectileLifeSpan(InRange / InSpeed);
 }
 
 void AProjectileBase::SetVelocity(const FVector NewVelocity) const
@@ -60,19 +60,9 @@ void AProjectileBase::ApplyProjectileDamage(AActor* TargetActor)
 
 void AProjectileBase::DisposeProjectile()
 {
-	if (!LifeSpanTimerHandle.IsValid())
+	if (!bIsProjectileAlive)
 		return;
 	
-	const UWorld* World = GetWorld();
-
-	if (!IsValid(World))
-	{
-		UE_LOG(LogShooter, Error, TEXT("ProjectileBase::DisposeProjectile: World is invalid."));
-		return;
-	}
-
-	LifeSpanTimerHandle.Invalidate();
-	World->GetTimerManager().ClearTimer(LifeSpanTimerHandle);
 	IPooledActor::Execute_ReleasePooledActor(this);
 }
 
@@ -93,17 +83,10 @@ void AProjectileBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	ProjectileMovementComponent->OnProjectileBounce.RemoveDynamic(this, &AProjectileBase::OnProjectileHit);
 }
 
-void AProjectileBase::SetProjectileLifeSpan(const float InLifeSpan)
+void AProjectileBase::Tick(float DeltaSeconds)
 {
-	const UWorld* World = GetWorld();
-
-	if (!IsValid(World))
-	{
-		UE_LOG(LogShooter, Error, TEXT("ProjectileBase::SetProjectileLifeSpan(): World is invalid."));
-		return;
-	}
-
-	World->GetTimerManager().SetTimer(LifeSpanTimerHandle, this, &AProjectileBase::ProjectileLifeSpanEnd, InLifeSpan, false);
+	Super::Tick(DeltaSeconds);
+	ProcessProjectileLifeSpan(DeltaSeconds);
 }
 
 void AProjectileBase::OnProjectileHit_Implementation(const FHitResult& ImpactResult, const FVector& ImpactVelocity)
@@ -115,10 +98,28 @@ void AProjectileBase::OnProjectileLifeSpanEnd_Implementation()
 {
 }
 
-void AProjectileBase::ProjectileLifeSpanEnd()
+void AProjectileBase::StartProjectileLifeSpan(const float InLifeSpan)
+{
+	RemainingLifeSpan = InLifeSpan;
+	bIsProjectileAlive = true;
+}
+
+void AProjectileBase::ProcessProjectileLifeSpan(const float DeltaSeconds)
+{
+	if (!bIsProjectileAlive)
+		return;
+
+	RemainingLifeSpan -= DeltaSeconds;
+
+	if (RemainingLifeSpan <= 0.f)
+		EndProjectileLifeSpan();
+}
+
+void AProjectileBase::EndProjectileLifeSpan()
 {
 	OnProjectileLifeSpanEnd();
 	DisposeProjectile();
+	bIsProjectileAlive = false;
 }
 
 void AProjectileBase::ProjectileHit(const FHitResult& ImpactResult, const FVector& ImpactVelocity)

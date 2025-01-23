@@ -1,7 +1,7 @@
 // Copyright Villains, Inc. All Rights Reserved.
 
-#include "Features/Gameplay/WeponSystem/WeaponsSwitcher.h"
-#include "Features/Gameplay/WeponSystem/Factories/BWWeaponsFactory.h"
+#include "ProjectBW/Public/Features/Gameplay/WeaponSystem/WeaponsSwitcher.h"
+#include "ProjectBW/Public/Features/Gameplay/WeaponSystem/Factories/BWWeaponsFactory.h"
 
 UWeaponsSwitcher::UWeaponsSwitcher(): WeaponEquipSlotKey(nullptr),
                                       Equipment(nullptr),
@@ -31,6 +31,11 @@ void UWeaponsSwitcher::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 	Equipment->OnAnyItemEquipped.RemoveDynamic(this, &UWeaponsSwitcher::OnAnyItemEquipped);
 	Equipment->OnAnyItemUnequipped.RemoveDynamic(this, &UWeaponsSwitcher::OnAnyItemUnequipped);
+}
+
+bool UWeaponsSwitcher::IsAnyWeaponEquipped() const
+{
+	return IsValid(CurrentEquippedWeapon);
 }
 
 bool UWeaponsSwitcher::TryGetEquippedWeapon(AWeaponBase*& OutWeapon) const
@@ -77,7 +82,7 @@ bool UWeaponsSwitcher::TryUnequipCurrentWeapon()
 	return true;
 }
 
-void UWeaponsSwitcher::AddWeaponActor(UWeaponItem* Item, const int32 SlotIndex)
+void UWeaponsSwitcher::AddWeaponActor(UBWWeaponItem* Item, const int32 SlotIndex)
 {
 	if (!Check() || !IsValid(Item))
 		return;
@@ -88,7 +93,7 @@ void UWeaponsSwitcher::AddWeaponActor(UWeaponItem* Item, const int32 SlotIndex)
 
 	Weapons.Add(SlotIndex, Weapon);
 
-	if (bEquipWeaponOnFirstSlot && SlotIndex == 0)
+	if (!IsAnyWeaponEquipped())
 		TryEquipWeaponAtSlot(SlotIndex);
 	else
 		WithdrawWeapon(Weapon);
@@ -107,7 +112,7 @@ void UWeaponsSwitcher::RemoveWeaponActor(const int32 SlotIndex)
 
 bool UWeaponsSwitcher::IsWeapon(const UEquipSlotKey* EquipSlotKey, const UItemBase* Item) const
 {
-	return IsValid(Item) && EquipSlotKey == WeaponEquipSlotKey && Item->IsA(UWeaponItem::StaticClass());
+	return IsValid(Item) && EquipSlotKey == WeaponEquipSlotKey && Item->IsA(UBWWeaponItem::StaticClass());
 }
 
 void UWeaponsSwitcher::OnAnyItemEquipped(UEquipSlotKey* EquipSlotKey, int32 SlotIndex, UItemBase* Item)
@@ -115,7 +120,7 @@ void UWeaponsSwitcher::OnAnyItemEquipped(UEquipSlotKey* EquipSlotKey, int32 Slot
 	if (!IsWeapon(EquipSlotKey, Item))
 		return;
 
-	UWeaponItem* WeaponItem = Cast<UWeaponItem>(Item);
+	UBWWeaponItem* WeaponItem = Cast<UBWWeaponItem>(Item);
 	if (!IsValid(WeaponItem))
 	{
 		UE_LOG(LogBWWeapons, Error, TEXT("WeaponSwitccher::OnAnyItemEquipped: WeaponItem is nullptr"));
