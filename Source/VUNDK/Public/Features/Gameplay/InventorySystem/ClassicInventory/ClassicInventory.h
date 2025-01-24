@@ -14,9 +14,11 @@ class VUNDK_API UClassicInventory : public UInventoryBase
 
 public:
 	UClassicInventory();
+	
+	virtual USaveData* CreateSaveDataObject_Implementation() override;
 
-	virtual USaveData* CreateSaveData() override;
-
+	virtual USaveData* CreateInventorySaveData_Implementation(USaveData* SaveData, TArray<UItemBase*>& ItemsToSave) override;
+	
 	virtual void LoadInventorySaveData_Implementation(UInventoryBaseSaveData* InventorySaveData) override;
 
 	virtual void OnItemAdded_Implementation(UItemBase* Item) override;

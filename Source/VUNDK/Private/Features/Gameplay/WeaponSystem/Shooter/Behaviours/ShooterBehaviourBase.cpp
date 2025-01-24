@@ -4,7 +4,7 @@
 #include "Features/Gameplay/WeaponSystem/Shooter/Shooter.h"
 #include "Kismet/GameplayStatics.h"
 
-void UShooterBehaviourBase::Init(UShooter* InShooter, const FShootData InShootData, const TArray<UShootPoint*> InShootPoints)
+void UShooterBehaviourBase::Init(UShooter* InShooter, const FShootData InShootData, UShootBarrel* InShootBarrel)
 {
 	if (!IsValid(InShooter))
 	{
@@ -12,17 +12,29 @@ void UShooterBehaviourBase::Init(UShooter* InShooter, const FShootData InShootDa
 		return;
 	}
 
-	if (InShootPoints.Num() == 0)
+	if (!IsValid(InShootBarrel))
 	{
-		UE_LOG(LogShooter, Error, TEXT("ShootPoints in %s is empty."), *GetName());
+		UE_LOG(LogShooter, Error, TEXT("ShootBarrel in %s is null."), *GetName());
 		return;
 	}
 
 	ShootData = InShootData;
 	Shooter = InShooter;
-	ShootPoints = InShootPoints;
+	ShootBarrel = InShootBarrel;
+	ShootPoints = ShootBarrel->GetShootPointsChildren();
 	EnableBehaviour();
 	OnInit();
+}
+
+void UShooterBehaviourBase::SetOwner(APawn* InOwner)
+{
+	if (!IsValid(InOwner))
+	{
+		UE_LOG(LogShooter, Error, TEXT("Owner in %s is null."), *GetName());
+		return;
+	}
+
+	Owner = InOwner;
 }
 
 void UShooterBehaviourBase::EnableBehaviour()
@@ -37,42 +49,39 @@ void UShooterBehaviourBase::DisableBehaviour()
 	OnBehaviourDisabled();
 }
 
-bool UShooterBehaviourBase::Shoot(const EShootType ShootType)
+bool UShooterBehaviourBase::Shoot()
 {
 	if (!Check())
-		return false;
-
-	if (bIsInCooldown)
-		return false;
-
-	StartShootCooldown();
-
-	switch (ShootType)
 	{
-	case EShootType::Simultaneous:
-		{
-			HandleSimultaneousShoot();
-			break;
-		}
-
-	case EShootType::Sequential:
-		{
-			HandleSequentialShoot();
-			break;
-		}
-
-	default:
+		UE_LOG(LogShooter, Error, TEXT("Shoot() in %s failed check."), *GetName());
+		ShootFail(EShootFailReason::Error);
 		return false;
 	}
 
+	if (bIsInCooldown)
+	{
+		ShootFail(EShootFailReason::CoolDown);
+		return false;
+	}
+
+	if (!TryConsumeAmmoForShoot())
+	{
+		ShootFail(EShootFailReason::NoAmmo);
+		return false;
+	}
+
+	HandleShoot();
+	ShootSuccess();
 	return true;
+}
+
+void UShooterBehaviourBase::ResetRecoil()
+{
+	ShotsFired = 0;
 }
 
 int32 UShooterBehaviourBase::Refill(const int32 Ammo)
 {
-	if (!Check())
-		return 0;
-
 	ModifyCurrentAmmo(Ammo);
 	OnRefill();
 	OnBehaviourRefill.Broadcast(CurrentAmmo);
@@ -84,65 +93,54 @@ void UShooterBehaviourBase::RefillAllMagazine()
 	Refill(GetMagSize());
 }
 
-void UShooterBehaviourBase::SetShootParams(const float NewDamage, const float NewFireRate, const float NewRange, const int32 NewMagSize)
+void UShooterBehaviourBase::SetShootParams(const float NewDamage, const float NewFireRate, const float NewRange, const int32 NewMagSize, const int32 NewRecoilStrength)
 {
 	SetDamage(NewDamage);
 	SetFireRate(NewFireRate);
-	SetRange(NewRange);
+	SetMaxRange(NewRange);
 	SetMagSize(NewMagSize);
+	SetRecoilStrength(NewRecoilStrength);
 }
 
 void UShooterBehaviourBase::SetDamage(const float NewDamage)
 {
-	if (NewDamage < 0.0f)
-	{
-		UE_LOG(LogShooter, Warning, TEXT("Trying to set negative damage in %s. New Damage set to zero."), *GetName());
-		ShootData.Damage = 0.0f;
-		return;
-	}
-
-	ShootData.Damage = NewDamage;
+	ShootData.Damage = FMath::Clamp(NewDamage, 0.f, MAX_FLT);
 }
 
 void UShooterBehaviourBase::SetFireRate(const float NewFireRate)
 {
-	if (NewFireRate < 0.0f)
-	{
-		UE_LOG(LogShooter, Warning, TEXT("Trying to set negative fire rate in %s. New Fire Rate set to zero."), *GetName());
-		ShootData.FireRate = 0.0f;
-		return;
-	}
-
-	ShootData.FireRate = NewFireRate;
+	ShootData.FireRate = FMath::Clamp(NewFireRate, 0.f, MAX_FLT);
 }
 
-void UShooterBehaviourBase::SetRange(const float NewRange)
+void UShooterBehaviourBase::SetMaxRange(const float NewRange)
 {
-	if (NewRange < 0.0f)
-	{
-		UE_LOG(LogShooter, Warning, TEXT("Trying to set negative range in %s. New Range set to zero."), *GetName());
-		ShootData.Range = 0.0f;
-		return;
-	}
-
-	ShootData.Range = NewRange;
+	ShootData.MaxRange = FMath::Clamp(NewRange, 0.f, MAX_FLT);
 }
 
 void UShooterBehaviourBase::SetMagSize(const int32 NewMagSize)
 {
-	if (NewMagSize < 0)
-	{
-		UE_LOG(LogShooter, Warning, TEXT("Trying to set negative mag size in %s. New Mag Size set to zero."), *GetName());
-		ShootData.MagSize = 0;
-		return;
-	}
-
-	ShootData.MagSize = NewMagSize;
+	ShootData.MagSize = FMath::Clamp(NewMagSize, 0, MAX_int32);
 }
 
-float UShooterBehaviourBase::GetRange_Implementation() const
+void UShooterBehaviourBase::SetRecoilStrength(float NewRecoilStrength)
 {
-	return ShootData.Range * 100.f;
+	NewRecoilStrength = FMath::Clamp(NewRecoilStrength, 0.f, 1.f);
+	ShootData.RecoilStrength = NewRecoilStrength;
+}
+
+void UShooterBehaviourBase::SetMaxSpread(const float NewSpread)
+{
+	ShootData.MaxSpread = FMath::Clamp(NewSpread, 0.f, 1.f);
+}
+
+void UShooterBehaviourBase::SetCurrentAmmo(const int32 NewAmmo)
+{
+	CurrentAmmo = FMath::Clamp(NewAmmo, 0, GetMagSize());
+}
+
+float UShooterBehaviourBase::GetMaxRange_Implementation() const
+{
+	return ShootData.MaxRange * RangeMultiplier;
 }
 
 float UShooterBehaviourBase::GetFireRate_Implementation() const
@@ -160,21 +158,36 @@ int32 UShooterBehaviourBase::GetMagSize_Implementation() const
 	return ShootData.MagSize;
 }
 
+float UShooterBehaviourBase::GetRecoilStrength_Implementation() const
+{
+	return ShootData.RecoilStrength * RecoilStrengthMultiplier;
+}
+
+float UShooterBehaviourBase::GetMaxSpread_Implementation() const
+{
+	return ShootData.MaxSpread * MaxSpreadMultiplier;
+}
+
+EShootType UShooterBehaviourBase::GetShootType() const
+{
+	return ShootData.ShootType;
+}
+
 int32 UShooterBehaviourBase::GetCurrentAmmo() const
 {
 	return CurrentAmmo;
 }
 
-TEnumAsByte<ECollisionChannel> UShooterBehaviourBase::GetDamageChannel() const
+int32 UShooterBehaviourBase::GetAmmoToConsume() const
 {
-	return ShootData.DamageChannel;
+	return AmmoToConsumePerShot;
 }
 
 UWorld* UShooterBehaviourBase::GetWorld() const
 {
 	if (!IsValid(Shooter))
 		return Super::GetWorld();
-	
+
 	return Shooter->GetWorld();
 }
 
@@ -186,19 +199,64 @@ bool UShooterBehaviourBase::ImplementsGetWorld() const
 }
 #endif
 
-void UShooterBehaviourBase::ShootSuccess(UShootPoint* ShootPoint) const
+void UShooterBehaviourBase::HandleShoot()
+{
+	switch (GetShootType())
+	{
+	case EShootType::Simultaneous:
+		{
+			HandleSimultaneousShoot();
+			break;
+		}
+
+	case EShootType::Sequential:
+		{
+			HandleSequentialShoot();
+			break;
+		}
+	}
+}
+
+void UShooterBehaviourBase::ShootFromShootPoint(UShootPoint* ShootPoint) const
 {
 	const FVector ShooterTargetLocation = GetShooterTargetLocation();
 	FVector ShootPointDirToTarget = ShooterTargetLocation - ShootPoint->GetShootPointLocation();
 	ShootPointDirToTarget.Normalize();
-	OnShootSuccess(ShootPoint, ShooterTargetLocation, ShootPointDirToTarget);
-	OnBehaviourShootSuccess.Broadcast(ShootPoint);
+	ShootPoint->SetSpread(GenerateSpread());
+	OnDeployShoot(ShootPoint, ShooterTargetLocation, ShootPointDirToTarget);
+	OnShootFromShootPoint(ShootPoint, ShooterTargetLocation, ShootPointDirToTarget);
 }
 
-void UShooterBehaviourBase::ShootFail()
+void UShooterBehaviourBase::ShootSuccess()
 {
-	OnShootFail();
+	if (!IsValid(Shooter))
+	{
+		UE_LOG(LogShooter, Error, TEXT("ShootSuccess::Shooter in %s is null."), *GetName());
+		return;
+	}
+
+	StartShootCooldown();
+	ApplyRecoilImpulse();
+	OnShootSuccess(ShootBarrel);
+	OnBehaviourShootSuccess.Broadcast(ShootBarrel, ShotsFired);
+	ShotsFired++;
+}
+
+void UShooterBehaviourBase::ShootFail(const EShootFailReason FailReason)
+{
+	OnShootFail(FailReason);
 	OnBehaviourShootFail.Broadcast();
+}
+
+void UShooterBehaviourBase::TickBehaviour(const float DeltaTime)
+{
+	OnTickBehaviour(DeltaTime);
+	ProcessCooldown(DeltaTime);
+	ProcessRecoilImpulseRotation(DeltaTime);
+}
+
+void UShooterBehaviourBase::OnTickBehaviour_Implementation(const float DeltaTime)
+{
 }
 
 void UShooterBehaviourBase::OnBehaviourEnabled_Implementation()
@@ -209,15 +267,19 @@ void UShooterBehaviourBase::OnBehaviourDisabled_Implementation()
 {
 }
 
+void UShooterBehaviourBase::OnDeployShoot_Implementation(UShootPoint* ShootPoint, const FVector& TargetLocation, const FVector& DirectionToTarget) const
+{
+}
+
+void UShooterBehaviourBase::OnShootFromShootPoint_Implementation(UShootPoint* ShootPoint, const FVector& TargetLocation, const FVector& DirectionToTarget) const
+{
+}
+
 void UShooterBehaviourBase::OnInit_Implementation()
 {
 }
 
-void UShooterBehaviourBase::OnShootSuccess_Implementation(UShootPoint* ShootPoint, const FVector& ShooterTargetLocation, const FVector& ShootPointDirectionToTarget) const
-{
-}
-
-void UShooterBehaviourBase::OnShootFail_Implementation()
+void UShooterBehaviourBase::OnShootFail_Implementation(const EShootFailReason FailReason)
 {
 }
 
@@ -225,26 +287,20 @@ void UShooterBehaviourBase::OnRefill_Implementation()
 {
 }
 
-FVector UShooterBehaviourBase::CalculateShooterTargetLocation_Implementation() const
+FVector UShooterBehaviourBase::GetShooterTargetLocation_Implementation() const
 {
-	return FVector::ZeroVector;
-}
-
-FVector UShooterBehaviourBase::GetShooterTargetLocation() const
-{
-	if (!bUseCameraTargetLocation)
-		return CalculateShooterTargetLocation();
-
-	FVector CameraStartPoint;
-	FVector CameraEndPoint;
-	FVector CameraHitPoint;
-	if (TryGetCameraPoints(CameraStartPoint, CameraEndPoint, CameraHitPoint))
+	FRotator Rotation;
+	if (FVector CameraStartPoint, CameraEndPoint, CameraHitPoint; TryGetCameraPoints(CameraStartPoint, CameraEndPoint, CameraHitPoint, Rotation))
 		return CameraHitPoint;
 
 	return FVector::ZeroVector;
 }
 
-bool UShooterBehaviourBase::TryGetCameraPoints(FVector& OutStartPoint, FVector& OutEndPoint, FVector& OutHitPoint) const
+void UShooterBehaviourBase::OnShootSuccess_Implementation(const UShootBarrel* OutShootBarrel)
+{
+}
+
+bool UShooterBehaviourBase::TryGetCameraPoints(FVector& OutStartPoint, FVector& OutEndPoint, FVector& OutHitPoint, FRotator& OutRotation, const FVector StartPointOffset) const
 {
 	const UWorld* World = Shooter->GetWorld();
 
@@ -261,11 +317,15 @@ bool UShooterBehaviourBase::TryGetCameraPoints(FVector& OutStartPoint, FVector& 
 		return false;
 	}
 
-	OutStartPoint = CameraManager->GetCameraCacheView().Location;
-	OutEndPoint = OutStartPoint + CameraManager->GetCameraCacheView().Rotation.Vector() * GetRange();
+	const FVector CameraLocation = CameraManager->GetCameraCacheView().Location;
+	OutRotation = CameraManager->GetCameraCacheView().Rotation;
+
+	const FVector WorldOffset = OutRotation.RotateVector(StartPointOffset);
+	OutStartPoint = CameraLocation + WorldOffset;
+	OutEndPoint = OutStartPoint + OutRotation.Vector() * GetMaxRange();
 	OutHitPoint = OutEndPoint;
 
-	if (FHitResult HitResult; World->LineTraceSingleByChannel(HitResult, OutStartPoint, OutEndPoint, ECollisionChannel::ECC_Camera))
+	if (FHitResult HitResult; World->LineTraceSingleByChannel(HitResult, OutStartPoint, OutEndPoint, SightTraceChannel))
 		OutHitPoint = HitResult.ImpactPoint;
 
 	return true;
@@ -281,21 +341,19 @@ bool UShooterBehaviourBase::IsInLineOfSight(const FVector& StartPoint, const FVe
 		return false;
 	}
 
-	if (FHitResult HitResult; World->LineTraceSingleByChannel(HitResult, StartPoint, TargetPoint, ECC_Visibility))
+	if (FHitResult HitResult; World->LineTraceSingleByChannel(HitResult, StartPoint, TargetPoint, SightTraceChannel))
 		return HitResult.ImpactPoint.Equals(TargetPoint, Tolerance);
 
 	return true;
 }
 
-bool UShooterBehaviourBase::HandleSimultaneousShoot()
+bool UShooterBehaviourBase::Check() const
 {
-	if (!HasEnoughAmmoToShoot(ShootPoints.Num()))
-	{
-		ShootFail();
-		return false;
-	}
+	return IsValid(Shooter) && bIsBehaviourActive && IsValid(ShootBarrel);
+}
 
-	ModifyCurrentAmmo(-ShootPoints.Num());
+void UShooterBehaviourBase::HandleSimultaneousShoot()
+{
 	for (UShootPoint* ShootPoint : ShootPoints)
 	{
 		if (!IsValid(ShootPoint))
@@ -304,37 +362,21 @@ bool UShooterBehaviourBase::HandleSimultaneousShoot()
 			continue;
 		}
 
-		ShootSuccess(ShootPoint);
+		ShootFromShootPoint(ShootPoint);
 	}
-
-	return true;
 }
 
-bool UShooterBehaviourBase::HandleSequentialShoot()
+void UShooterBehaviourBase::HandleSequentialShoot()
 {
-	if (!HasEnoughAmmoToShoot(1))
-	{
-		ShootFail();
-		return false;
-	}
-
-	ModifyCurrentAmmo(-1);
 	NextShootPointIndex();
 
 	if (!IsValid(ShootPoints[CurrentShootPointIndex]))
 	{
 		UE_LOG(LogShooter, Error, TEXT("HandleSequentialShoot(), Invalid ShootPoint in %s."), *GetName());
-		return false;
+		return;
 	}
 
-	ShootSuccess(ShootPoints[CurrentShootPointIndex]);
-
-	return true;
-}
-
-bool UShooterBehaviourBase::HasEnoughAmmoToShoot(const int32 DesiredAmmoToConsume) const
-{
-	return ShootPoints.Num() > 0 && (bHasInfiniteAmmo || CurrentAmmo - DesiredAmmoToConsume >= 0);
+	ShootFromShootPoint(ShootPoints[CurrentShootPointIndex]);
 }
 
 int32 UShooterBehaviourBase::NextShootPointIndex()
@@ -350,12 +392,18 @@ int32 UShooterBehaviourBase::NextShootPointIndex()
 	return CurrentShootPointIndex;
 }
 
-void UShooterBehaviourBase::SetCurrentAmmo(const int32 NewAmmoValue)
+bool UShooterBehaviourBase::TryConsumeAmmoForShoot()
 {
-	if (bHasInfiniteAmmo)
-		return;
+	if (!HasEnoughAmmoToShoot())
+		return false;
 
-	CurrentAmmo = FMath::Clamp(NewAmmoValue, 0, GetMagSize());
+	ModifyCurrentAmmo(-GetAmmoToConsume());
+	return true;
+}
+
+bool UShooterBehaviourBase::HasEnoughAmmoToShoot() const
+{
+	return ShootPoints.Num() > 0 && (bHasInfiniteAmmo || CurrentAmmo - GetAmmoToConsume() >= 0);
 }
 
 void UShooterBehaviourBase::ModifyCurrentAmmo(const int32 AmmoValue)
@@ -363,18 +411,53 @@ void UShooterBehaviourBase::ModifyCurrentAmmo(const int32 AmmoValue)
 	SetCurrentAmmo(CurrentAmmo + AmmoValue);
 }
 
-void UShooterBehaviourBase::StartShootCooldown()
+void UShooterBehaviourBase::ApplyRecoilImpulse()
 {
-	if (!IsValid(Shooter->GetWorld()))
+	if (!ShootData.bHasRecoil || !IsValid(ShootData.RecoilCurve))
+		return;
+
+	if (!IsValid(Owner))
 	{
-		UE_LOG(LogShooter, Error, TEXT("ShooterBehaviour World is invalid in %s."), *GetName());
+		UE_LOG(LogShooter, Error, TEXT("UShooterBehaviourBase::ApplyRecoilImpulse: Owner is null in %s."), *GetName());
 		return;
 	}
 
-	bIsInCooldown = true;
-	FTimerHandle TimerHandle;
+	const float RecoilPitch = ShootData.RecoilCurve->GetVectorValue(ShotsFired).Y;
+	const float RecoilYaw = ShootData.RecoilCurve->GetVectorValue(ShotsFired).Z;
+	ImpulseRecoil = FRotator(RecoilPitch, RecoilYaw, 0.0f);
+	RecoilRemaining = ShootData.RecoilDuration;
+}
+
+void UShooterBehaviourBase::ProcessRecoilImpulseRotation(const float DeltaTime)
+{
+	if (!IsValid(Owner) || RecoilRemaining <= 0.0f)
+		return;
+	
+	const float NormalizedTime = FMath::Clamp(RecoilRemaining / ShootData.RecoilDuration, -1.f, 1.f);
+	const float DecayFactor = ShootData.RecoilCurve->GetVectorValue(1.0f - NormalizedTime).X;
+	const FRotator RecoilStep = ImpulseRecoil * (DecayFactor * DeltaTime * GetRecoilStrength());
+
+	Owner->AddControllerPitchInput(-RecoilStep.Pitch);
+	Owner->AddControllerYawInput(RecoilStep.Yaw);
+
+	RecoilRemaining -= DeltaTime;
+}
+
+void UShooterBehaviourBase::StartShootCooldown()
+{
 	const float Cooldown = 1.0f / (GetFireRate() / 60.0f);
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UShooterBehaviourBase::EndShootCooldown, Cooldown);
+	CooldownRemaining = Cooldown;
+	bIsInCooldown = true;
+}
+
+void UShooterBehaviourBase::ProcessCooldown(const float DeltaTime)
+{
+	if (!bIsInCooldown)
+		return;
+
+	CooldownRemaining -= DeltaTime;
+	if (CooldownRemaining <= 0.0f)
+		EndShootCooldown();
 }
 
 void UShooterBehaviourBase::EndShootCooldown()
@@ -382,7 +465,7 @@ void UShooterBehaviourBase::EndShootCooldown()
 	bIsInCooldown = false;
 }
 
-bool UShooterBehaviourBase::Check() const
+float UShooterBehaviourBase::GenerateSpread() const
 {
-	return IsValid(Shooter) && bIsBehaviourActive;
+	return FMath::RandRange(0.f, GetMaxSpread());
 }

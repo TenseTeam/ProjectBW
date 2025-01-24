@@ -5,12 +5,13 @@
 
 #include "Utility/FGvDebug.h"
 
-UResourceAttributeBase::UResourceAttributeBase(): Owner(nullptr), bCanRegen(false), bStopRegenOnValueDecrease(true),
-                                                  MaxValue(0), MinValue(0),
-                                                  RegenSpeed(0),
-                                                  RegenDelay(0), StartRegenValue(0), StopRegenValue(0),
-                                                  CurrentValue(0), bMustRegen(false)
+UResourceAttributeBase::UResourceAttributeBase(): bCanRegen(false), bStopRegenOnValueDecrease(true),
+                                                  MaxValue(1), MinValue(0),
+                                                  RegenSpeed(1),
+                                                  RegenDelay(1), StartRegenValue(1 - KINDA_SMALL_NUMBER), StopRegenValue(1),
+                                                  CurrentValue(1), bMustRegen(false)
 {
+	Owner = nullptr;
 }
 
 void UResourceAttributeBase::Initialize(AActor* InOwner, const FName InName)
@@ -22,9 +23,6 @@ void UResourceAttributeBase::Initialize(AActor* InOwner, const FName InName)
 	}
 	Owner = InOwner;
 	Name = InName;
-
-	FGvDebug::Log("PostInitProperties");
-	UObject::PostInitProperties();
 
 	CheckOrder(MinValue, MaxValue);
 	

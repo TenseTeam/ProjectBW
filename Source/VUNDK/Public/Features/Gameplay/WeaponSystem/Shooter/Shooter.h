@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ShootBarrel.h"
 #include "Behaviours/ShooterBehaviourBase.h"
 #include "Components/ActorComponent.h"
 #include "Data/ShootData.h"
@@ -22,17 +23,21 @@ public:
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	FShootData ShootData;
-	UPROPERTY()
-	TArray<UShootPoint*> ShootPoints;
-
+	
 public:
 	UShooter();
 
 	UFUNCTION(BlueprintCallable)
-	void Init(const TArray<UShootPoint*> InShootPoints);
+	void Init(UShootBarrel* InShootBarrel);
+
+	UFUNCTION(BlueprintCallable)
+	void SetOwner(APawn* InOwner) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
-	bool Shoot(const EShootType ShootType = EShootType::Simultaneous) const;
+	bool Shoot() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure = false)
+	void ResetRecoil() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
 	int32 Refill(const int32 Ammo) const;
@@ -44,6 +49,8 @@ public:
 	int32 GetCurrentAmmo() const;
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
 	bool Check() const;

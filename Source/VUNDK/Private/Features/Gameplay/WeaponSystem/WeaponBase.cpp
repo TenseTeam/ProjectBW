@@ -5,7 +5,20 @@
 AWeaponBase::AWeaponBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	MeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
+	WeaponMeshRoot = CreateDefaultSubobject<USceneComponent>(TEXT("WeaponRoot"));
+	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
+	WeaponMesh->SetupAttachment(WeaponMeshRoot);
+	
+#if WITH_EDITORONLY_DATA
+	ArrowComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("ArrowComponent"));
+	ArrowComponent->SetArrowColor(FColor::Blue);
+#endif
+}
+
+void AWeaponBase::Init(APawn* InOwner)
+{
+	SetOwner(InOwner);
+	SetInstigator(InOwner);
 }
 
 void AWeaponBase::SetWeaponDamage(const float NewDamage)
@@ -15,12 +28,15 @@ void AWeaponBase::SetWeaponDamage(const float NewDamage)
 
 bool AWeaponBase::WeaponAttack()
 {
-	if (OnWeaponAttack())
+	if (DeployWeaponAttack())
 	{
-		OnWeaponAttackEvent.Broadcast();
+		OnWeaponAttackSuccess();
+		OnWeaponAttackSuccessEvent.Broadcast();
 		return true;
 	}
 
+	OnWeaponAttackFail();
+	OnWeaponAttackFailEvent.Broadcast();
 	return false;
 }
 
@@ -29,7 +45,16 @@ FWeaponData AWeaponBase::GetWeaponData() const
 	return WeaponData;
 }
 
-bool AWeaponBase::OnWeaponAttack_Implementation()
+bool AWeaponBase::DeployWeaponAttack_Implementation()
 {
 	return true;
 }
+
+void AWeaponBase::OnWeaponAttackSuccess_Implementation()
+{
+}
+
+void AWeaponBase::OnWeaponAttackFail_Implementation()
+{
+}
+

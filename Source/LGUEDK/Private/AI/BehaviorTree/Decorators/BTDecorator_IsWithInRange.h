@@ -16,6 +16,7 @@ class LGUEDK_API UBTDecorator_IsWithInRange : public UBTDecorator_BlackboardBase
 	GENERATED_BODY()
 	
 protected:
+	
 	explicit UBTDecorator_IsWithInRange(FObjectInitializer const& ObjectInitializer);
 	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
 	
@@ -23,11 +24,11 @@ protected:
 public:
 	
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
-	FBlackboardKeySelector SelfPositionKey;
-
-	UPROPERTY(EditAnywhere, Category = "Blackboard")
-	FBlackboardKeySelector AttackTargetPositionKey;
+	FBlackboardKeySelector DistanceFromPlayerKey;
 	
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
-	FBlackboardKeySelector AccettableRadiusKey;
+	FBlackboardKeySelector MaxAttackRadiusKey;
+
+	UPROPERTY(EditAnywhere, Category = "Blackboard")
+	FBlackboardKeySelector MinAttackRadiusKey;
 };

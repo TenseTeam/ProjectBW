@@ -3,25 +3,19 @@
 #include "Features/Gameplay/WeaponSystem/Shooter/Behaviours/ShooterPhysicProjectileBehaviour.h"
 #include "Features/Gameplay/WeaponSystem/Shooter/Shooter.h"
 #include "Features/Gameplay/WeaponSystem/Shooter/Projectiles/ProjectileBase.h"
+#include "Patterns/ObjectPool/Utility/PoolsUtility.h"
 
 UShooterPhysicProjectileBehaviour::UShooterPhysicProjectileBehaviour(): ProjectilePool(nullptr)
 {
-	ProjectilePool = CreateDefaultSubobject<UActorPool>(TEXT("ProjectilePool"));
-	ProjectilePool->SetActorClass(AProjectileBase::StaticClass());
 }
 
-void UShooterPhysicProjectileBehaviour::Init(UShooter* InShooter, const FShootData InShootData, const TArray<UShootPoint*> InShootPoints)
+void UShooterPhysicProjectileBehaviour::Init(UShooter* InShooter, const FShootData InShootData, UShootBarrel* InShootBarrel)
 {
-	Super::Init(InShooter, InShootData, InShootPoints);
-	ProjectilePool->Init();
+	ProjectilePool = UPoolsUtility::GetPool(ProjectilesPoolName);
+	Super::Init(InShooter, InShootData, InShootBarrel);
 }
 
-void UShooterPhysicProjectileBehaviour::OnBehaviourDisabled_Implementation()
-{
-	ProjectilePool->DestroyPool();
-}
-
-void UShooterPhysicProjectileBehaviour::OnShootSuccess_Implementation(UShootPoint* ShootPoint, const FVector& ShooterTargetLocation, const FVector& ShootPointDirectionToTarget) const
+void UShooterPhysicProjectileBehaviour::OnDeployShoot_Implementation(UShootPoint* ShootPoint, const FVector& TargetLocation, const FVector& DirectionToTarget) const
 {
 	AActor* ActorPrj = ProjectilePool->AcquireActor();
 
@@ -30,10 +24,13 @@ void UShooterPhysicProjectileBehaviour::OnShootSuccess_Implementation(UShootPoin
 		UE_LOG(LogShooter, Error, TEXT("ShooterPhysicProjectileBehaviour ShootSuccess(), Invalid projectile."));
 		return;
 	}
-
-	FVector ProjectileDirection = ShootPointDirectionToTarget;
-	AProjectileBase* Projectile = Cast<AProjectileBase>(ActorPrj);
 	
+	AProjectileBase* Projectile = Cast<AProjectileBase>(ActorPrj);
 	Projectile->SetActorLocation(ShootPoint->GetShootPointLocation());
-	Projectile->Init(Shooter->GetOwner(), GetDamage(), ProjectileMaxLifeTime, ShootPointDirectionToTarget * ProjectileSpeed);
+	Projectile->Init(Shooter->GetOwner(), GetDamage(), GetMaxRange(), ProjectileSpeed, DirectionToTarget);
+}
+
+bool UShooterPhysicProjectileBehaviour::Check() const
+{
+	return Super::Check() && IsValid(ProjectilePool);
 }

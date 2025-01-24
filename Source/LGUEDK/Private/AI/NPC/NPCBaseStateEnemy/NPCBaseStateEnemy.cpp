@@ -3,7 +3,6 @@
 
 #include "AI/NPC/NPCBaseStateEnemy/NPCBaseStateEnemy.h"
 
-#include "AI/NPC/BWNPCBaseEnemy/BWNPCbaseEnemyController.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -34,7 +33,7 @@ FVector ANPCBaseStateEnemy::RandomPosition(FVector Position)
 void ANPCBaseStateEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	EQS_Manager = Cast<AEQS_Manager>(UGameplayStatics::GetActorOfClass(GetWorld(),AEQS_Manager::StaticClass()));
 }
 
 

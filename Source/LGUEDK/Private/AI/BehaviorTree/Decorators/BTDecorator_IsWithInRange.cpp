@@ -27,14 +27,18 @@ bool UBTDecorator_IsWithInRange::CalculateRawConditionValue(UBehaviorTreeCompone
 		return false;
 	}
 
-	const FVector SelfPosition = BlackboardComp->GetValueAsVector(SelfPositionKey.SelectedKeyName);
-	const FVector TargetPosition = BlackboardComp->GetValueAsVector(AttackTargetPositionKey.SelectedKeyName);
+	const float MaxRange = BlackboardComp->GetValueAsFloat(MaxAttackRadiusKey.SelectedKeyName);
+	const float MinRange = BlackboardComp->GetValueAsFloat(MinAttackRadiusKey.SelectedKeyName);
+	float DistanceFromPlayer = BlackboardComp->GetValueAsFloat(DistanceFromPlayerKey.SelectedKeyName);
 	
-	const float DistanceFromPlayer = FVector::Dist(SelfPosition, TargetPosition);
+	//LGDebug::Log("DistanceFromPlayer: " + FString::SanitizeFloat(DistanceFromPlayer), true);
+	// LGDebug::Log("MaxRange: " + FString::SanitizeFloat(MaxRange), true);
+	// LGDebug::Log("MinRange: " + FString::SanitizeFloat(MinRange), true);
 	
-	const float MaxRange = BlackboardComp->GetValueAsFloat(AccettableRadiusKey.SelectedKeyName);
+	if (DistanceFromPlayer <= MaxRange && DistanceFromPlayer >= MinRange)
+	{
+		return true; 
+	}
 	
-	LGDebug::Log(FString::SanitizeFloat(DistanceFromPlayer), true);
-	
-	return DistanceFromPlayer <= MaxRange && DistanceFromPlayer > 500;
+	return false;
 }

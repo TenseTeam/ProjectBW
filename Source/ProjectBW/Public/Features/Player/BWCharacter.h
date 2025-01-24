@@ -9,10 +9,15 @@
 #include "Components/EnvironmentTracing/GroundCheckComponent.h"
 #include "Data/CharacterData.h"
 #include "Features/Gameplay/DynamicCameraSystem/GvSpringArmComponent.h"
-#include "Features/Gameplay/GrapplingHookSystem/GrapplingHookComponent.h"
+#include "Features/Gameplay/GrapplingHookSystem/Components/GrapplingHookComponent.h"
 #include "Patterns/State/StateMachineComponent.h"
 #include "BWCharacter.generated.h"
 
+class ABWWeaponFirearm;
+class UWeaponsSwitcher;
+class UShieldAttribute;
+class UStaminaAttribute;
+class UHealthAttribute;
 class UResourceAttributeManager;
 class UInteractableDetectorComponent;
 class UCharacterState;
@@ -82,6 +87,24 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopHook);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInteract, AActor*, Interactable);
 
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLostHealth);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGainedHealth);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDeath);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLostStamina);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGainedStamina);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStaminaEmptied);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLostShield);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGainedShield);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FShieldEmptied);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartReloading);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FReloading);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopReloading);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FReloadInterrupted);
+
+
 UCLASS()
 class PROJECTBW_API ABWCharacter : public ABWCharacterBase
 {
@@ -126,6 +149,37 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
 	FInteract OnInteract;
+
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FLostHealth OnLostHealth;
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FGainedHealth OnGainedHealth;
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FDeath OnDeath;
+
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FLostStamina OnLostStamina;
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FGainedStamina OnGainedStamina;
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FStaminaEmptied OnStaminaEmptied;
+
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FLostShield OnLostShield;
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FGainedShield OnGainedShield;
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FShieldEmptied OnShieldEmptied;
+
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FStartReloading OnStartReloading;
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FReloading OnReloading;
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FStopReloading OnStopReloading;
+	UPROPERTY(BlueprintAssignable, Category = "BW Character Events")
+	FReloadInterrupted OnReloadInterrupted;
+	
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UCharacterData* Data;
@@ -161,9 +215,20 @@ private:
 	UInteractableDetectorComponent* InteractableDetector;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UResourceAttributeManager* AttributeManager;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UWeaponsSwitcher* WeaponsSwitcher;
 	
 	UPROPERTY()
 	AGameplayController* BWController;
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UHealthAttribute* Health; //initialized in blueprint event graph
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UShieldAttribute* Shield; //initialized in blueprint event graph
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UStaminaAttribute* Stamina; //initialized in blueprint event graph
+
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	ABWWeaponFirearm* HoldedWeapon;
 
 	bool bWantRunning;
     bool bWantShooting;
@@ -174,6 +239,7 @@ private:
 	bool bIsAiming;
 	bool bIsHooking;
 	bool bIsDodging;
+	bool bIsReloading;
 	
 	bool bCanMove;
 	bool bCanLook;
@@ -182,11 +248,11 @@ private:
 	bool bCanShoot;
 	bool bCanHook;
 	bool bCanInteract;
+	bool bCanReload;
 	
 
 public:
 	ABWCharacter();
-	virtual void Tick(float DeltaTime) override;
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	
@@ -212,6 +278,8 @@ public:
 	UCameraComponent* GetFollowCamera() const;
 	UFUNCTION(BlueprintCallable)
 	UInteractableDetectorComponent* GetInteractableDetector() const;
+	UFUNCTION(BlueprintCallable)
+	ABWWeaponFirearm* GetHoldedWeapon() const;
 
 	UFUNCTION(BlueprintCallable)
 	float GetGroundDistance() const;
@@ -284,6 +352,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool CanInteract() const;
 
+	UFUNCTION(BlueprintCallable)
+	bool IsReloading() const;
+	UFUNCTION(BlueprintCallable)
+	void SetIsReloading(bool Value);
+	UFUNCTION(BlueprintCallable)
+	bool CanReload() const;
+	UFUNCTION(BlueprintCallable)
+	void SetCanReload(bool Value);
+	UFUNCTION(BlueprintCallable)
+	bool IsHoldingWeapon() const;
+
 private:
 	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode) override;
 	virtual void NotifyJumpApex() override;
@@ -300,6 +379,27 @@ private:
 	UFUNCTION()
 	void StopDodging();
 
-	void InitStats();
-	void UpdateStats();
+	UFUNCTION()
+	void LostHealth();
+	UFUNCTION()
+	void GainedHealth();
+	UFUNCTION()
+	void Death();
+
+	UFUNCTION()
+	void LostStamina();
+	UFUNCTION()
+	void GainedStamina();
+	UFUNCTION()
+	void StaminaEmptied();
+
+	UFUNCTION()
+	void LostShield();
+	UFUNCTION()
+	void GainedShield();
+	UFUNCTION()
+	void ShieldEmptied();
+	
+	void UpdateCharacterData() const;
+	void InitAttributes();
 };

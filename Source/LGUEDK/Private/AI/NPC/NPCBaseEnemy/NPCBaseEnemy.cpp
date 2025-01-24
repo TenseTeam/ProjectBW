@@ -48,7 +48,7 @@ void ANPCBaseEnemy::SetMovementSpeed(EMovementSpeed MovementSpeed) const
 		break;
 	}
 
-	LGDebug::Log(*StaticEnum<EMovementSpeed>()->GetNameByValue((int64)MovementSpeed).ToString(),true);
+	//LGDebug::Log(*StaticEnum<EMovementSpeed>()->GetNameByValue((int64)MovementSpeed).ToString(),true);
 	
 }
 

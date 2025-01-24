@@ -3,7 +3,8 @@
 #include "Patterns/ObjectPool/ActorPool.h"
 #include "Patterns/ObjectPool/Interfaces/PooledActor.h"
 
-UActorPool::UActorPool(): bIsCapped(false)
+UActorPool::UActorPool(): bIsCapped(false),
+                          bHasBeenDestroyed(false)
 {
 }
 
@@ -194,6 +195,7 @@ void UActorPool::ClearActor(AActor* Actor)
 		UE_LOG(LogObjectPool, Error, TEXT("ActorPool ClearActor(), Invalid actor."));
 		return;
 	}
-	
+
+	Actor->SetActorTransform(FTransform::Identity);
 	IPooledActor::Execute_ClearPooledActor(Actor);
 }

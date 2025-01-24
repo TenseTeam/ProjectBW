@@ -5,6 +5,8 @@
 
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 UBTTask_SetFocus::UBTTask_SetFocus(FObjectInitializer const& ObjectInitializer)
 {
@@ -30,6 +32,10 @@ EBTNodeResult::Type UBTTask_SetFocus::ExecuteTask(UBehaviorTreeComponent& OwnerC
 	{
 		return EBTNodeResult::Failed;
 	}
+
+	ACharacter* Character = Cast<ACharacter>(AIController->GetPawn());
+	Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+	Character->GetCharacterMovement()->bUseControllerDesiredRotation = true;
 	
 	AIController->SetFocus(TargetActor, EAIFocusPriority::Gameplay);
 

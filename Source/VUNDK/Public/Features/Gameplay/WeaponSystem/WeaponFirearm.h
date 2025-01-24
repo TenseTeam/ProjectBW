@@ -16,21 +16,41 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UShooter* Shooter;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UShootBarrel* ShootBarrel;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FName ShootBarrelSocketName = "Barrel";
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EShootType WeaponShootType;
 	
 public:
 	AWeaponFirearm();
 
+	virtual void PostInitProperties() override;
+	
+	virtual void Init(APawn* InOwner) override;
+
+	UFUNCTION(BlueprintCallable)
+	void ResetRecoil() const;
+	
 	virtual void SetWeaponDamage(const float NewDamage) override;
 
+	UFUNCTION(BlueprintCallable)
 	void SetWeaponFireRate(const float NewFireRate) const;
 
+	UFUNCTION(BlueprintCallable)
 	void SetWeaponMagSize(const int32 NewMagSize) const;
 
-	void SetWeaponRange(const float NewRange) const;
+	UFUNCTION(BlueprintCallable)
+	void SetWeaponMaxRange(const float NewRange) const;
+
+	UFUNCTION(BlueprintCallable)
+	void SetWeaponAmmoRemaining(const int32 NewAmmoRemaining) const;
 	
 	UFUNCTION(BlueprintCallable)
 	void SetWeaponShootType(const EShootType NewShootType);
+
+	UFUNCTION(BlueprintCallable)
+	void SetWeaponMaxSpread(const float NewSpread) const;
 	
 	UFUNCTION(BlueprintCallable)
 	int32 Reload(int32 Ammo);
@@ -44,5 +64,5 @@ protected:
 	UFUNCTION(BlueprintNativeEvent)
 	void OnReload();
 	
-	virtual bool OnWeaponAttack_Implementation() override;
+	virtual bool DeployWeaponAttack_Implementation() override;
 };

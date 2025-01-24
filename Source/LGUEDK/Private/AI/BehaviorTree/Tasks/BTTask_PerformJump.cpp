@@ -6,8 +6,8 @@
 #include "AIController.h"
 #include "NavigationSystem.h"
 #include "AI/NavigationSystemBase.h"
-#include "AI/NPC/BWNPCBaseEnemy/BWNPCbaseEnemyController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "GameFramework/Character.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 UBTTask_PerformJump::UBTTask_PerformJump(FObjectInitializer const& ObjectInitializer)
