@@ -15,7 +15,7 @@ void UShooterPhysicProjectileBehaviour::Init(UShooter* InShooter, const FShootDa
 	Super::Init(InShooter, InShootData, InShootBarrel);
 }
 
-void UShooterPhysicProjectileBehaviour::OnDeployShoot_Implementation(UShootPoint* ShootPoint, const bool bIsUsingCameraHitTargetLocation, const FVector& TargetLocation, const FVector& DirectionToTarget) const
+void UShooterPhysicProjectileBehaviour::OnDeployShoot_Implementation(UShootPoint* ShootPoint, const FVector& TargetLocation, const FVector& DirectionToTarget) const
 {
 	AActor* ActorPrj = ProjectilePool->AcquireActor();
 
@@ -24,8 +24,7 @@ void UShooterPhysicProjectileBehaviour::OnDeployShoot_Implementation(UShootPoint
 		UE_LOG(LogShooter, Error, TEXT("ShooterPhysicProjectileBehaviour ShootSuccess(), Invalid projectile."));
 		return;
 	}
-
-	FVector ProjectileDirection = DirectionToTarget;
+	
 	AProjectileBase* Projectile = Cast<AProjectileBase>(ActorPrj);
 	Projectile->SetActorLocation(ShootPoint->GetShootPointLocation());
 	Projectile->Init(Shooter->GetOwner(), GetDamage(), GetMaxRange(), ProjectileSpeed, DirectionToTarget);

@@ -15,13 +15,14 @@ public class ProjectBWEditorTarget : TargetRules
 		{
 			"ProjectBW",
 			"VUNDK",
-			"GVUEDK"
+			"GVUEDK",
+			"LGUEDK"
 		} );
-		RegisterModulesCreatedByRider();
+		// RegisterModulesCreatedByRider();
 	}
 
-	private void RegisterModulesCreatedByRider()
-	{
-		ExtraModuleNames.AddRange(new string[] { "LGUEDK" });
-	}
+	// private void RegisterModulesCreatedByRider()
+	// {
+	// 	ExtraModuleNames.AddRange(new string[] { "LGUEDK" });
+	// }
 }

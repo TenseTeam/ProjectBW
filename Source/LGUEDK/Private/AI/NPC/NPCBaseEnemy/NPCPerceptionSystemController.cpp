@@ -21,7 +21,7 @@ ANPCPerceptionSystemController::ANPCPerceptionSystemController()
 	CanHear = true;
 	CanTakeDamage = true;
 	SetUpPerceptionSystem();
-	LGDebug::Log("ANPCPerceptionSystemController COSTRUTTORE",true);
+	//LGDebug::Log("ANPCPerceptionSystemController COSTRUTTORE",true);
 }
 
 void ANPCPerceptionSystemController::BeginPlay()
@@ -67,7 +67,7 @@ void ANPCPerceptionSystemController::SetUpSightConfig()
 		SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
 		SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
 
-		LGDebug::Log("inizialize senso vista ",true);
+		//LGDebug::Log("inizialize senso vista ",true);
 		AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ANPCPerceptionSystemController::HandleSight);
 		AIPerceptionComponent->ConfigureSense(*SightConfig);
 		AIPerceptionComponent->SetDominantSense(*SightConfig->GetSenseImplementation());

@@ -13,6 +13,8 @@ UBTService_UpdatePlayerDistance::UBTService_UpdatePlayerDistance(FObjectInitiali
 {
 	NodeName = " Update Player Distance";
 	
+	ForceInstancing(true);
+	
 	CachedAttackTarget = nullptr;
 	CachedBlackboardComp = nullptr;
 	CachedSelf = nullptr;
@@ -54,8 +56,6 @@ void UBTService_UpdatePlayerDistance::OnBecomeRelevant(UBehaviorTreeComponent& O
 
 	CachedBlackboardComp->SetValueAsVector(AttackTargetPositionKey.SelectedKeyName, CachedAttackTarget->GetActorLocation());
 	CachedBlackboardComp->SetValueAsVector(PawnPositionKey.SelectedKeyName, CachedSelf->GetActorLocation());
-	
-	LGDebug::Log("Servizio aggiornamento distanza inizializzato", true);
 
 }
 
@@ -75,10 +75,25 @@ void UBTService_UpdatePlayerDistance::TickNode(UBehaviorTreeComponent& OwnerComp
 		return;
 	}
 
-	CachedBlackboardComp->SetValueAsVector(AttackTargetPositionKey.SelectedKeyName, CachedAttackTarget->GetActorLocation());
-	CachedBlackboardComp->SetValueAsVector(PawnPositionKey.SelectedKeyName, CachedSelf->GetActorLocation());
+	if (!CachedSelf)
+	{
+		LGDebug::Log("CachedSelf non trovati", true);
+		return;
+	}
 	
-	// LGDebug::Log("player position " + CachedAttackTarget->GetActorLocation().ToString(), true);
+	FVector AttackTargetPosition = CachedAttackTarget->GetActorLocation();
+	FVector PawnPosition = CachedSelf->GetActorLocation();
+	float Distance = FVector::Distance(AttackTargetPosition, PawnPosition);
+	
+	CachedBlackboardComp->SetValueAsVector(AttackTargetPositionKey.SelectedKeyName, AttackTargetPosition);
+	CachedBlackboardComp->SetValueAsVector(PawnPositionKey.SelectedKeyName, PawnPosition);
+	CachedBlackboardComp->SetValueAsFloat(DistanceFromPlayerKey.SelectedKeyName, Distance);
+	
+	
+	//LGDebug::Log("player position " + CachedAttackTarget->GetActorLocation().ToString(), true);
+	//LGDebug::Log("player position " + CachedSelf->GetName(), true);
+	
 	// LGDebug::Log("enemy position " + CachedSelf->GetActorLocation().ToString(), true);
 }
+
 

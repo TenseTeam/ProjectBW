@@ -4,7 +4,6 @@
 #include "AI/Custom Navigation/CustomNavLinkProxy.h"
 
 #include "AIController.h"
-#include "AI/NPC/BWNPCBaseEnemy/BWNPCbaseEnemyController.h"
 #include "AI/NPC/NPCBaseStateEnemy/NPCBaseStateEnemy.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"

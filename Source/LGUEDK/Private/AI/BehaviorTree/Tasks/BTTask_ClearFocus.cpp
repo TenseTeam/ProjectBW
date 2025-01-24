@@ -3,6 +3,8 @@
 
 #include "BTTask_ClearFocus.h"
 #include "AIController.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 UBTTask_ClearFocus::UBTTask_ClearFocus(FObjectInitializer const& ObjectInitializer)
 {
@@ -17,6 +19,10 @@ EBTNodeResult::Type UBTTask_ClearFocus::ExecuteTask(UBehaviorTreeComponent& Owne
 		UE_LOG(LogTemp, Warning, TEXT("ClearEnemyFocusTask: AIController is null"));
 		return EBTNodeResult::Failed;
 	}
+
+	ACharacter* Character = Cast<ACharacter>(AIController->GetPawn());
+	Character->GetCharacterMovement()->bOrientRotationToMovement = true;
+	Character->GetCharacterMovement()->bUseControllerDesiredRotation = false;
 	
 	AIController->ClearFocus(EAIFocusPriority::Gameplay);
 	UE_LOG(LogTemp, Log, TEXT("ClearEnemyFocusTask: Focus cleared"));

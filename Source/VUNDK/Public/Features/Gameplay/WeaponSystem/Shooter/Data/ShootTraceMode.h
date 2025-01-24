@@ -6,5 +6,6 @@ UENUM(BlueprintType)
 enum EShootTraceMode : uint8
 {
 	CameraSightTrace,
-	ShootPointTrace
+	ShootPointTrace,
+	TargetTrace
 };

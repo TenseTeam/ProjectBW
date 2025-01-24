@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AI/EQS/EQS_Manager.h"
 #include "AI/NPC/NPCBaseEnemy/NPCBaseEnemy.h"
 #include "NPCBaseStateEnemy.generated.h"
 
@@ -17,7 +18,13 @@ public:
 		
 	UFUNCTION(BlueprintCallable)
 	FVector RandomPosition(FVector Position);
-	
+
+	UFUNCTION()
+	virtual float GetSearchRadius() const { return SearchRadius; }
+	UFUNCTION()
+	virtual float GetTimeBeforeNextStep() const { return TimeBeforeNextStep; }
+	UFUNCTION()
+	virtual bool GetWantExplore() const{return bWantExplore;}
 	UFUNCTION()
 	virtual int GetMinInvestigatingRadius() const { return MinInvestigatingRadius; }
 	UFUNCTION()
@@ -32,7 +39,7 @@ public:
 	UFUNCTION()
 	virtual float GetMaxRadius() {return MaxAttackRadius; }
 	UFUNCTION()
-	virtual float GetRandomStrafeRadius() {return FMath::RandRange(MinStrafeRadius, MaxStrafeRadius); }
+	virtual float GetStrafeRadius() {return MaxStrafeRadius; }
 	
 	UFUNCTION()
 	virtual float GetJumpHeight() const {return MaxJumpingHeight; }
@@ -43,15 +50,30 @@ public:
 	UFUNCTION(BlueprintPure)
 	AActor* GetAttackTarget() const { return AttackTarget; }
 	
+	UPROPERTY(VisibleAnywhere, Category = "AI|EQS")
+	AEQS_Manager* EQS_Manager;
+
+	UPROPERTY(VisibleAnywhere, Category = "AI|")
+	EEnemyType EnemyType;
+	
 protected:
 	
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Patrolling")
+	float SearchRadius = 200;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Patrolling", meta = (ClampMin = "0", ClampMax = "10", UIMin = "0", UIMax = "10"))
+	float TimeBeforeNextStep = 5;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Patrolling")
+	bool bWantExplore;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Investigating", meta = (ClampMin = "0", ClampMax = "1000", UIMin = "0", UIMax = "1000"))
-	int MinInvestigatingRadius = 200;
+	float MinInvestigatingRadius = 200;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Investigating", meta = (ClampMin = "0", ClampMax = "2000", UIMin = "0", UIMax = "2000"))
-	int MaxInvestigatingRadius = 600;
+	float MaxInvestigatingRadius = 600;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Investigating", meta = (ClampMin = "0", ClampMax = "10", UIMin = "0", UIMax = "10"))
 	float TimeBeforeInvestigating = 2.f;
@@ -70,9 +92,6 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Attack Ranges")
 	float MaxAttackRadius = 1000.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Attack Ranges")
-	float MinStrafeRadius = 1000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Attack Ranges")
 	float MaxStrafeRadius = 1000.f;

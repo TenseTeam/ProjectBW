@@ -28,7 +28,7 @@ public:
 	virtual void Init(UShooter* InShooter, const FShootData InShootData, UShootBarrel* InShootBarrel) override;
 
 protected:
-	virtual void OnDeployShoot_Implementation(UShootPoint* ShootPoint, const bool bIsUsingCameraHitTargetLocation, const FVector& TargetLocation, const FVector& DirectionToTarget) const override;
+	virtual void OnDeployShoot_Implementation(UShootPoint* ShootPoint, const FVector& TargetLocation, const FVector& DirectionToTarget) const override;
 
 	virtual bool Check() const override;
 };

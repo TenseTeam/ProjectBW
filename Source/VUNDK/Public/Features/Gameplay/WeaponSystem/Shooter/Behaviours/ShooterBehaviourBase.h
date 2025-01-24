@@ -52,8 +52,6 @@ public:
 	TEnumAsByte<ECollisionChannel> SightTraceChannel = ECollisionChannel::ECC_Visibility;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bHasInfiniteAmmo = false;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bUseCameraTargetLocation = true;
 
 protected:
 	UPROPERTY(BlueprintReadOnly)
@@ -181,7 +179,7 @@ protected:
 	void OnBehaviourDisabled();
 
 	UFUNCTION(BlueprintNativeEvent)
-	void OnDeployShoot(UShootPoint* ShootPoint, const bool bIsUsingCameraHitTargetLocation, const FVector& TargetLocation, const FVector& DirectionToTarget) const;
+	void OnDeployShoot(UShootPoint* ShootPoint, const FVector& TargetLocation, const FVector& DirectionToTarget) const;
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnShootFromShootPoint(UShootPoint* ShootPoint, const FVector& TargetLocation, const FVector& DirectionToTarget) const;
