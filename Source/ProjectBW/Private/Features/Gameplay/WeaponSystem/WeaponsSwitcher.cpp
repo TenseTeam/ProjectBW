@@ -5,7 +5,6 @@
 
 UWeaponsSwitcher::UWeaponsSwitcher(): WeaponEquipSlotKey(nullptr),
                                       Equipment(nullptr),
-                                      CurrentEquippedWeapon(nullptr),
                                       OwnerPawn(nullptr),
                                       AttachToComponentUnequipped(nullptr),
                                       AttachToComponentEquipped(nullptr)
@@ -24,6 +23,7 @@ void UWeaponsSwitcher::Init(UEquipment* InEquipment, USceneComponent* InAttachTo
 
 	Equipment->OnAnyItemEquipped.AddDynamic(this, &UWeaponsSwitcher::OnAnyItemEquipped);
 	Equipment->OnAnyItemUnequipped.AddDynamic(this, &UWeaponsSwitcher::OnAnyItemUnequipped);
+	Equipment->OnAnyItemEquipSlotChanged.AddDynamic(this, &UWeaponsSwitcher::OnAnyItemEquipSlotChanged);
 }
 
 void UWeaponsSwitcher::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -33,53 +33,40 @@ void UWeaponsSwitcher::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Equipment->OnAnyItemUnequipped.RemoveDynamic(this, &UWeaponsSwitcher::OnAnyItemUnequipped);
 }
 
-bool UWeaponsSwitcher::IsAnyWeaponEquipped() const
+bool UWeaponsSwitcher::IsHoldingWeapon() const
 {
-	return IsValid(CurrentEquippedWeapon);
+	return HeldWeaponTuple.Key != nullptr || HeldWeaponTuple.Value != nullptr;
 }
 
-bool UWeaponsSwitcher::TryGetEquippedWeapon(AWeaponBase*& OutWeapon) const
+bool UWeaponsSwitcher::TryGetHeldWeapon(AWeaponBase*& OutWeapon) const
 {
 	if (!Check())
 		return false;
 
-	OutWeapon = CurrentEquippedWeapon;
+	OutWeapon = HeldWeaponTuple.Key;
 	return IsValid(OutWeapon);
 }
 
-bool UWeaponsSwitcher::TryEquipWeaponAtSlot(const int32 SlotIndex)
+void UWeaponsSwitcher::HoldWeaponAtSlot(const int32 SlotIndex)
 {
-	if (!Check())
-		return false;
+	if (!Check() || !Weapons.Contains(SlotIndex))
+		return;
 
-	AWeaponBase* WeaponToEquip = Weapons.FindRef(SlotIndex);
-
-	if (!IsValid(WeaponToEquip))
-	{
-		UE_LOG(LogBWWeapons, Error, TEXT("WeaponsSwitcher::TryEquipWeaponAtSlot: WeaponToEquip is nullptr"));
-		return false;
-	}
-
-	if (CurrentEquippedWeapon == WeaponToEquip)
-		return true;
-
-	TryUnequipCurrentWeapon();
-	CurrentEquippedWeapon = WeaponToEquip;
-	ShowWeaponActor(CurrentEquippedWeapon);
-	CurrentEquippedWeapon->AttachToComponent(AttachToComponentEquipped, FAttachmentTransformRules::SnapToTargetNotIncludingScale, EquippedWeaponAttachSocketName);
-	OnNewWeaponEquipped.Broadcast(CurrentEquippedWeapon);
-	return true;
+	const TTuple<AWeaponBase*, UBWWeaponItem*> WeaponTuple = Weapons.FindRef(SlotIndex);
+	if (WeaponTuple.Key == nullptr || HeldWeaponTuple.Key == WeaponTuple.Key)
+		return;
+	
+	WithdrawWeapon(HeldWeaponTuple.Key);
+	HoldWeapon(WeaponTuple);
 }
 
-bool UWeaponsSwitcher::TryUnequipCurrentWeapon()
+void UWeaponsSwitcher::WithdrawWeaponAtSlot(int32 SlotIndex)
 {
-	if (!Check() || !IsValid(CurrentEquippedWeapon))
-		return false;
+	if (!Check() || !Weapons.Contains(SlotIndex))
+		return;
 
-	WithdrawWeapon(CurrentEquippedWeapon);
-	CurrentEquippedWeapon = nullptr;
-	OnWeaponUnequipped.Broadcast();
-	return true;
+	const TTuple<AWeaponBase*, UBWWeaponItem*> WeaponTuple = Weapons.FindRef(SlotIndex);
+	WithdrawWeapon(WeaponTuple.Key);
 }
 
 void UWeaponsSwitcher::AddWeaponActor(UBWWeaponItem* Item, const int32 SlotIndex)
@@ -88,15 +75,8 @@ void UWeaponsSwitcher::AddWeaponActor(UBWWeaponItem* Item, const int32 SlotIndex
 		return;
 
 	AWeaponBase* Weapon = UBWWeaponsFactory::CreateWeapon(OwnerPawn, Item);
-	if (!IsValid(Weapon))
-		return;
-
-	Weapons.Add(SlotIndex, Weapon);
-
-	if (!IsAnyWeaponEquipped())
-		TryEquipWeaponAtSlot(SlotIndex);
-	else
-		WithdrawWeapon(Weapon);
+	const TTuple<AWeaponBase*, UBWWeaponItem*> WeaponTuple = TTuple<AWeaponBase*, UBWWeaponItem*>(Weapon, Item);
+	Weapons.Add(SlotIndex, WeaponTuple);
 }
 
 void UWeaponsSwitcher::RemoveWeaponActor(const int32 SlotIndex)
@@ -104,8 +84,13 @@ void UWeaponsSwitcher::RemoveWeaponActor(const int32 SlotIndex)
 	if (!Check() || !Weapons.Contains(SlotIndex))
 		return;
 
-	if (AWeaponBase* Weapon = Weapons.FindRef(SlotIndex); IsValid(Weapon))
-		Weapon->Destroy();
+	const TTuple<AWeaponBase*, UBWWeaponItem*> WeaponTuple = Weapons.FindRef(SlotIndex);
+
+	if (WeaponTuple == HeldWeaponTuple)
+		HeldWeaponTuple = TTuple<AWeaponBase*, UBWWeaponItem*>(nullptr, nullptr);
+
+	if (IsValid(WeaponTuple.Key))
+		WeaponTuple.Key->Destroy();
 
 	Weapons.Remove(SlotIndex);
 }
@@ -115,19 +100,21 @@ bool UWeaponsSwitcher::IsWeapon(const UEquipSlotKey* EquipSlotKey, const UItemBa
 	return IsValid(Item) && EquipSlotKey == WeaponEquipSlotKey && Item->IsA(UBWWeaponItem::StaticClass());
 }
 
-void UWeaponsSwitcher::OnAnyItemEquipped(UEquipSlotKey* EquipSlotKey, int32 SlotIndex, UItemBase* Item)
+void UWeaponsSwitcher::OnAnyItemEquipped(UEquipSlotKey* EquipSlotKey, int32 NewSlotIndex, UItemBase* Item)
 {
 	if (!IsWeapon(EquipSlotKey, Item))
 		return;
-
+	
 	UBWWeaponItem* WeaponItem = Cast<UBWWeaponItem>(Item);
 	if (!IsValid(WeaponItem))
-	{
-		UE_LOG(LogBWWeapons, Error, TEXT("WeaponSwitccher::OnAnyItemEquipped: WeaponItem is nullptr"));
 		return;
-	}
 
-	AddWeaponActor(WeaponItem, SlotIndex);
+	AddWeaponActor(WeaponItem, NewSlotIndex);
+
+	if (!IsHoldingWeapon())
+		HoldWeaponAtSlot(NewSlotIndex);
+	else
+		WithdrawWeaponAtSlot(NewSlotIndex);
 }
 
 void UWeaponsSwitcher::OnAnyItemUnequipped(UEquipSlotKey* EquipSlotKey, int32 SlotIndex, UItemBase* Item)
@@ -138,20 +125,59 @@ void UWeaponsSwitcher::OnAnyItemUnequipped(UEquipSlotKey* EquipSlotKey, int32 Sl
 	RemoveWeaponActor(SlotIndex);
 }
 
-void UWeaponsSwitcher::WithdrawWeapon(AWeaponBase* Weapon) const
+void UWeaponsSwitcher::OnAnyItemEquipSlotChanged(UEquipSlotKey* EquipSlotKey, UItemBase* Item, int32 NewSlotIndex, int32 OldSlotIndex)
 {
-	if (IsValid(AttachToComponentUnequipped))
-		AttachWeaponToUnequipSocket(Weapon);
-	else
-		HideWeaponActor(Weapon);
-}
-
-void UWeaponsSwitcher::AttachWeaponToUnequipSocket(AWeaponBase* Weapon) const
-{
-	if (!IsValid(Weapon))
+	if (!IsWeapon(EquipSlotKey, Item))
 		return;
 
-	Weapon->AttachToComponent(AttachToComponentUnequipped, FAttachmentTransformRules::SnapToTargetNotIncludingScale, UnequippedWeaponAttachSocketName);
+	ChangeWeaponSlot(HeldWeaponTuple, NewSlotIndex);
+}
+
+void UWeaponsSwitcher::ChangeWeaponSlot(const TTuple<AWeaponBase*, UBWWeaponItem*> WeaponTuple, const int32 NewSlotIndex)
+{
+	if (!Check())
+		return;
+
+	if (Weapons.Contains(NewSlotIndex))
+	{
+		UE_LOG(LogBWWeapons, Error, TEXT("WeaponsSwitcher::ChangeWeaponSlot: SlotIndex %d is already occupied"), NewSlotIndex);
+		return;
+	}
+
+	const int* KeyRef = Weapons.FindKey(WeaponTuple);
+	if (KeyRef == nullptr)
+	{
+		UE_LOG(LogBWWeapons, Error, TEXT("WeaponsSwitcher::ChangeWeaponSlot: Weapon is not in the map"));
+		return;
+	}
+
+	const int32 OldSlotIndex = *KeyRef;
+	Weapons.Add(NewSlotIndex, WeaponTuple);
+	Weapons.Remove(OldSlotIndex);
+}
+
+void UWeaponsSwitcher::HoldWeapon(const TTuple<AWeaponBase*, UBWWeaponItem*> WeaponTuple)
+{
+	if (!Check() || WeaponTuple.Key == nullptr || WeaponTuple.Value == nullptr)
+		return;
+
+	HeldWeaponTuple = WeaponTuple;
+	ShowWeaponActor(HeldWeaponTuple.Key);
+	HeldWeaponTuple.Key->AttachToComponent(AttachToComponentEquipped, FAttachmentTransformRules::SnapToTargetNotIncludingScale, EquippedWeaponAttachSocketName);
+	OnWeaponHeld.Broadcast(HeldWeaponTuple.Key);
+}
+
+void UWeaponsSwitcher::WithdrawWeapon(AWeaponBase* Weapon) const
+{
+	if (!Check() || !IsValid(Weapon))
+		return;
+	
+	if (IsValid(AttachToComponentUnequipped))
+		Weapon->AttachToComponent(AttachToComponentUnequipped, FAttachmentTransformRules::SnapToTargetNotIncludingScale, UnequippedWeaponAttachSocketName);
+	else
+		HideWeaponActor(Weapon);
+
+	OnWeaponWithdraw.Broadcast(Weapon);
 }
 
 void UWeaponsSwitcher::ShowWeaponActor(AWeaponBase* Weapon)

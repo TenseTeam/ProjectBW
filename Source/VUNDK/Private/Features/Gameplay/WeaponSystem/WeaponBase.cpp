@@ -8,7 +8,7 @@ AWeaponBase::AWeaponBase()
 	WeaponMeshRoot = CreateDefaultSubobject<USceneComponent>(TEXT("WeaponRoot"));
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
 	WeaponMesh->SetupAttachment(WeaponMeshRoot);
-	
+
 #if WITH_EDITORONLY_DATA
 	ArrowComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("ArrowComponent"));
 	ArrowComponent->SetArrowColor(FColor::Blue);
@@ -57,3 +57,4 @@ void AWeaponBase::OnWeaponAttackSuccess_Implementation()
 void AWeaponBase::OnWeaponAttackFail_Implementation()
 {
 }
+

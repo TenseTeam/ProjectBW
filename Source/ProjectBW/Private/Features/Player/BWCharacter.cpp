@@ -341,6 +341,7 @@ bool ABWCharacter::IsHoldingWeapon() const
 	return IsValid(HoldedWeapon);
 }
 
+
 void ABWCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)
 {
 	Super::OnMovementModeChanged(PrevMovementMode, PreviousCustomMode);

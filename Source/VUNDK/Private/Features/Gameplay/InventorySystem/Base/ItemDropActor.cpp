@@ -8,7 +8,7 @@ AItemDropActor::AItemDropActor(): RelatedItem(nullptr)
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 }
 
-void AItemDropActor::Init(class UItemBase* Item)
+void AItemDropActor::Init(UItemBase* Item)
 {
 	RelatedItem = Item;
 	Mesh->SetStaticMesh(Item->GetItemMesh());

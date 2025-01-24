@@ -2,8 +2,14 @@
 
 #include "ProjectBW/Public/Features/Gameplay/WeaponSystem/BWWeaponFirearm.h"
 
+#include "Components/WidgetComponent.h"
+
 ABWWeaponFirearm::ABWWeaponFirearm(): WeaponFirearmItem(nullptr)
 {
+	AmmoWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("WeaponWidgetComponent"));
+	AmmoWidgetComponent->SetupAttachment(WeaponMesh);
+	AmmoWidgetComponent->SetWidgetSpace(EWidgetSpace::World);
+	AmmoWidgetComponent->SetDrawSize(FVector2D(812.0f, 267.0f));
 }
 
 void ABWWeaponFirearm::InitBWWeapon(APawn* InOwner, UBWWeaponFirearmItem* InWeaponItem)

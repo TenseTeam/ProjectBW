@@ -7,6 +7,7 @@
 #include "Features/Gameplay/WeaponSystem/WeaponFirearm.h"
 #include "BWWeaponFirearm.generated.h"
 
+class UWidgetComponent;
 DEFINE_LOG_CATEGORY_STATIC(LogBWWeapons, All, All);
 
 UCLASS()
@@ -17,6 +18,8 @@ class PROJECTBW_API ABWWeaponFirearm : public AWeaponFirearm
 public:
 	UPROPERTY(BlueprintReadOnly)
 	UBWWeaponFirearmItem* WeaponFirearmItem;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UWidgetComponent* AmmoWidgetComponent;
 	
 public:
 	ABWWeaponFirearm();

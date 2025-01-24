@@ -24,4 +24,11 @@ void UPoolsManager::BeginPlay()
 {
 	Super::BeginPlay();
 	UPoolsUtility::Init(this);
+	InitPools();
+}
+
+void UPoolsManager::InitPools()
+{
+	for (const auto& Pool : Pools)
+		Pool.Value->Init();
 }

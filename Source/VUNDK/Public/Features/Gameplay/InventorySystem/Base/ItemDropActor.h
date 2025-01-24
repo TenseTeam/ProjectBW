@@ -21,7 +21,7 @@ protected:
 public:
 	AItemDropActor();
 
-	void Init(class UItemBase* Item);
+	void Init(UItemBase* Item);
 
 private:
 	bool Check() const;

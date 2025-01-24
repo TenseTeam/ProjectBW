@@ -42,7 +42,7 @@ private:
 
 public:
 	AWeaponBase();
-
+	
 	UFUNCTION(BlueprintCallable)
 	virtual void Init(APawn* InOwner);
 

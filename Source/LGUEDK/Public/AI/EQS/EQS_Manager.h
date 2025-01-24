@@ -46,9 +46,6 @@ protected:
 	float MaxAttackRadiusRanged = 1200.0f;
 	
 	UPROPERTY(EditAnywhere, Category = "AI|EQS Parameters")
-	int32 NumberOfPoints = 12;
-	
-	UPROPERTY(EditAnywhere, Category = "AI|EQS Parameters")
 	float UpdateInterval = 5.0f;
 	
 	void UpdateStrafePoints();
