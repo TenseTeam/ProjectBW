@@ -42,9 +42,7 @@ private:
 
 public:
 	AWeaponBase();
-
-	virtual void PostInitProperties() override;
-
+	
 	UFUNCTION(BlueprintCallable)
 	virtual void Init(APawn* InOwner);
 

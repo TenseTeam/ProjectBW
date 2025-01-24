@@ -24,8 +24,6 @@ protected:
 	
 public:
 	AWeaponFirearm();
-
-	virtual void PostInitProperties() override;
 	
 	virtual void Init(APawn* InOwner) override;
 
