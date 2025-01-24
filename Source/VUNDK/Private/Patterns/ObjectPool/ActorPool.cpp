@@ -49,16 +49,12 @@ void UActorPool::ReleaseActor(AActor* InActor)
 		return;
 	}
 
+	if (AvailableActors.Contains(InActor))
+		return;
+
 	if (bHasBeenDestroyed)
 	{
 		UE_LOG(LogObjectPool, Warning, TEXT("ActorPool ReleaseActor(), Cannot release actor, pool has been destroyed."));
-		InActor->Destroy();
-		return;
-	}
-	
-	if (AvailableActors.Contains(InActor))
-	{
-		UE_LOG(LogObjectPool, Warning, TEXT("ActorPool ReleaseActor(), Actor already released."));
 		InActor->Destroy();
 		return;
 	}

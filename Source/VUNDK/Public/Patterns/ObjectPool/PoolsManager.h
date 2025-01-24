@@ -15,13 +15,16 @@ class VUNDK_API UPoolsManager : public UActorComponent
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
 	TMap<FName, UActorPool*> Pools;
-	
+
 public:
 	UPoolsManager();
 
 	UFUNCTION(BlueprintPure)
 	UActorPool* GetPool(FName PoolName) const;
-	
+
 protected:
 	virtual void BeginPlay() override;
+
+private:
+	void InitPools();
 };
