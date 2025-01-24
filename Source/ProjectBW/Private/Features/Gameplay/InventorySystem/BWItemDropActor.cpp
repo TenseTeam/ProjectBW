@@ -1,7 +1,7 @@
 // Copyright Villains, Inc. All Rights Reserved.
 
 #include "Features/Gameplay/InventorySystem/BWItemDropActor.h"
-#include "Features/Gameplay/InventorySystem/Items/BWWeaponFirearmItem.h"
+
 #include "Features/Gameplay/RPGSystem/RPGInventory/RPGInventory.h"
 #include "Features/Player/BWCharacter.h"
 #include "Kismet/GameplayStatics.h"
