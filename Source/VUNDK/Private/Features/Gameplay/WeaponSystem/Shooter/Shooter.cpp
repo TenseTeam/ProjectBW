@@ -74,6 +74,7 @@ void UShooter::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorCo
 	
 	if (!Check())
 		return;
+
 	ShooterBehaviour->TickBehaviour(DeltaTime);
 }
 

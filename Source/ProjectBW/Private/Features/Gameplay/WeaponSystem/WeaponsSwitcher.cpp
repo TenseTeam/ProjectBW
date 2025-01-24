@@ -104,9 +104,7 @@ void UWeaponsSwitcher::OnAnyItemEquipped(UEquipSlotKey* EquipSlotKey, int32 NewS
 {
 	if (!IsWeapon(EquipSlotKey, Item))
 		return;
-
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("OnAnyItemEquipped"));
-
+	
 	UBWWeaponItem* WeaponItem = Cast<UBWWeaponItem>(Item);
 	if (!IsValid(WeaponItem))
 		return;
@@ -124,7 +122,6 @@ void UWeaponsSwitcher::OnAnyItemUnequipped(UEquipSlotKey* EquipSlotKey, int32 Sl
 	if (!IsWeapon(EquipSlotKey, Item))
 		return;
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("OnAnyItemUnequipped"));
 	RemoveWeaponActor(SlotIndex);
 }
 
@@ -133,7 +130,6 @@ void UWeaponsSwitcher::OnAnyItemEquipSlotChanged(UEquipSlotKey* EquipSlotKey, UI
 	if (!IsWeapon(EquipSlotKey, Item))
 		return;
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("OnAnyItemEquipSlotChanged"));
 	ChangeWeaponSlot(HeldWeaponTuple, NewSlotIndex);
 }
 
