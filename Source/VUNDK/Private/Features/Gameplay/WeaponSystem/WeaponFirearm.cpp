@@ -6,16 +6,7 @@ AWeaponFirearm::AWeaponFirearm()
 {
 	Shooter = CreateDefaultSubobject<UShooter>(TEXT("Shooter"));
 	ShootBarrel = CreateDefaultSubobject<UShootBarrel>(TEXT("ShootBarrel"));
-}
-
-void AWeaponFirearm::PostInitProperties()
-{
-	Super::PostInitProperties();
-
-	if (WeaponMesh->DoesSocketExist(ShootBarrelSocketName))
-		ShootBarrel->AttachToComponent(WeaponMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, ShootBarrelSocketName);
-	else
-		ShootBarrel->SetupAttachment(WeaponMesh);
+	ShootBarrel->SetupAttachment(WeaponMesh);
 }
 
 void AWeaponFirearm::Init(APawn* InOwner)
@@ -81,6 +72,10 @@ void AWeaponFirearm::ReloadAllMagazine()
 void AWeaponFirearm::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	if (WeaponMesh->DoesSocketExist(ShootBarrelSocketName))
+		ShootBarrel->AttachToComponent(WeaponMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, ShootBarrelSocketName);
+	
 	Shooter->Init(ShootBarrel);
 	SetWeaponDamage(WeaponData.Damage);
 }

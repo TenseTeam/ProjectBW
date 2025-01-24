@@ -7,17 +7,12 @@ AWeaponBase::AWeaponBase()
 	PrimaryActorTick.bCanEverTick = true;
 	WeaponMeshRoot = CreateDefaultSubobject<USceneComponent>(TEXT("WeaponRoot"));
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
-	
+	WeaponMesh->SetupAttachment(WeaponMeshRoot);
+
 #if WITH_EDITORONLY_DATA
 	ArrowComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("ArrowComponent"));
 	ArrowComponent->SetArrowColor(FColor::Blue);
 #endif
-}
-
-void AWeaponBase::PostInitProperties()
-{
-	Super::PostInitProperties();
-	WeaponMesh->SetupAttachment(WeaponMeshRoot);
 }
 
 void AWeaponBase::Init(APawn* InOwner)
