@@ -13,6 +13,7 @@
 #include "Patterns/State/StateMachineComponent.h"
 #include "BWCharacter.generated.h"
 
+class AWeaponBase;
 class ABWWeaponFirearm;
 class UWeaponsSwitcher;
 class UShieldAttribute;

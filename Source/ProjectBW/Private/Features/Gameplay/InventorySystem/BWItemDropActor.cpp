@@ -3,6 +3,7 @@
 
 #include "Features/Gameplay/InventorySystem/BWItemDropActor.h"
 
+#include "Features/Gameplay/InventorySystem/Items/BWWeaponFirearmItem.h"
 #include "Features/Gameplay/RPGSystem/RPGInventory/RPGInventory.h"
 #include "Features/Player/BWCharacter.h"
 #include "Kismet/GameplayStatics.h"
@@ -18,6 +19,18 @@ void ABWItemDropActor::Interact_Implementation()
 {
 	if (IsValid(PlayerInventory))
 	{
+		UBWWeaponFirearmItem* WeaponItem = Cast<UBWWeaponFirearmItem>(RelatedItem);
+		UEquipment* Equipment = PlayerInventory->GetEquipment();
+		if (Equipment->TryEquipItem(WeaponItem, WeaponItem->GetItemData()->EquipSlotKey, 0, false))
+		{
+			Destroy();
+			return;	
+		}
+		if (Equipment->TryEquipItem(WeaponItem, WeaponItem->GetItemData()->EquipSlotKey, 1, false))
+		{
+			Destroy();
+			return;	
+		}
 		if (PlayerInventory->TryAddItem(RelatedItem))
 			Destroy();
 	}
