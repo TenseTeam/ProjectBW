@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Features/Gameplay/GrapplingHookSystem/GrabPoint.h"
-#include "Features/Gameplay/GrapplingHookSystem/GrapplingHookComponent.h"
+#include "Features/Gameplay/GrapplingHookSystem/Interfaces/GrabPoint.h"
+#include "Features/Gameplay/GrapplingHookSystem/Components/GrapplingHookComponent.h"
 #include "GameFramework/Actor.h"
 #include "BWGrabPoint.generated.h"
 

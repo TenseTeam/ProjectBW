@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GrabPoint.h"
+#include "Features/Gameplay/GrapplingHookSystem/Interfaces/GrabPoint.h"
 #include "GrapplingHookComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartHooking);
