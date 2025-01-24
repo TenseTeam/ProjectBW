@@ -67,10 +67,13 @@ public:
 	UEquipment();
 	
 	virtual void BeginPlay() override;
+
+	UFUNCTION(BlueprintCallable)
+	bool TryEquipItemToFirstAvailableSlot(UItemBase* Item);
 	
 	UFUNCTION(BlueprintCallable)
 	bool TryEquipItem(UItemBase* Item, UEquipSlotKey* TargetSlotKey, const int32 SlotIndex, const bool bRemoveFromInventory = true);
-
+	
 	UFUNCTION(BlueprintCallable)
 	bool TryUnequipItem(UItemBase* Item);
 	
@@ -90,9 +93,9 @@ protected:
 	void OnUnequipItem(UEquipSlotKey* EquipSlotKey, UItemBase* Item);
 	
 private:
-	void EquipItem(UItemBase* Item, UEquipSlotKey* EquipSlotKey, const int32 SlotIndex, const bool bRemoveFromInventory = true);
+	void EquipItem(UItemBase* Item, const UEquipSlotKey* EquipSlotKey, const int32 SlotIndex, const bool bRemoveFromInventory = true);
 
-	void UnequipItem(UItemBase* Item, UEquipSlotKey* EquipSlotKey);
+	void UnequipItem(UItemBase* Item, const UEquipSlotKey* EquipSlotKey, const int32 SlotIndex);
 	
 	void AddItemInEquipSlot(UItemBase* Item, const UEquipSlotKey* EquipSlotKey, int32 NewSlotIndex);
 

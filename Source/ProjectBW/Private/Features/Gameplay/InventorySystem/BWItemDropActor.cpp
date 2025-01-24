@@ -1,12 +1,10 @@
 // Copyright Villains, Inc. All Rights Reserved.
 
-
 #include "Features/Gameplay/InventorySystem/BWItemDropActor.h"
-
+#include "Features/Gameplay/InventorySystem/Items/BWWeaponFirearmItem.h"
 #include "Features/Gameplay/RPGSystem/RPGInventory/RPGInventory.h"
 #include "Features/Player/BWCharacter.h"
 #include "Kismet/GameplayStatics.h"
-
 
 void ABWItemDropActor::BeginPlay()
 {
@@ -18,6 +16,16 @@ void ABWItemDropActor::Interact_Implementation()
 {
 	if (IsValid(PlayerInventory))
 	{
+		UEquipment* Equipment = PlayerInventory->GetEquipment();
+		if (IsValid(Equipment))
+		{
+			if (Equipment->TryEquipItemToFirstAvailableSlot(RelatedItem))
+			{
+				Destroy();
+				return;
+			}
+		}
+
 		if (PlayerInventory->TryAddItem(RelatedItem))
 			Destroy();
 	}
@@ -26,7 +34,7 @@ void ABWItemDropActor::Interact_Implementation()
 bool ABWItemDropActor::CanBeInteracted_Implementation(AActor* Caller) const
 {
 	FVector EndTraceLocation;
-	ABWCharacter* BWCharacter = Cast<ABWCharacter>(Caller);
+	const ABWCharacter* BWCharacter = Cast<ABWCharacter>(Caller);
 	if (IsValid(BWCharacter))
 	{
 		FMinimalViewInfo CameraViewInfo;
@@ -34,7 +42,7 @@ bool ABWItemDropActor::CanBeInteracted_Implementation(AActor* Caller) const
 		EndTraceLocation = CameraViewInfo.Location;
 	}
 	else EndTraceLocation = Caller->GetActorLocation();
-	
+
 	FHitResult HitResult;
 	GetWorld()->LineTraceSingleByChannel(HitResult, GetActorLocation(), EndTraceLocation, ECC_Visibility);
 	return !HitResult.bBlockingHit;

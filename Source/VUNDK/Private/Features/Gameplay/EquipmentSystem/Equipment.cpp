@@ -17,14 +17,33 @@ void UEquipment::BeginPlay()
 	{
 		if (SlotLimit.Key == nullptr)
 			continue;
-		
+
 		TMap<int32, UItemBase*> IndexedItems = TMap<int32, UItemBase*>();
 
 		for (int32 i = 0; i < SlotLimit.Value; i++)
 			IndexedItems.Add(i, nullptr);
-		
+
 		EquipSlots.Add(SlotLimit.Key->EquipSlotKey, IndexedItems);
 	}
+}
+
+bool UEquipment::TryEquipItemToFirstAvailableSlot(UItemBase* Item)
+{
+	if (!IsValid(Item) || !IsValid(Item->GetItemData()))
+		return false;
+
+	UEquipSlotKey* ItemSlotKey = Item->GetItemData()->EquipSlotKey;
+
+	if (!EquipSlots.Contains(ItemSlotKey->EquipSlotKey))
+		return false;
+
+	for (int32 i = 0; i < SlotLimits[ItemSlotKey]; i++)
+	{
+		if (TryEquipItem(Item, ItemSlotKey, i))
+			return true;
+	}
+
+	return false;
 }
 
 bool UEquipment::TryEquipItem(UItemBase* Item, UEquipSlotKey* TargetSlotKey, const int32 SlotIndex, const bool bRemoveFromInventory)
@@ -35,9 +54,9 @@ bool UEquipment::TryEquipItem(UItemBase* Item, UEquipSlotKey* TargetSlotKey, con
 		return false;
 	}
 
-	UEquipSlotKey* ItemSlotKey = Item->GetItemData()->EquipSlotKey;
+	UEquipSlotKey* EquipSlotKey = Item->GetItemData()->EquipSlotKey;
 
-	if (!CanEquipItem(Item, ItemSlotKey, SlotIndex))
+	if (!CanEquipItem(Item, EquipSlotKey, SlotIndex))
 	{
 		UE_LOG(LogEquipment, Warning, TEXT("UEquipment::TryEquipItem: Item cannot be equipped."));
 		return false;
@@ -45,11 +64,13 @@ bool UEquipment::TryEquipItem(UItemBase* Item, UEquipSlotKey* TargetSlotKey, con
 
 	if (Item->IsEquipped())
 	{
-		ChangeItemEquipSlot(Item, ItemSlotKey, SlotIndex); // If the item is already equipped, change the slot
+		ChangeItemEquipSlot(Item, EquipSlotKey, SlotIndex); // If the item is already equipped, change the slot
 		return true;
 	}
-	
-	EquipItem(Item, ItemSlotKey, SlotIndex, bRemoveFromInventory);
+
+	EquipItem(Item, EquipSlotKey, SlotIndex, bRemoveFromInventory);
+	OnAnyItemEquipped.Broadcast(EquipSlotKey, SlotIndex, Item);
+	OnEquipChanged.Broadcast();
 	return true;
 }
 
@@ -57,13 +78,17 @@ bool UEquipment::TryUnequipItem(UItemBase* Item)
 {
 	if (!IsValid(Item) || !IsValid(Item->GetItemData()))
 		return false;
+
+	UEquipSlotKey* EquipSlotKey = Item->GetItemData()->EquipSlotKey;
+	const TMap<int32, UItemBase*> SlotItems = EquipSlots[EquipSlotKey->EquipSlotKey];
+	const int32* SlotIndexRef = SlotItems.FindKey(Item);
 	
-	UEquipSlotKey* ItemSlotKey = Item->GetItemData()->EquipSlotKey;
-
-	if (!EquipSlots.Contains(ItemSlotKey->EquipSlotKey) || EquipSlots[ItemSlotKey->EquipSlotKey].FindKey(Item) == nullptr)
+	if (!EquipSlots.Contains(EquipSlotKey->EquipSlotKey) || SlotIndexRef == nullptr)
 		return false;
-
-	UnequipItem(Item, ItemSlotKey);
+	
+	UnequipItem(Item, EquipSlotKey, *SlotIndexRef);
+	OnAnyItemUnequipped.Broadcast(EquipSlotKey, *SlotIndexRef, Item);
+	OnEquipChanged.Broadcast();
 	return true;
 }
 
@@ -78,7 +103,7 @@ TSet<UItemBase*> UEquipment::GetEquippedItems()
 				Items.Add(Item.Value);
 		}
 	}
-	
+
 	return Items;
 }
 
@@ -98,15 +123,15 @@ bool UEquipment::CanEquipItem(const UItemBase* Item, const UEquipSlotKey* Target
 {
 	if (!IsValid(Item) || !IsValid(Item->GetItemData()) || !IsValid(TargetSlotKey))
 		return false;
-	
+
 	if (Item->GetItemData()->EquipSlotKey != TargetSlotKey || !EquipSlots.Contains(TargetSlotKey->EquipSlotKey))
 		return false;
 
 	TMap<int32, UItemBase*> SlotItems = EquipSlots[TargetSlotKey->EquipSlotKey];
-	
+
 	const bool bIsSlotIndexValid = SlotIndex >= 0 && SlotIndex < SlotLimits[TargetSlotKey];
 	const bool bIsSlotEmpty = SlotItems.Contains(SlotIndex) && SlotItems[SlotIndex] == nullptr;
-	
+
 	return bIsSlotIndexValid && bIsSlotEmpty;
 }
 
@@ -118,26 +143,19 @@ void UEquipment::OnUnequipItem_Implementation(UEquipSlotKey* EquipSlotKey, UItem
 {
 }
 
-void UEquipment::EquipItem(UItemBase* Item, UEquipSlotKey* EquipSlotKey, const int32 SlotIndex, const bool bRemoveFromInventory)
+void UEquipment::EquipItem(UItemBase* Item, const UEquipSlotKey* EquipSlotKey, const int32 SlotIndex, const bool bRemoveFromInventory)
 {
 	AddItemInEquipSlot(Item, EquipSlotKey, SlotIndex);
-	
+
 	if (bRemoveFromInventory)
 		Item->Remove();
-
-	OnAnyItemEquipped.Broadcast(EquipSlotKey, SlotIndex, Item);
-	OnEquipChanged.Broadcast();
+	
 	Item->OnItemAdded.AddDynamic(this, &UEquipment::OnItemAddedToAnyInventory); // If the item is added to any inventory or equipped to another slot, remove it from the current slot
 }
 
-void UEquipment::UnequipItem(UItemBase* Item, UEquipSlotKey* EquipSlotKey)
+void UEquipment::UnequipItem(UItemBase* Item, const UEquipSlotKey* EquipSlotKey, const int32 SlotIndex)
 {
-	const TMap<int32, UItemBase*> SlotItems = EquipSlots[EquipSlotKey->EquipSlotKey];
-	const int32 Index = *(SlotItems.FindKey(Item));
-
-	RemoveItemFromEquipSlot(Item, EquipSlotKey, Index);
-	OnAnyItemUnequipped.Broadcast(EquipSlotKey, Index, Item);
-	OnEquipChanged.Broadcast();
+	RemoveItemFromEquipSlot(Item, EquipSlotKey, SlotIndex);
 	Item->OnItemAdded.RemoveDynamic(this, &UEquipment::OnItemAddedToAnyInventory);
 }
 
@@ -156,18 +174,18 @@ void UEquipment::RemoveItemFromEquipSlot(UItemBase* Item, const UEquipSlotKey* E
 void UEquipment::ChangeItemEquipSlot(UItemBase* Item, UEquipSlotKey* EquipSlotKey, const int32 NewSlotIndex)
 {
 	const TMap<int32, UItemBase*> SlotItems = EquipSlots[EquipSlotKey->EquipSlotKey];
-	const int32* OldSlotKeyRef = SlotItems.FindKey(Item);
-	
-	if (OldSlotKeyRef == nullptr) // Safe check to prevent crashes
+	const int32* OldSlotIndexRef = SlotItems.FindKey(Item);
+
+	if (OldSlotIndexRef == nullptr) // Safe check to prevent crashes
 	{
 		EquipItem(Item, EquipSlotKey, NewSlotIndex);
 		return;
 	}
-	
-	UnequipItem(Item, EquipSlotKey);
+
+	UnequipItem(Item, EquipSlotKey, *OldSlotIndexRef);
 	EquipItem(Item, EquipSlotKey, NewSlotIndex);
-	OnAnyItemEquipSlotChanged.Broadcast(EquipSlotKey, Item, NewSlotIndex, *OldSlotKeyRef);
 	OnEquipChanged.Broadcast();
+	OnAnyItemEquipSlotChanged.Broadcast(EquipSlotKey, Item, NewSlotIndex, *OldSlotIndexRef);
 }
 
 void UEquipment::OnItemAddedToAnyInventory(UItemBase* Item, UInventoryBase* Inventory)

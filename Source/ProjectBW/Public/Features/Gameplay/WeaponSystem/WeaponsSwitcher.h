@@ -10,12 +10,13 @@
 #include "WeaponsSwitcher.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
-	FOnNewWeaponEquipped,
+	FOnWeaponHeld,
 	AWeaponBase*, Weapon
 );
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(
-	FOnWeaponUnequipped
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
+	FOnWeaponWithdraw,
+	AWeaponBase*, Weapon
 );
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -25,9 +26,9 @@ class PROJECTBW_API UWeaponsSwitcher : public UActorComponent
 
 public:
 	UPROPERTY(BlueprintAssignable)
-	FOnNewWeaponEquipped OnNewWeaponEquipped;
+	FOnWeaponHeld OnWeaponHeld;
 	UPROPERTY(BlueprintAssignable)
-	FOnWeaponUnequipped OnWeaponUnequipped;
+	FOnWeaponWithdraw OnWeaponWithdraw;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UEquipSlotKey* WeaponEquipSlotKey;
@@ -36,15 +37,13 @@ private:
 	UPROPERTY()
 	UEquipment* Equipment;
 	UPROPERTY()
-	TMap<int32, AWeaponBase*> Weapons;
-	UPROPERTY()
-	AWeaponBase* CurrentEquippedWeapon;
-	UPROPERTY()
 	APawn* OwnerPawn;
 	UPROPERTY()
 	USceneComponent* AttachToComponentUnequipped;
 	UPROPERTY()
 	USceneComponent* AttachToComponentEquipped;
+	TTuple<AWeaponBase*, UBWWeaponItem*> HeldWeaponTuple;
+	TMap<int32, TTuple<AWeaponBase*, UBWWeaponItem*>> Weapons;
 	FName EquippedWeaponAttachSocketName;
 	FName UnequippedWeaponAttachSocketName;
 
@@ -57,16 +56,16 @@ public:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	UFUNCTION(BlueprintPure)
-	bool IsAnyWeaponEquipped() const;
+	bool IsHoldingWeapon() const;
 	
 	UFUNCTION(BlueprintPure)
-	bool TryGetEquippedWeapon(AWeaponBase*& OutWeapon) const;
+	bool TryGetHeldWeapon(AWeaponBase*& OutWeapon) const;
 
 	UFUNCTION(BlueprintCallable)
-	bool TryEquipWeaponAtSlot(int32 SlotIndex);
+	void HoldWeaponAtSlot(int32 SlotIndex);
 
 	UFUNCTION(BlueprintCallable)
-	bool TryUnequipCurrentWeapon();
+	void WithdrawWeaponAtSlot(int32 SlotIndex);
 
 protected:
 	void AddWeaponActor(UBWWeaponItem* Item, int32 SlotIndex);
@@ -75,14 +74,19 @@ protected:
 
 private:
 	UFUNCTION()
-	void OnAnyItemEquipped(UEquipSlotKey* EquipSlotKey, int32 SlotIndex, UItemBase* Item);
+	void OnAnyItemEquipped(UEquipSlotKey* EquipSlotKey, int32 NewSlotIndex, UItemBase* Item);
 	
 	UFUNCTION()
 	void OnAnyItemUnequipped(UEquipSlotKey* EquipSlotKey, int32 SlotIndex, UItemBase* Item);
 
-	void WithdrawWeapon(AWeaponBase* Weapon) const;
+	UFUNCTION()
+	void OnAnyItemEquipSlotChanged(UEquipSlotKey* EquipSlotKey, UItemBase* Item, int32 NewSlotIndex, int32 OldSlotIndex);
+
+	void ChangeWeaponSlot(TTuple<AWeaponBase*, UBWWeaponItem*> WeaponTuple, int32 NewSlotIndex);
+
+	void HoldWeapon(TTuple<AWeaponBase*, UBWWeaponItem*> WeaponTuple);
 	
-	void AttachWeaponToUnequipSocket(AWeaponBase* Weapon) const;
+	void WithdrawWeapon(AWeaponBase* Weapon) const;
 	
 	static void ShowWeaponActor(AWeaponBase* Weapon);
 
