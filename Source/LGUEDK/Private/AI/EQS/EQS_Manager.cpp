@@ -23,6 +23,7 @@ void AEQS_Manager::BeginPlay()
 	Super::BeginPlay();
 	CurrentTime = 0;
 	AttackTarget = UGameplayStatics::GetPlayerCharacter(GetWorld(),0);
+	
 }
 
 void AEQS_Manager::UpdateStrafePoints()
@@ -105,7 +106,7 @@ void AEQS_Manager::UpdateStrafePoints()
 			FVector GridPoint = TargetLocation + FVector(X * StepSize, Y * StepSize, 0.0f);
 
 			// Aggiunta di randomizzazione attorno al punto base
-			float Angle = FMath::DegreesToRadians(FMath::RandRange(0.0f, 360.0f));
+			float Angle = FMath::DegreesToRadians(FMath::RandRange(0.0f, 100.f));
 			float Radius = FMath::RandRange(0.0f, StepSize); // Randomizzazione entro la dimensione della griglia
 			FVector RandomOffset = FVector(
 				FMath::Cos(Angle) * Radius,
@@ -180,7 +181,7 @@ bool AEQS_Manager::IsInRange(FVector TargetPosition,FVector CurrentPosition, con
 	return Distance > MinDistance && Distance < MaxDistance;
 }
 
-// Called every frame
+
 void AEQS_Manager::Tick(float DeltaTime)
 {
 	if (CanSearchPoint)
@@ -193,11 +194,15 @@ void AEQS_Manager::Tick(float DeltaTime)
 		}
 		CurrentTime -= DeltaTime;
 	}
-	
 }
 
 FVector AEQS_Manager::GetPoint(EEnemyType EnemyType)
 {
+	if (Points[EEnemyType::Melee].IsEmpty() || Points[EEnemyType::Ranged].IsEmpty())
+	{
+		UpdateStrafePoints();
+	}
+	
 	FVector SelectedPoint = FVector::ZeroVector;
 	
 	TArray<FVector> PossiblePoints;

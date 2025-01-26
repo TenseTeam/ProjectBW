@@ -122,33 +122,38 @@ void ABaseEnemyController::SetStateAsInvestigating()
 void ABaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 {
 	Super::HandleSight(Actor, Stimulus);
+	int SightActorTeamIndex;
+	int MyIndex;
 	
 	if (Stimulus.WasSuccessfullySensed())
 	{
 		if (Stimulus.Type != UAISense::GetSenseID<UAISense_Sight>())return;
 		if (EnemyBase->GetState() == EEnemyState::Attacking)return;
 		
-		if (Actor->Implements<UAITargetInterface>())
+		SightActorTeamIndex = GetTeamIndex(Actor);
+		MyIndex = GetTeamIndex(EnemyBase);
+			
+		if (GetWorld()->GetTimerManager().IsTimerActive(LostSightTimerHandle) && SightActorTeamIndex != MyIndex)
 		{
-			int Playerindex = IAITargetInterface::Execute_GetTeamIndex(Actor);
-			int MyIndex = IAITargetInterface::Execute_GetTeamIndex(EnemyBase);
-			
-			if (GetWorld()->GetTimerManager().IsTimerActive(LostSightTimerHandle))
-			{
-				GetWorld()->GetTimerManager().ClearTimer(LostSightTimerHandle);
-				LGDebug::Log("TIMER PERSO ANNULLATO", true);
-			}
-			
-			if (Playerindex == MyIndex)return;
-			
-			SetStateAsAttacking(Actor);
-			LGDebug::Log("SEE PLAYER ",true);
+			GetWorld()->GetTimerManager().ClearTimer(LostSightTimerHandle);
+			//LGDebug::Log("TIMER PERSO ANNULLATO", true);
 		}
+
+		if (SightActorTeamIndex == MyIndex)return;
+			
+		SetStateAsAttacking(Actor);
+		LGDebug::Log("SEE PLAYER ",true);
+		
 	}
 	else
 	{
 		if (EnemyBase->GetState() == EEnemyState::Investigating)return;
 		if (!Actor->Implements<UAITargetInterface>()) return;
+		
+		SightActorTeamIndex = GetTeamIndex(Actor);
+		MyIndex = GetTeamIndex(EnemyBase);
+		
+		if (SightActorTeamIndex == MyIndex)return;
 		
 		GetWorld()->GetTimerManager().SetTimer(
 			LostSightTimerHandle,
@@ -228,6 +233,19 @@ void ABaseEnemyController::OnLostDamage()
 	
 	SetStateAsPatrolling();
 	LGDebug::Log(" LOST DAMAGE PLAYER ",true);
+}
+
+int ABaseEnemyController::GetTeamIndex(AActor* Actor)
+{
+	if (Actor->Implements<UAITargetInterface>())
+	{
+		int index = IAITargetInterface::Execute_GetTeamIndex(Actor);
+		return  index;
+	}
+	
+	LGDebug::Log(" NON IMPLEMENTA INTERFACCIA " + Actor->GetName(),true);
+	return -1;
+	
 }
 
 

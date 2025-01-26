@@ -49,7 +49,7 @@ protected:
 	float UpdateInterval = 5.0f;
 	
 	void UpdateStrafePoints();
-
+	
 	
 private:
 

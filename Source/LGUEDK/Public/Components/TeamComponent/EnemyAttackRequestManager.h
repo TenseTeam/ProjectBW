@@ -25,6 +25,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void ReleaseToken(int ReturnToken);
+
+	UFUNCTION()
+	void SetTeamIndex(int NewTeamIndex) {TeamIndex = NewTeamIndex;}
 	
 protected:
 	virtual void BeginPlay() override;

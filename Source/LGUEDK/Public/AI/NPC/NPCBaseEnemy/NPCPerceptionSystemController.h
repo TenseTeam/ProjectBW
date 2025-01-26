@@ -65,14 +65,13 @@ protected:
 
 	FTimerHandle LostDamageTimerHandle;
 
-
+	
 	virtual void BeginPlay() override;
 	
 	virtual void OnPossess(APawn* InPawn) override;
 	
 	virtual void InitializeBlackboardValues() override;
-
-
+	
 	UFUNCTION()
 	virtual void HandleSight(AActor* Actor, FAIStimulus Stimulus) { };
 	UFUNCTION()

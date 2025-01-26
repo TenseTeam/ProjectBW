@@ -23,14 +23,11 @@ public:
 	
 	AMeleeEnemy();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Blueprintable, BlueprintCallable)
 	bool GetWieldSword() const {return bWieldSword; }
 	
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Blueprintable, BlueprintCallable)
 	void SetWieldSword(bool bHasSword) { bWieldSword = bHasSword; }
-	
-	// UFUNCTION(BlueprintCallable)
-	// void PlayMontageWithNotify(UAnimMontage* MontageToPlay);
 	
 	UFUNCTION(BlueprintCallable)
 	void EquipSword(FName SocketName);
@@ -67,6 +64,5 @@ private:
 	UPROPERTY(EditAnywhere, Category = "AI|Melee")
 	bool bWieldSword;
 	
-	//void OnMontageNotifyReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
 	
 };

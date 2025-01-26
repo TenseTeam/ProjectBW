@@ -3,6 +3,7 @@
 
 #include "IA/EnemyBase/EnemyBase.h"
 
+#include "IA/EnemyBase/ABaseEnemyController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Utility/LGDebug.h"
 
@@ -17,7 +18,8 @@ AEnemyBase::AEnemyBase()
 void AEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	// MyController = Cast<ABaseEnemyController>(GetAIController());
+	EnemyAttackRequestManage->SetTeamIndex(1);
 }
 
 

@@ -18,16 +18,16 @@ public:
 	
 	ANPCBaseStateEnemyController();
 		
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Blueprintable,BlueprintCallable, Category = "State")
 	virtual void SetStateAsPassive() {};
 	
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Blueprintable,BlueprintCallable, Category = "State")
 	virtual void SetStateAsPatrolling() {};
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Blueprintable,BlueprintCallable, Category = "State")
 	virtual void SetStateAsAttacking(AActor* Actor) {};
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Blueprintable,BlueprintCallable, Category = "State")
 	virtual void SetStateAsInvestigating() {};
 
 protected:
@@ -45,11 +45,5 @@ protected:
 	virtual void OnLostSight() override { Super::OnLostSight(); };
 	virtual void OnLostHear() override { Super::OnLostHear(); };
 	virtual void OnLostDamage() override { Super::OnLostDamage(); };
-	
-private:
-	
-	UPROPERTY()
-	ANPCBaseStateEnemy* MyControlledPawn;
-	
 	
 };

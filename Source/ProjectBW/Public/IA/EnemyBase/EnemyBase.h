@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AI/EQS/EQS_Manager.h"
 #include "AI/Interfaces/AITargetInterface.h"
 #include "AI/NPC/NPCBaseStateEnemy/NPCBaseStateEnemy.h"
 #include "Components/TeamComponent/EnemyAttackRequestManager.h"
@@ -16,9 +15,11 @@ class PROJECTBW_API AEnemyBase : public ANPCBaseStateEnemy, public IAITargetInte
 	GENERATED_BODY()
 
 public:
+	
 	AEnemyBase();
 	
 protected:
+	
 	virtual void BeginPlay() override;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI|Health")

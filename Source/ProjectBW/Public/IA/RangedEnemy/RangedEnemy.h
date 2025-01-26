@@ -20,11 +20,10 @@ public:
 protected:
 
 	virtual void BeginPlay() override;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI|Shooter")
-	UShooter* Shooter;
-
-
 	
-
+	virtual void PostInitProperties() override;
+	
+	// UPROPERTY(EditDefaultsOnly)
+	// UChildActorComponent* ChildActor;
+	
 };

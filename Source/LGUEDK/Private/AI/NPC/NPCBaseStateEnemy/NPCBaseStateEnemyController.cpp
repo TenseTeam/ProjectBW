@@ -10,11 +10,10 @@
 
 ANPCBaseStateEnemyController::ANPCBaseStateEnemyController()
 {
-	MyControlledPawn = nullptr;
+	
 }
 
 void ANPCBaseStateEnemyController::BeginPlay()
 {
-	MyControlledPawn = Cast<ANPCBaseStateEnemy>(GetControlledPawn());
 	Super::BeginPlay();
 }

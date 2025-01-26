@@ -29,11 +29,6 @@ void ANPCBaseController::OnPossess(APawn* InPawn)
 	}
 }
 
-ANPCBase* ANPCBaseController::GetControlledPawn() const
-{
-	return ControlledPawn;
-}
-
 void ANPCBaseController::BeginPlay()
 {
 	Super::BeginPlay();

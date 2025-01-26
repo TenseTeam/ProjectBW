@@ -47,4 +47,7 @@ private:
 	UPROPERTY()
 	AEnemyBase* EnemyBase;
 
+	UFUNCTION()
+	int GetTeamIndex (AActor* Actor);
+
 };
