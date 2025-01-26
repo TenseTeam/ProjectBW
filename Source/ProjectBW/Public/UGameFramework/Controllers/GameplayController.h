@@ -8,6 +8,8 @@
 #include "Features/Player/BWCharacter.h"
 #include "GameplayController.generated.h"
 
+class UCharacterStats;
+class UEquipment;
 /**
  * 
  */
@@ -15,6 +17,14 @@ UCLASS()
 class PROJECTBW_API AGameplayController : public ABWControllerBase
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UBWInventory* Inventory;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UEquipment* Equipment;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UCharacterStats* CharacterStats;
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

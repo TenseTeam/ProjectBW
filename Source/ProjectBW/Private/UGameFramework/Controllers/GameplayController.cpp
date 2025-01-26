@@ -3,26 +3,34 @@
 
 #include "UGameFramework/Controllers/GameplayController.h"
 #include "EnhancedInputComponent.h"
+#include "Features/Gameplay/InventorySystem/BWInventory.h"
+#include "Features/Gameplay/RPGSystem/StatsSystem/CharacterStats/CharacterStats.h"
 #include "Utility/FGvDebug.h"
 
 FVector AGameplayController::MoveInputValue = FVector::ZeroVector;
 
 AGameplayController::AGameplayController()
 {
+	Inventory = CreateDefaultSubobject<UBWInventory>("Inventory");
+	Equipment = CreateDefaultSubobject<UEquipment>("Equipment");
+	CharacterStats = CreateDefaultSubobject<UCharacterStats>("CharacterStats");
 }
 
 void AGameplayController::BeginPlay()
 {
+
+	Inventory->LinkEquipment(Equipment);
 	Super::BeginPlay();
+	CharacterStats->Init(Equipment);
+	
 	BWCharacter = Cast<ABWCharacter>(GetCharacter());
 	if (!BWCharacter)
 	{
 		FGvDebug::Warning(GetName() + " Has Invalid Character, input will not work", true);
 		return;
 	}
-	//AddMappingContext();
-	ContextsManager->SetGameplayMappingContext();
 	
+	ContextsManager->SetGameplayMappingContext();
 }
 
 void AGameplayController::SetupInputComponent()

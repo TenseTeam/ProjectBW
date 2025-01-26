@@ -161,7 +161,7 @@ UInteractableDetectorComponent* ABWCharacter::GetInteractableDetector() const
 
 ABWWeaponFirearm* ABWCharacter::GetHoldedWeapon() const
 {
-	return HoldedWeapon;
+	return HeldWeapon;
 }
 
 float ABWCharacter::GetGroundDistance() const
@@ -328,7 +328,7 @@ void ABWCharacter::SetIsReloading(bool Value)
 
 bool ABWCharacter::CanReload() const
 {
-	return bCanReload && IsHoldingWeapon() && !IsDodging() && !IsHooking();
+	return bCanReload && IsHoldingWeapon() && !IsDodging() && !IsHooking() && HasInventoryEnoughAmmo();
 }
 
 void ABWCharacter::SetCanReload(bool Value)
@@ -338,7 +338,12 @@ void ABWCharacter::SetCanReload(bool Value)
 
 bool ABWCharacter::IsHoldingWeapon() const
 {
-	return IsValid(HoldedWeapon);
+	return IsValid(HeldWeapon);
+}
+
+bool ABWCharacter::HasInventoryEnoughAmmo() const
+{
+	return BWController->Inventory->AmmoInventory->CanRemoveAmmo(HeldWeapon->FirearmData.AmmoType, 0);
 }
 
 
