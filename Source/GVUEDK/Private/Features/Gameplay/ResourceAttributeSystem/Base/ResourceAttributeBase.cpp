@@ -6,7 +6,7 @@
 #include "Utility/FGvDebug.h"
 
 UResourceAttributeBase::UResourceAttributeBase(): bCanRegen(false), bStopRegenOnValueDecrease(true),
-                                                  MaxValue(1), MinValue(0),
+                                                  MaxValue(1), MinValue(0), bUseStartingValue(false), StartingValue(1),
                                                   RegenSpeed(1),
                                                   RegenDelay(1), StartRegenValue(1 - KINDA_SMALL_NUMBER), StopRegenValue(1),
                                                   CurrentValue(1), bMustRegen(false)
@@ -41,6 +41,11 @@ void UResourceAttributeBase::Initialize(AActor* InOwner, const FName InName)
 			StopRegenValue = MaxValue;
 		}
 	}
+
+	if (bUseStartingValue)
+		SetValue(StartingValue);
+	else
+		SetValue(MaxValue);
 }
 
 void UResourceAttributeBase::SetValue(const float NewValue)
