@@ -33,7 +33,7 @@ void URPGInventory::CreateRPGInventorySaveData(FRPGInventoryItemsSaveData& RPGIt
 	TArray<UItemBase*> RemaingToSave = ItemsToSave;
 	for (UItemBase* Item : ItemsToSave)
 	{
-		RemaingToSave.Remove(Item);
+		RemaingToSave.Remove(Item); // Either way, the item will be saved
 		
 		if (Item->IsA(URPGGearItem::StaticClass()))
 		{

@@ -13,6 +13,7 @@
 #include "Patterns/State/StateMachineComponent.h"
 #include "BWCharacter.generated.h"
 
+class UBWInventory;
 class AWeaponBase;
 class ABWWeaponFirearm;
 class UWeaponsSwitcher;
@@ -229,7 +230,7 @@ private:
 	UStaminaAttribute* Stamina; //initialized in blueprint event graph
 
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	ABWWeaponFirearm* HoldedWeapon;
+	ABWWeaponFirearm* HeldWeapon;
 
 	bool bWantRunning;
     bool bWantShooting;
@@ -361,8 +362,11 @@ public:
 	bool CanReload() const;
 	UFUNCTION(BlueprintCallable)
 	void SetCanReload(bool Value);
+	
 	UFUNCTION(BlueprintCallable)
 	bool IsHoldingWeapon() const;
+	UFUNCTION(BlueprintCallable)
+	bool HasInventoryEnoughAmmo() const;
 
 private:
 	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode) override;

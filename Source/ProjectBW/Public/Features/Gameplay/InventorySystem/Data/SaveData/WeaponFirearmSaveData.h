@@ -18,7 +18,9 @@ struct FWeaponFirearmSaveData
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bHasNewMag;
 
-	FWeaponFirearmSaveData() : WeaponItemSaveData()
+	FWeaponFirearmSaveData() : WeaponItemSaveData(),
+	                           AmmoRemaining(0),
+	                           bHasNewMag(false)
 	{
 	}
 };
