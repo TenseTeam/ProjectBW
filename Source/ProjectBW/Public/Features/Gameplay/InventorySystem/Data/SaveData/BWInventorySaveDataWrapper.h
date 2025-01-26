@@ -1,4 +1,4 @@
-// Copyright VUNDK, Inc. All Rights Reserved.
+// Copyright Villains, Inc. All Rights Reserved.
 
 #pragma once
 
@@ -6,10 +6,10 @@
 #include "WeaponFirearmItemsSaveArray.h"
 #include "WeaponItemsSaveArray.h"
 #include "Features/Gameplay/RPGSystem/RPGInventory/Data/SaveData/RPGInventoryItemsSaveData.h"
-#include "BWInventoryItemsSaveData.generated.h"
+#include "BWInventorySaveDataWrapper.generated.h"
 
 USTRUCT(BlueprintType)
-struct FBWInventoryItemsSaveData
+struct FBWInventorySaveDataWrapper
 {
 	GENERATED_BODY()
 
@@ -19,4 +19,6 @@ struct FBWInventoryItemsSaveData
 	TMap<FGuid, FWeaponItemsSaveArray> GenericWeaponItems;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TMap<FGuid, FWeaponFirearmItemsSaveArray> WeaponFirearmItems;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<FGuid, int32> AmmoSaveData;
 };

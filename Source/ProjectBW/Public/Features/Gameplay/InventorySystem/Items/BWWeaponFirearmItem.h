@@ -21,18 +21,18 @@ public:
 
 	void LoadWeaponFirearmItemSaveData(UBWInventory* LoadingInventory, FWeaponFirearmSaveData& WeaponItemSaveData);
 	
-	void SetWeaponItemAmmoRemaining(const int32 NewAmmoRemaining);
+	void SetAmmoRemaining(const int32 NewAmmoRemaining);
 
 	bool TryConsumeWeaponItemNewMagazine(const int MagSize);
 	
-	int32 GetWeaponItemAmmoRemaining() const;
+	int32 GetAmmoRemaining() const;
 	
 	UFUNCTION(BlueprintNativeEvent)
-	float GetWeaponItemFireRate();
+	float GetFireRate();
 	
 	UFUNCTION(BlueprintNativeEvent)
-	float GetWeaponItemMaxRange();
+	float GetMaxRange();
 
 	UFUNCTION(BlueprintNativeEvent)
-	int32 GetWeaponItemMagSize();
+	int32 GetMagSize();
 };

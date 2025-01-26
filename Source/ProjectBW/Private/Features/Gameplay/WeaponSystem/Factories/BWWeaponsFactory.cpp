@@ -2,29 +2,29 @@
 
 #include "ProjectBW/Public/Features/Gameplay/WeaponSystem/Factories/BWWeaponsFactory.h"
 #include "Features/Gameplay/InventorySystem/Data/WeaponItemData.h"
+#include "Features/Gameplay/WeaponSystem/BWWeaponMelee.h"
 #include "ProjectBW/Public/Features/Gameplay/WeaponSystem/BWWeaponFirearm.h"
 
 AWeaponBase* UBWWeaponsFactory::CreateWeapon(APawn* Owner, UBWWeaponItem* WeaponItem)
 {
 	if (WeaponItem->IsA(UBWWeaponFirearmItem::StaticClass()))
-		return CreateWeaponFirearm(Owner, Cast<UBWWeaponFirearmItem>(WeaponItem));
+		return CreateBWWeaponFirearm(Owner, Cast<UBWWeaponFirearmItem>(WeaponItem));
 
-	return CreateWeaponBase(Owner, WeaponItem);
+	return CreateBWWeaponMelee(Owner, WeaponItem);
 }
 
-AWeaponBase* UBWWeaponsFactory::CreateWeaponBase(APawn* Owner, UBWWeaponItem* WeaponItem)
+ABWWeaponMelee* UBWWeaponsFactory::CreateBWWeaponMelee(APawn* Owner, UBWWeaponItem* WeaponItem)
 {
-	AWeaponBase* WeaponBase = Cast<AWeaponBase>(SpawnWeaponActor(Owner, WeaponItem));
+	ABWWeaponMelee* Weapon = Cast<ABWWeaponMelee>(SpawnWeaponActor(Owner, WeaponItem));
 
-	if (!IsValid(WeaponBase))
+	if (!IsValid(Weapon))
 		return nullptr;
 
-	WeaponBase->Init(Owner);
-	WeaponBase->SetWeaponDamage(WeaponItem->GetWeaponDamage());
-	return WeaponBase;
+	Weapon->Init(Owner, WeaponItem);
+	return Weapon;
 }
 
-ABWWeaponFirearm* UBWWeaponsFactory::CreateWeaponFirearm(APawn* Owner, UBWWeaponFirearmItem* WeaponItem)
+ABWWeaponFirearm* UBWWeaponsFactory::CreateBWWeaponFirearm(APawn* Owner, UBWWeaponFirearmItem* WeaponItem)
 {
 	ABWWeaponFirearm* WeaponFirearm = Cast<ABWWeaponFirearm>(SpawnWeaponActor(Owner, WeaponItem));
 
@@ -34,7 +34,7 @@ ABWWeaponFirearm* UBWWeaponsFactory::CreateWeaponFirearm(APawn* Owner, UBWWeapon
 		return nullptr;
 	}
 
-	WeaponFirearm->InitBWWeapon(Owner, WeaponItem);
+	WeaponFirearm->Init(Owner, WeaponItem);
 	return WeaponFirearm;
 }
 

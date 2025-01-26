@@ -49,12 +49,12 @@ void UShooterTraceBehaviour::CameraSightTrace(const UWorld* World, const UShootP
 	if (!TryGetCameraPoints(CameraStartPoint, CameraEndPoint, CameraHitPoint, CameraRotation, ShootPoint->GetShootPointRelativeLocation()))
 	{
 		UE_LOG(LogShooter, Error, TEXT("UShooterTraceBehaviour::CameraOriginTrace: TryGetCameraPoints failed, using Fallback option."));
-		TargetTrace(World, ShootPoint->GetShootPointLocation(), ShootPoint->GetShootPointDirection());
+		ShootPointTrace(World, ShootPoint);
 		return;
 	}
 
 	const FVector ShootPointLocation = ShootPoint->GetShootPointLocation();
-	const FVector WorldShootDirection = CameraRotation.RotateVector(ShootPoint->GetShootPointRelativeDirection());
+	const FVector WorldShootDirection = CameraRotation.RotateVector(ShootPoint->GetShootPointSpreadedRelativeDirection());
 	FVector TraceStartPoint = CameraStartPoint;
 	FVector TraceEndPoint = TraceStartPoint + WorldShootDirection * GetMaxRange();
 
@@ -62,7 +62,7 @@ void UShooterTraceBehaviour::CameraSightTrace(const UWorld* World, const UShootP
 	if (!bIsInLineOfSight)
 	{
 		TraceStartPoint = ShootPointLocation;
-		TraceEndPoint = ShootPointLocation + ShootPoint->GetShootPointDirection() * GetMaxRange();
+		TraceEndPoint = ShootPointLocation + ShootPoint->GetShootPointSpreadedDirection() * GetMaxRange();
 	}
 
 #if WITH_EDITORONLY_DATA
@@ -82,7 +82,7 @@ void UShooterTraceBehaviour::ShootPointTrace(const UWorld* World, const UShootPo
 	}
 
 	const FVector ShootPointLocation = ShootPoint->GetShootPointLocation();
-	const FVector ShootPointDirection = ShootPoint->GetShootPointDirection();
+	const FVector ShootPointDirection = ShootPoint->GetShootPointSpreadedDirection();
 	const FVector TraceStartPoint = ShootPointLocation;
 	const FVector TraceEndPoint = TraceStartPoint + ShootPointDirection * GetMaxRange();
 

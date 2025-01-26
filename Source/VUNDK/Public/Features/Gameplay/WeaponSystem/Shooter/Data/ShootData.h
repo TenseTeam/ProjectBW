@@ -19,9 +19,9 @@ struct VUNDK_API FShootData
 	float FireRate;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EShootType ShootType;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	float MaxSpread;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0", UIMin = "0", ToolTip = "meters"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0", UIMin = "0", ClampMax = "360", UIMax = "360"))
+	float MaxSpreadDegree;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0", UIMin = "0"))
 	float MaxRange;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0", UIMin = "0"))
 	int32 MagSize;

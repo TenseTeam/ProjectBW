@@ -22,7 +22,8 @@ void APooledActorBase::ReleasePooledActor_Implementation()
 {
 	if (!Check())
 	{
-		UE_LOG(LogObjectPool, Error, TEXT("APooledActorBase ReleasePooledActor(), Invalid actor pool."));
+		UE_LOG(LogObjectPool, Warning, TEXT("APooledActorBase ReleasePooledActor(), Invalid actor pool. Destroying actor."));
+		Destroy();
 		return;
 	}
 

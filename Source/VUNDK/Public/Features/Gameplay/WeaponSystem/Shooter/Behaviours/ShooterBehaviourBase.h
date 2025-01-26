@@ -29,9 +29,13 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
 	int32, CurrentAmmo
 );
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
+	FOnCurrentAmmoChanged,
+	int32, CurrentAmmo,
+	int32, MagSize
+);
+
 constexpr float RecoilStrengthMultiplier = 100.f;
-constexpr float RangeMultiplier = 100.f;
-constexpr float MaxSpreadMultiplier = .1f;
 
 UCLASS(Abstract, Blueprintable, BlueprintType, EditInlineNew)
 class VUNDK_API UShooterBehaviourBase : public UObject, public IShooterBehaviour
@@ -47,6 +51,8 @@ public:
 	FOnBehaviourShootFail OnBehaviourShootFail;
 	UPROPERTY(BlueprintAssignable)
 	FOnBehaviourRefill OnBehaviourRefill;
+	UPROPERTY(BlueprintAssignable)
+	FOnCurrentAmmoChanged OnCurrentAmmoChanged;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TEnumAsByte<ECollisionChannel> SightTraceChannel = ECollisionChannel::ECC_Visibility;
@@ -90,7 +96,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
 	virtual bool Shoot() override;
-	
+
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
 	void ResetRecoil();
 
@@ -101,7 +107,7 @@ public:
 	virtual void RefillAllMagazine() override;
 
 	UFUNCTION(BlueprintCallable)
-	void SetShootParams(const float NewDamage, const float NewFireRate, const float NewRange, const int32 NewMagSize, const int32 NewRecoilStrength);
+	void SetShootParams(const float NewDamage, const float NewFireRate, const float NewRange, const int32 NewMagSize, const int32 NewRecoilStrength, const float NewSpread);
 
 	UFUNCTION(BlueprintCallable)
 	void SetDamage(const float NewDamage);
@@ -119,10 +125,13 @@ public:
 	void SetRecoilStrength(float NewRecoilStrength);
 
 	UFUNCTION(BlueprintCallable)
-	void SetMaxSpread(const float NewSpread);
+	void SetMaxSpread(const float NewMaxSpread);
 
 	UFUNCTION(BlueprintCallable)
 	void SetCurrentAmmo(const int32 NewAmmo);
+
+	UFUNCTION(BlueprintCallable)
+	void ModifyCurrentAmmo(const int32 AmmoValue);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
 	float GetDamage() const;
@@ -150,7 +159,7 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	int32 GetAmmoToConsume() const;
-	
+
 	virtual UWorld* GetWorld() const override;
 
 #if WITH_EDITOR
@@ -159,11 +168,11 @@ public:
 
 protected:
 	virtual void HandleShoot();
-	
+
 	void ShootFromShootPoint(UShootPoint* ShootPoint) const;
-	
+
 	void ShootSuccess();
-	
+
 	void ShootFail(const EShootFailReason FailReason);
 
 	UFUNCTION(BlueprintNativeEvent)
@@ -204,25 +213,23 @@ protected:
 	bool TryGetCameraPoints(FVector& OutStartPoint, FVector& OutEndPoint, FVector& OutHitPoint, FRotator& OutRotation, FVector StartPointOffset = FVector::ZeroVector) const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsInLineOfSight(const FVector& StartPoint, const FVector& TargetPoint, const float Tolerance = 50.0f) const;
+	bool IsInLineOfSight(const FVector& StartPoint, const FVector& TargetPoint, const float Tolerance = 25.0f) const;
 
 	virtual bool Check() const;
 
 private:
 	void TickBehaviour(float DeltaTime);
-	
+
 	void HandleSimultaneousShoot();
 
 	void HandleSequentialShoot();
-	
+
 	int32 NextShootPointIndex();
-	
+
 	bool TryConsumeAmmoForShoot();
-	
+
 	bool HasEnoughAmmoToShoot() const;
-
-	void ModifyCurrentAmmo(const int32 AmmoValue);
-
+	
 	void ApplyRecoilImpulse();
 
 	void ProcessRecoilImpulseRotation(float DeltaTime);
