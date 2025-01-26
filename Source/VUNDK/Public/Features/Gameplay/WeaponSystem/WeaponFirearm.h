@@ -62,6 +62,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetWeaponMaxSpread(const float NewSpread) const;
+
+	UFUNCTION(BlueprintCallable)
+	int32 ReloadWithAmmo(UAmmoTypeData* AmmoData, int32 Ammo);
 	
 	UFUNCTION(BlueprintCallable)
 	int32 Reload(int32 Ammo);
@@ -91,7 +94,7 @@ protected:
 	void OnEnableAimDownSight();
 
 	UFUNCTION(BlueprintNativeEvent)
-	void OnDisableAimUpSight();
+	void OnDisableAimDownSight();
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void OnCurrentAmmoChanged(int32 CurrentAmmo, int32 MagSize);

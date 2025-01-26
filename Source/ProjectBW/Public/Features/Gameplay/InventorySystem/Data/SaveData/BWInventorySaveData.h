@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BWInventoryItemsSaveData.h"
+#include "BWInventorySaveDataWrapper.h"
 #include "Features/Gameplay/RPGSystem/RPGInventory/Data/SaveData/RPGInventorySaveData.h"
 #include "BWInventorySaveData.generated.h"
 
@@ -14,5 +14,5 @@ class PROJECTBW_API UBWInventorySaveData : public UInventoryBaseSaveData
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = true))
-	FBWInventoryItemsSaveData BWItemsSaveData;
+	FBWInventorySaveDataWrapper SaveDataWrapper;
 };

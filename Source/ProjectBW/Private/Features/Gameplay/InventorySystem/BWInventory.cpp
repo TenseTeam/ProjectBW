@@ -10,8 +10,14 @@
 #include "Features/Gameplay/InventorySystem/Items/BWWeaponItem.h"
 #include "Features/Gameplay/RPGSystem/Factories/RPGFactory.h"
 
-UBWInventory::UBWInventory()
+UBWInventory::UBWInventory(): AmmoInventory(nullptr)
 {
+}
+
+void UBWInventory::BeginPlay()
+{
+	Super::BeginPlay();
+	AmmoInventory->Init();
 }
 
 USaveData* UBWInventory::CreateSaveDataObject_Implementation()
@@ -21,36 +27,35 @@ USaveData* UBWInventory::CreateSaveDataObject_Implementation()
 
 USaveData* UBWInventory::CreateInventorySaveData_Implementation(USaveData* SaveData, TArray<UItemBase*>& ItemsToSave)
 {
-	UBWInventorySaveData* InventorySaveData = Cast<UBWInventorySaveData>(SaveData);
-	CreateBWInventorySaveData(InventorySaveData->BWItemsSaveData, ItemsToSave);
-	CreateRPGInventorySaveData(InventorySaveData->BWItemsSaveData.RPGItemsSaveData, ItemsToSave);
-	return InventorySaveData;
+	UBWInventorySaveData* InvSaveData = Cast<UBWInventorySaveData>(SaveData);
+	CreateBWInventorySaveData(InvSaveData->SaveDataWrapper, ItemsToSave);
+	CreateRPGInventorySaveData(InvSaveData->SaveDataWrapper.RPGItemsSaveData, ItemsToSave);
+	return InvSaveData;
 }
 
 void UBWInventory::LoadInventorySaveData_Implementation(UInventoryBaseSaveData* InventorySaveData)
 {
-	UBWInventorySaveData* BWInventorySaveData = Cast<UBWInventorySaveData>(InventorySaveData);
-	LoadRPGInventorySaveData(BWInventorySaveData->BWItemsSaveData.RPGItemsSaveData);
-	LoadBWInventorySaveData(BWInventorySaveData->BWItemsSaveData);
+	UBWInventorySaveData* InvSaveData = Cast<UBWInventorySaveData>(InventorySaveData);
+	LoadRPGInventorySaveData(InvSaveData->SaveDataWrapper.RPGItemsSaveData);
+	LoadBWInventorySaveData(InvSaveData->SaveDataWrapper);
 }
 
-void UBWInventory::CreateBWInventorySaveData(FBWInventoryItemsSaveData& BWItemsSaveData, TArray<UItemBase*>& ItemsToSave)
+void UBWInventory::CreateBWInventorySaveData(FBWInventorySaveDataWrapper& SaveDataWrapper, TArray<UItemBase*>& ItemsToSave) const
 {
 	TArray<UItemBase*> RemaingItemsToSave = ItemsToSave;
 	for (UItemBase* Item : ItemsToSave)
 	{
-		RemaingItemsToSave.Remove(Item);
-		
 		if (Item->IsA(UBWWeaponFirearmItem::StaticClass()))
 		{
 			const UBWWeaponFirearmItem* WeaponItem = Cast<UBWWeaponFirearmItem>(Item);
 			FGuid ItemID = Item->GetItemData()->ItemDataID;
 
-			if (!BWItemsSaveData.WeaponFirearmItems.Contains(ItemID))
-				BWItemsSaveData.WeaponFirearmItems.Add(ItemID, FWeaponFirearmItemsSaveArray());
+			if (!SaveDataWrapper.WeaponFirearmItems.Contains(ItemID))
+				SaveDataWrapper.WeaponFirearmItems.Add(ItemID, FWeaponFirearmItemsSaveArray());
 
 			FWeaponFirearmSaveData WeaponItemSaveData = WeaponItem->CreateWeaponFirearmSaveData();
-			BWItemsSaveData.WeaponFirearmItems[ItemID].WeaponFirearmItems.Add(WeaponItemSaveData);
+			SaveDataWrapper.WeaponFirearmItems[ItemID].WeaponFirearmItems.Add(WeaponItemSaveData);
+			RemaingItemsToSave.Remove(Item);
 			continue;
 		}
 
@@ -58,21 +63,23 @@ void UBWInventory::CreateBWInventorySaveData(FBWInventoryItemsSaveData& BWItemsS
 		{
 			const UBWWeaponItem* WeaponItem = Cast<UBWWeaponItem>(Item);
 			FGuid ItemID = Item->GetItemData()->ItemDataID;
-
-			if (!BWItemsSaveData.GenericWeaponItems.Contains(ItemID))
-				BWItemsSaveData.GenericWeaponItems.Add(ItemID, FWeaponItemsSaveArray());
+			
+			if (!SaveDataWrapper.GenericWeaponItems.Contains(ItemID))
+				SaveDataWrapper.GenericWeaponItems.Add(ItemID, FWeaponItemsSaveArray());
 
 			FWeaponItemSaveData WeaponItemSaveData = WeaponItem->CreateWeaponItemSaveData();
-			BWItemsSaveData.GenericWeaponItems[ItemID].WeaponItems.Add(WeaponItemSaveData);
+			SaveDataWrapper.GenericWeaponItems[ItemID].WeaponItems.Add(WeaponItemSaveData);
+			RemaingItemsToSave.Remove(Item);
 		}
 	}
 
 	ItemsToSave = RemaingItemsToSave;
+	SaveDataWrapper.AmmoSaveData = AmmoInventory->CreateAmmoSaveData();
 }
 
-void UBWInventory::LoadBWInventorySaveData(FBWInventoryItemsSaveData& BWItemsSaveData)
+void UBWInventory::LoadBWInventorySaveData(FBWInventorySaveDataWrapper& SaveDataWrapper)
 {
-	for (auto& WeaponFirearmItems : BWItemsSaveData.WeaponFirearmItems)
+	for (auto& WeaponFirearmItems : SaveDataWrapper.WeaponFirearmItems)
 	{
 		const FGuid ItemID = WeaponFirearmItems.Key;
 
@@ -94,7 +101,7 @@ void UBWInventory::LoadBWInventorySaveData(FBWInventoryItemsSaveData& BWItemsSav
 		}
 	}
 	
-	for (auto& WeaponItems : BWItemsSaveData.GenericWeaponItems)
+	for (auto& WeaponItems : SaveDataWrapper.GenericWeaponItems)
 	{
 		const FGuid ItemID = WeaponItems.Key;
 
@@ -115,4 +122,6 @@ void UBWInventory::LoadBWInventorySaveData(FBWInventoryItemsSaveData& BWItemsSav
 			}
 		}
 	}
+
+	AmmoInventory->LoadAmmoSaveData(SaveDataWrapper.AmmoSaveData);
 }

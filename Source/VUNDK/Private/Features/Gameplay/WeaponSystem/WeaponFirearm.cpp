@@ -61,6 +61,14 @@ void AWeaponFirearm::SetWeaponMaxSpread(const float NewSpread) const
 	Shooter->ShooterBehaviour->SetMaxSpread(NewSpread);
 }
 
+int32 AWeaponFirearm::ReloadWithAmmo(UAmmoTypeData* AmmoData, const int32 Ammo)
+{
+	if (!IsValid(AmmoData) || AmmoData->AmmoID != FirearmData.AmmoType->AmmoID)
+		return Ammo;
+
+	return Reload(Ammo);
+}
+
 int32 AWeaponFirearm::Reload(const int32 Ammo)
 {
 	const int32 Remain = Shooter->Refill(Ammo);
@@ -116,7 +124,7 @@ void AWeaponFirearm::DisableAimDownSight()
 {
 	SetWeaponMaxSpread(DefaultMaxSpread);
 	SetWeaponRecoilStrength(DefaultRecoilStrength);
-	OnEnableAimDownSight();
+	OnDisableAimDownSight();
 }
 
 void AWeaponFirearm::OnEnableAimDownSight_Implementation()
@@ -131,7 +139,7 @@ void AWeaponFirearm::OnCurrentAmmoChanged_Implementation(int32 CurrentAmmo, int3
 {
 }
 
-void AWeaponFirearm::OnDisableAimUpSight_Implementation()
+void AWeaponFirearm::OnDisableAimDownSight_Implementation()
 {
 }
 
