@@ -14,17 +14,18 @@ class PROJECTBW_API ABWWeaponFirearm : public AWeaponFirearm
 {
 	GENERATED_BODY()
 
-public:
-	UPROPERTY(BlueprintReadOnly)
+private:
+	UPROPERTY()
 	UBWWeaponFirearmItem* WeaponFirearmItem;
 	
 public:
 	ABWWeaponFirearm();
 
-	void InitBWWeapon(APawn* InOwner, UBWWeaponFirearmItem* InWeaponItem);
+	virtual void Init(APawn* InOwner, UObject* InPayload = nullptr) override;
+
+	UFUNCTION(BlueprintPure)
+	UBWWeaponFirearmItem* GetWeaponFirearmItem() const;
 	
 protected:
-	virtual void OnReload_Implementation() override;
-	
-	virtual bool DeployWeaponAttack_Implementation() override;
+	virtual void OnCurrentAmmoChanged_Implementation(int32 CurrentAmmo, int32 MagSize) override;
 };

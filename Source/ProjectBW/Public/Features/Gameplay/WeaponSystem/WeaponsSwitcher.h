@@ -42,11 +42,15 @@ private:
 	USceneComponent* AttachToComponentUnequipped;
 	UPROPERTY()
 	USceneComponent* AttachToComponentEquipped;
-	TTuple<AWeaponBase*, UBWWeaponItem*> HeldWeaponTuple;
-	TMap<int32, TTuple<AWeaponBase*, UBWWeaponItem*>> Weapons;
+	UPROPERTY()
+	AWeaponBase* HeldWeapon;
+	UPROPERTY()
+	TMap<int32, AWeaponBase*> CurrentWeapons;
 	FName EquippedWeaponAttachSocketName;
 	FName UnequippedWeaponAttachSocketName;
-
+	int32 CurrentWeaponSlotIndex;
+	TArray<int32> CurrentWeaponKeys;
+	
 public:
 	UWeaponsSwitcher();
 	
@@ -62,10 +66,16 @@ public:
 	bool TryGetHeldWeapon(AWeaponBase*& OutWeapon) const;
 
 	UFUNCTION(BlueprintCallable)
+	void HoldNextWeapon();
+
+	UFUNCTION(BlueprintCallable)
+	void HoldPreviousWeapon();
+
+	UFUNCTION(BlueprintCallable)
 	void HoldWeaponAtSlot(int32 SlotIndex);
 
 	UFUNCTION(BlueprintCallable)
-	void WithdrawWeaponAtSlot(int32 SlotIndex);
+	void WithdrawWeaponAtSlot(int32 SlotIndex) const;
 
 protected:
 	void AddWeaponActor(UBWWeaponItem* Item, int32 SlotIndex);
@@ -82,9 +92,9 @@ private:
 	UFUNCTION()
 	void OnAnyItemEquipSlotChanged(UEquipSlotKey* EquipSlotKey, UItemBase* Item, int32 NewSlotIndex, int32 OldSlotIndex);
 
-	void ChangeWeaponSlot(TTuple<AWeaponBase*, UBWWeaponItem*> WeaponTuple, int32 NewSlotIndex);
+	void ChangeWeaponSlot(AWeaponBase* Weapon, const int32 NewSlotIndex);
 
-	void HoldWeapon(TTuple<AWeaponBase*, UBWWeaponItem*> WeaponTuple);
+	void HoldWeapon(AWeaponBase* Weapon);
 	
 	void WithdrawWeapon(AWeaponBase* Weapon) const;
 	
@@ -94,5 +104,9 @@ private:
 
 	bool IsWeapon(const UEquipSlotKey* EquipSlotKey, const UItemBase* Item) const;
 
+	static bool HasSameWeaponItem(const AWeaponBase* WeaponA, const AWeaponBase* WeaponB);
+
+	void UpdateWeaponKeys();
+	
 	bool Check() const;
 };

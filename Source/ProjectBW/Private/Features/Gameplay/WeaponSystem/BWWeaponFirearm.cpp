@@ -6,29 +6,41 @@ ABWWeaponFirearm::ABWWeaponFirearm(): WeaponFirearmItem(nullptr)
 {
 }
 
-void ABWWeaponFirearm::InitBWWeapon(APawn* InOwner, UBWWeaponFirearmItem* InWeaponItem)
+void ABWWeaponFirearm::Init(APawn* InOwner, UObject* InPayload)
 {
-	Super::Init(InOwner);
-	WeaponFirearmItem = InWeaponItem;
+	Super::Init(InOwner, InPayload);
+	
+	if (!IsValid(InPayload))
+	{
+		UE_LOG(LogBWWeapons, Display, TEXT("ABWWeaponFirearm::Init: Payload is nullptr."));
+		return;
+	}
+	
+	WeaponFirearmItem = GetWeaponFirearmItem();
 
-	SetWeaponDamage(WeaponFirearmItem->GetWeaponDamage());
-	SetWeaponFireRate(WeaponFirearmItem->GetWeaponItemFireRate());
-	SetWeaponMaxRange(WeaponFirearmItem->GetWeaponItemMaxRange());
+	const float Damage = WeaponFirearmItem->GetWeaponDamage();
+	const float FireRate = WeaponFirearmItem->GetFireRate();
+	const float MaxRange = WeaponFirearmItem->GetMaxRange();
+	const int32 MagSize = WeaponFirearmItem->GetMagSize();
 
-	const int32 MagSize = WeaponFirearmItem->GetWeaponItemMagSize();
-	SetWeaponMagSize(MagSize);
 	WeaponFirearmItem->TryConsumeWeaponItemNewMagazine(MagSize);
-	SetWeaponAmmoRemaining(WeaponFirearmItem->GetWeaponItemAmmoRemaining());
+	SetWeaponDamage(Damage);
+	SetWeaponFireRate(FireRate);
+	SetWeaponMaxRange(MaxRange);
+	SetWeaponMagSize(MagSize);
+	SetCurrentAmmo(WeaponFirearmItem->GetAmmoRemaining());
 }
 
-void ABWWeaponFirearm::OnReload_Implementation()
+UBWWeaponFirearmItem* ABWWeaponFirearm::GetWeaponFirearmItem() const
 {
-	Super::OnReload_Implementation();
-	WeaponFirearmItem->SetWeaponItemAmmoRemaining(Shooter->ShooterBehaviour->GetCurrentAmmo());
+	if (!IsValid(WeaponFirearmItem))
+		return Cast<UBWWeaponFirearmItem>(GetPayload());
+
+	return WeaponFirearmItem;
 }
 
-bool ABWWeaponFirearm::DeployWeaponAttack_Implementation()
+void ABWWeaponFirearm::OnCurrentAmmoChanged_Implementation(int32 CurrentAmmo, int32 MagSize)
 {
-	WeaponFirearmItem->SetWeaponItemAmmoRemaining(Shooter->ShooterBehaviour->GetCurrentAmmo());
-	return Super::DeployWeaponAttack_Implementation();
+	Super::OnCurrentAmmoChanged_Implementation(CurrentAmmo, MagSize);
+	WeaponFirearmItem->SetAmmoRemaining(Shooter->ShooterBehaviour->GetCurrentAmmo());
 }

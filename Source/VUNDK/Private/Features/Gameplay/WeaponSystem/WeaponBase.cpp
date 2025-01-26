@@ -15,15 +15,26 @@ AWeaponBase::AWeaponBase()
 #endif
 }
 
-void AWeaponBase::Init(APawn* InOwner)
+void AWeaponBase::Init(APawn* InOwner, UObject* InPayload)
 {
+	SetPayload(InPayload);
 	SetOwner(InOwner);
 	SetInstigator(InOwner);
+}
+
+void AWeaponBase::SetPayload(UObject* InPayload)
+{
+	Payload = InPayload;
 }
 
 void AWeaponBase::SetWeaponDamage(const float NewDamage)
 {
 	WeaponData.Damage = NewDamage;
+}
+
+UObject* AWeaponBase::GetPayload() const
+{
+	return Payload;
 }
 
 bool AWeaponBase::WeaponAttack()
