@@ -328,7 +328,7 @@ void ABWCharacter::SetIsReloading(bool Value)
 
 bool ABWCharacter::CanReload() const
 {
-	return bCanReload && IsHoldingWeapon() && !IsDodging() && !IsHooking() && HasInventoryEnoughAmmo();
+	return bCanReload && IsHoldingWeapon() && HasInventoryEnoughAmmo() && !IsDodging() && !IsHooking();
 }
 
 void ABWCharacter::SetCanReload(bool Value)
@@ -343,7 +343,7 @@ bool ABWCharacter::IsHoldingWeapon() const
 
 bool ABWCharacter::HasInventoryEnoughAmmo() const
 {
-	return BWController->Inventory->AmmoInventory->CanRemoveAmmo(HeldWeapon->FirearmData.AmmoType, 0);
+	return BWController->Inventory->AmmoInventory->HasAmmoOfType(HeldWeapon->FirearmData.AmmoType);
 }
 
 

@@ -43,13 +43,13 @@ public:
 	int32 GetAmmoCount(const UAmmoTypeData* AmmoType, int32& OutMaxStack) const;
 	
 	UFUNCTION(BlueprintPure)
-	bool CanRemoveAmmo(const UAmmoTypeData* AmmoType, const int32 Amount) const;
+	bool HasAmmoOfType(const UAmmoTypeData* AmmoType) const;
 	
 	UFUNCTION(BlueprintCallable)
-	bool TryAddAmmo(UAmmoTypeData* AmmoType, int32 Amount, int32& OutRemaining);
+	void AddAmmo(UAmmoTypeData* AmmoType, int32 AmountToAdd, int32& OutRemaining);
 
 	UFUNCTION(BlueprintCallable)
-	bool TryRemoveAmmo(UAmmoTypeData* AmmoType, int32 Amount);
+	void ConsumeAmmo(UAmmoTypeData* AmmoType, int32 AmountToConsume, int32& OutConsumedAmount);
 
 private:
 	void SetAmmoCount(UAmmoTypeData* AmmoType, int32 NewAmount);

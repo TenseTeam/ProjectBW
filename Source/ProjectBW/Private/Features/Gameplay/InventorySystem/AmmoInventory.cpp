@@ -49,48 +49,46 @@ int32 UAmmoInventory::GetAmmoCount(const UAmmoTypeData* AmmoType, int32& OutMaxS
 	return CurrentAmmo[AmmoType];
 }
 
-bool UAmmoInventory::CanRemoveAmmo(const UAmmoTypeData* AmmoType, const int32 Amount) const
+bool UAmmoInventory::HasAmmoOfType(const UAmmoTypeData* AmmoType) const
 {
-	if (!IsValid(AmmoType))
+	if (!IsValid(AmmoType) || !CurrentAmmo.Contains(AmmoType))
 		return false;
 
-	if (!CurrentAmmo.Contains(AmmoType))
-		return false;
-
-	return CurrentAmmo[AmmoType] - Amount >= 0;
+	return CurrentAmmo[AmmoType] > 0;
 }
 
-bool UAmmoInventory::TryAddAmmo(UAmmoTypeData* AmmoType, int32 Amount, int32& OutRemaining)
+void UAmmoInventory::AddAmmo(UAmmoTypeData* AmmoType, int32 AmountToAdd, int32& OutRemaining)
 {
-	if (!IsValid(AmmoType))
-		return false;
-
-	if (!CurrentAmmo.Contains(AmmoType))
-		return false;
+	if (!IsValid(AmmoType) || !CurrentAmmo.Contains(AmmoType))
+		return;
 	
-	Amount = FMath::Abs(Amount);
+	AmountToAdd = FMath::Abs(AmountToAdd);
 	const int32 MaxStack = AmmoMaxStacks[AmmoType].MaxStack;
-	
 	const int32& Ammo =  CurrentAmmo[AmmoType];
-	OutRemaining = Ammo + Amount > MaxStack ? Amount - (MaxStack - Ammo) : 0;
-	SetAmmoCount(AmmoType, Ammo + Amount);
-	return true;
+	OutRemaining = Ammo + AmountToAdd > MaxStack ? AmountToAdd - (MaxStack - Ammo) : 0;
+	SetAmmoCount(AmmoType, Ammo + AmountToAdd);
 }
 
-bool UAmmoInventory::TryRemoveAmmo(UAmmoTypeData* AmmoType, int32 Amount)
+void UAmmoInventory::ConsumeAmmo(UAmmoTypeData* AmmoType, int32 AmountToConsume, int32& OutConsumedAmount)
 {
-	if (!CanRemoveAmmo(AmmoType, Amount))
-		return false;
+	AmountToConsume = FMath::Abs(AmountToConsume);
+	const int32 AvailableAmmo = CurrentAmmo[AmmoType];
 
-	Amount = FMath::Abs(Amount);
-	const int32& Ammo = CurrentAmmo[AmmoType];
-	SetAmmoCount(AmmoType, Ammo - Amount);
-	return true;
+	if (AvailableAmmo >= AmountToConsume)
+	{
+		SetAmmoCount(AmmoType, AvailableAmmo - AmountToConsume);
+		OutConsumedAmount = AmountToConsume;
+	}
+	else
+	{
+		SetAmmoCount(AmmoType, 0);
+		OutConsumedAmount = AvailableAmmo;
+	}
 }
 
 void UAmmoInventory::SetAmmoCount(UAmmoTypeData* AmmoType, const int32 NewAmount)
 {
 	const int32 MaxStack = AmmoMaxStacks[AmmoType].MaxStack;
-	CurrentAmmo[AmmoType] = FMath::Clamp(NewAmount, 0, MaxStack); // Just in case
+	CurrentAmmo[AmmoType] = FMath::Clamp(NewAmount, 0, MaxStack);
 	OnAmmoCountChanged.Broadcast(AmmoType, CurrentAmmo[AmmoType], MaxStack);
 }
