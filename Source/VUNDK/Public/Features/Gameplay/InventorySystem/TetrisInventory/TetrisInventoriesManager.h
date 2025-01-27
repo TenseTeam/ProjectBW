@@ -14,10 +14,7 @@ class VUNDK_API UTetrisInventoriesManager : public UInventoriesManager
 
 public:
 	UTetrisInventoriesManager();
-
+	
 	UFUNCTION(BlueprintCallable)
 	bool TryTransferItem(UTetrisItem* Item, UTetrisInventory* SourceInventory, UTetrisInventory* DestinationInventory, const FIntPoint& DestinationPosition);
-
-protected:
-	virtual void BeginPlay() override;
 };

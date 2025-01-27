@@ -49,16 +49,14 @@ private:
 	
 public:
 	UStatsBridgeBase();
-
+	
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	
 	UFUNCTION(BlueprintPure)
 	virtual USaveData* CreateSaveData() override;
 	
 	UFUNCTION(BlueprintCallable)
 	virtual bool LoadSaveData(USaveData* SavedData) override;
-	
-	virtual void BeginPlay() override;
-
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	
 	USpecialStatData* GetSpecialStatByID(const FGuid SpecialStatID) const;
 
@@ -86,6 +84,8 @@ public:
 	void CalculateAllStatsValues();
 	
 protected:
+	virtual void BeginPlay() override;
+	
 	UFUNCTION(BlueprintCallable)
 	void SetFullStatValue(UStatDataBase* Stat, float Value) const;
 

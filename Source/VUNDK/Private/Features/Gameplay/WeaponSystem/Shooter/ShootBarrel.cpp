@@ -1,8 +1,6 @@
 // Copyright VUNDK, Inc. All Rights Reserved.
 
 #include "Features/Gameplay/WeaponSystem/Shooter/ShootBarrel.h"
-
-#include "Features/Gameplay/WeaponSystem/Shooter/Shooter.h"
 #include "Features/Gameplay/WeaponSystem/Shooter/ShootPoint.h"
 
 UShootBarrel::UShootBarrel()
@@ -20,9 +18,4 @@ TArray<UShootPoint*> UShootBarrel::GetShootPointsChildren() const
 	}
 
 	return ShootPoints;
-}
-
-void UShootBarrel::BeginPlay()
-{
-	Super::BeginPlay();
 }

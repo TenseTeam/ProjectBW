@@ -3,8 +3,7 @@
 #include "Patterns/ObjectPool/ActorPool.h"
 #include "Patterns/ObjectPool/Interfaces/PooledActor.h"
 
-UActorPool::UActorPool(): bIsCapped(false),
-                          bHasBeenDestroyed(false)
+UActorPool::UActorPool(): bIsCapped(false)
 {
 }
 
@@ -22,7 +21,21 @@ void UActorPool::Init()
 		return;
 	}
 
+	AddToRoot();
 	SpawnInstances(InitialSize);
+}
+
+void UActorPool::DestroyPool()
+{
+	for (AActor* Actor : AvailableActors)
+	{
+		if (IsValid(Actor))
+			Actor->Destroy();
+	}
+
+	ActorClass = nullptr;
+	AvailableActors.Empty();
+	RemoveFromRoot();
 }
 
 TSubclassOf<AActor> UActorPool::GetActorClass() const
@@ -56,14 +69,7 @@ void UActorPool::ReleaseActor(AActor* InActor)
 
 	if (AvailableActors.Contains(InActor))
 		return;
-
-	if (bHasBeenDestroyed)
-	{
-		UE_LOG(LogObjectPool, Warning, TEXT("ActorPool ReleaseActor(), Cannot release actor, pool has been destroyed."));
-		InActor->Destroy();
-		return;
-	}
-
+	
 	if (IsFull() && bIsCapped)
 	{
 		UE_LOG(LogObjectPool, Warning, TEXT("ActorPool ReleaseActor(), Cannot release actor, pool is full and capped."));
@@ -83,21 +89,6 @@ void UActorPool::SetActorClass(const TSubclassOf<AActor>& InActorClass)
 	}
 
 	ActorClass = InActorClass;
-}
-
-void UActorPool::DestroyPool()
-{
-	for (AActor* Actor : AvailableActors)
-		if (IsValid(Actor))
-			Actor->Destroy();
-
-	bHasBeenDestroyed = true;
-}
-
-void UActorPool::BeginDestroy()
-{
-	UObject::BeginDestroy();
-	DestroyPool();
 }
 
 void UActorPool::SpawnInstances(const int32 InCount)

@@ -38,6 +38,8 @@ private:
 public:
 	AProjectileBase();
 	
+	virtual void Tick(float DeltaSeconds) override;
+	
 	void Init(AActor* InInstigator, float InDamage, float InRange, float InSpeed, const FVector& InDirection);
 
 	UFUNCTION(BlueprintNativeEvent)
@@ -64,9 +66,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
-	virtual void Tick(float DeltaSeconds) override;
-
+	
 	void StartProjectileLifeSpan(const float InLifeSpan);
 	
 	UFUNCTION(BlueprintNativeEvent)

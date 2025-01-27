@@ -11,6 +11,13 @@ UStatsBridgeBase::UStatsBridgeBase(): SpecialStatsContainer(nullptr),
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
+void UStatsBridgeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	SpecialStatsContainer->OnStatsValuesChanged.RemoveDynamic(this, &UStatsBridgeBase::CalculateAllStatsValues);
+	CoreStatsContainer->OnStatsValuesChanged.RemoveDynamic(this, &UStatsBridgeBase::CalculateFullStatsValues);
+}
+
 USaveData* UStatsBridgeBase::CreateSaveData()
 {
 	UStatsBridgeSaveData* BridgeSaveData = NewObject<UStatsBridgeSaveData>();
@@ -47,23 +54,6 @@ bool UStatsBridgeBase::LoadSaveData(USaveData* SavedData)
 	}
 	
 	return true;
-}
-
-void UStatsBridgeBase::BeginPlay()
-{
-	CreateStatsContainers();
-	SpecialStatsContainer->AddSpecialStats(SpecialStats);
-	CoreStatsContainer->AddCoreStats(CoreStats);
-	Super::BeginPlay();
-	SpecialStatsContainer->OnStatsValuesChanged.AddDynamic(this, &UStatsBridgeBase::CalculateAllStatsValues);
-	CoreStatsContainer->OnStatsValuesChanged.AddDynamic(this, &UStatsBridgeBase::CalculateFullStatsValues);
-}
-
-void UStatsBridgeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	Super::EndPlay(EndPlayReason);
-	SpecialStatsContainer->OnStatsValuesChanged.RemoveDynamic(this, &UStatsBridgeBase::CalculateAllStatsValues);
-	CoreStatsContainer->OnStatsValuesChanged.RemoveDynamic(this, &UStatsBridgeBase::CalculateFullStatsValues);
 }
 
 USpecialStatData* UStatsBridgeBase::GetSpecialStatByID(const FGuid SpecialStatID) const
@@ -130,6 +120,16 @@ void UStatsBridgeBase::CalculateAllStatsValues()
 {
 	CalculateCoreStatsValues();
 	CalculateFullStatsValues();
+}
+
+void UStatsBridgeBase::BeginPlay()
+{
+	CreateStatsContainers();
+	SpecialStatsContainer->AddSpecialStats(SpecialStats);
+	CoreStatsContainer->AddCoreStats(CoreStats);
+	Super::BeginPlay();
+	SpecialStatsContainer->OnStatsValuesChanged.AddDynamic(this, &UStatsBridgeBase::CalculateAllStatsValues);
+	CoreStatsContainer->OnStatsValuesChanged.AddDynamic(this, &UStatsBridgeBase::CalculateFullStatsValues);
 }
 
 void UStatsBridgeBase::SetFullStatValue(UStatDataBase* Stat, const float Value) const

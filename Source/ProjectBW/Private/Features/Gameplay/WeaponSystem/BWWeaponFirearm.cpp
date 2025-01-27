@@ -1,7 +1,6 @@
 // Copyright Villains, Inc. All Rights Reserved.
 
 #include "ProjectBW/Public/Features/Gameplay/WeaponSystem/BWWeaponFirearm.h"
-
 #include "Components/WidgetComponent.h"
 
 ABWWeaponFirearm::ABWWeaponFirearm(): WeaponFirearmItem(nullptr)

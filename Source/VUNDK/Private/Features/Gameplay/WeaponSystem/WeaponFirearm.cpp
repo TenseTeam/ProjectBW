@@ -9,6 +9,14 @@ AWeaponFirearm::AWeaponFirearm()
 	ShootBarrel->SetupAttachment(WeaponMesh);
 }
 
+#if WITH_EDITOR
+void AWeaponFirearm::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+	AttachBarrelToSocket();
+}
+#endif
+
 void AWeaponFirearm::Init(APawn* InOwner, UObject* InPayload)
 {
 	Super::Init(InOwner, InPayload);
@@ -147,14 +155,6 @@ bool AWeaponFirearm::IsAimingDownSight() const
 	return bIsAimingDownSight;
 }
 
-#if WITH_EDITOR
-void AWeaponFirearm::OnConstruction(const FTransform& Transform)
-{
-	Super::OnConstruction(Transform);
-	AttachBarrelToSocket();
-}
-#endif
-
 void AWeaponFirearm::BeginPlay()
 {
 	Super::BeginPlay();
@@ -221,4 +221,6 @@ void AWeaponFirearm::AttachBarrelToSocket() const
 {
 	if (WeaponMesh->DoesSocketExist(ShootBarrelSocketName))
 		ShootBarrel->AttachToComponent(WeaponMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, ShootBarrelSocketName);
+	else
+		ShootBarrel->AttachToComponent(WeaponMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, "None");
 }
