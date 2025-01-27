@@ -13,9 +13,11 @@ class VUNDK_API AWeaponFirearm : public AWeaponBase
 {
 	GENERATED_BODY()
 
-protected:
+public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FWeaponFirearmData FirearmData;
+
+protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UShooter* Shooter;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

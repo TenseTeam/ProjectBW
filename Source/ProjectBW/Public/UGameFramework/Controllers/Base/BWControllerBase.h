@@ -8,6 +8,8 @@
 #include "GameFramework/PlayerController.h"
 #include "BWControllerBase.generated.h"
 
+class USaver;
+
 UCLASS()
 class PROJECTBW_API ABWControllerBase : public APlayerController
 {
@@ -18,6 +20,8 @@ public:
 	UContextsManager* ContextsManager;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UMenuManager* MenuManager;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	USaver* Saver;
 	
 public:
 	ABWControllerBase();
