@@ -34,6 +34,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void FinishedAnimation();
+
+	virtual void OnEnemyDead_Implementation() override;
 	
 protected:
 	

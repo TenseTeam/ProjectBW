@@ -13,7 +13,7 @@
 AEQS_Manager::AEQS_Manager()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	CanSearchPoint = false;
+	CanSearchMeleePoint = false;
 	Initi();
 }
 
@@ -21,17 +21,17 @@ AEQS_Manager::AEQS_Manager()
 void AEQS_Manager::BeginPlay()
 {
 	Super::BeginPlay();
-	CurrentTime = 0;
+	CurrentMeleeTime = 0;
+	CurrentRangedTime = 0;
 	AttackTarget = UGameplayStatics::GetPlayerCharacter(GetWorld(),0);
 	
 }
 
-void AEQS_Manager::UpdateStrafePoints()
+void AEQS_Manager::UpdateStrafeMeleePoints()
 {
 	UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
 	if (!NavSystem) return ;
 	
-	Points.Empty();
 	FVector TargetLocation = AttackTarget->GetActorLocation();
 	
 	float MinRadius = MinAttackRadiusMelee;
@@ -55,7 +55,7 @@ void AEQS_Manager::UpdateStrafePoints()
 	// 	);
 	// 	
 	// 	MeleePoints.Add(Point);
-	// 	DrawDebugSphere(GetWorld(), Point, 25.0f, 12, FColor::Red, false, UpdateInterval);
+	// 	DrawDebugSphere(GetWorld(), Point, 25.0f, 12, FColor::Red, false, UpdateMeleeInterval);
 	// }
 	
 	for (int32 X = -GridSize; X <= GridSize; ++X)
@@ -88,15 +88,24 @@ void AEQS_Manager::UpdateStrafePoints()
 		);
 	}
 	
+	Points.Add(EEnemyType::Melee, MeleePoints);
+}
+
+void AEQS_Manager::UpdateStrafeRangedPoints()
+{
+	UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+	if (!NavSystem) return ;
 	
-	MinRadius = MinAttackRadiusRanged;
-	MaxRadius = MaxAttackRadiusRanged;
+	FVector TargetLocation = AttackTarget->GetActorLocation();
+	
+	float MinRadius = MinAttackRadiusRanged;
+	float MaxRadius = MaxAttackRadiusRanged;
 
 	TArray<FVector> RangedPoints;
-	
-	GridRadius = MaxRadius;
-	StepSize = 600;
-	GridSize = FMath::CeilToInt(GridRadius / StepSize); 
+	FNavLocation NavLocation;
+	float GridRadius = MaxRadius;
+	float StepSize = 600;
+	int32 GridSize = FMath::CeilToInt(GridRadius / StepSize); 
     
 	for (int32 X = -GridSize; X <= GridSize; ++X)
 	{
@@ -106,7 +115,7 @@ void AEQS_Manager::UpdateStrafePoints()
 			FVector GridPoint = TargetLocation + FVector(X * StepSize, Y * StepSize, 0.0f);
 
 			// Aggiunta di randomizzazione attorno al punto base
-			float Angle = FMath::DegreesToRadians(FMath::RandRange(0.0f, 100.f));
+			float Angle = FMath::DegreesToRadians(FMath::RandRange(0.0f, 360.f));
 			float Radius = FMath::RandRange(0.0f, StepSize); // Randomizzazione entro la dimensione della griglia
 			FVector RandomOffset = FVector(
 				FMath::Cos(Angle) * Radius,
@@ -130,19 +139,17 @@ void AEQS_Manager::UpdateStrafePoints()
 	
 	for (const FVector& Point : RangedPoints)
 	{
-	    DrawDebugSphere(
-	        GetWorld(), 
-	        Point,				// Posizione della sfera
-	        50.0f,             // Raggio della sfera
-	        12,                // Numero di segmenti
-	        FColor::Green,     // Colore della sfera
-	        false,             // Persistente nel tempo
-	        2.0f               // Durata della sfera
-	    );
+		DrawDebugSphere(
+			GetWorld(), 
+			Point,				// Posizione della sfera
+			50.0f,             // Raggio della sfera
+			12,                // Numero di segmenti
+			FColor::Green,     // Colore della sfera
+			false,             // Persistente nel tempo
+			2.0f               // Durata della sfera
+		);
 	}
 	
-	
-	Points.Add(EEnemyType::Melee, MeleePoints);
 	Points.Add(EEnemyType::Ranged, RangedPoints);
 }
 
@@ -184,40 +191,55 @@ bool AEQS_Manager::IsInRange(FVector TargetPosition,FVector CurrentPosition, con
 
 void AEQS_Manager::Tick(float DeltaTime)
 {
-	if (CanSearchPoint)
+	if (CanSearchMeleePoint)
 	{
-		if (CurrentTime <= 0.0f)
+		if (CurrentMeleeTime <= 0.0f)
 		{
-			UpdateStrafePoints();
-			CurrentTime = UpdateInterval;
+			Points[EEnemyType::Melee].Empty();
+			UpdateStrafeMeleePoints();
+			CurrentMeleeTime = UpdateMeleeInterval;
 			return;
 		}
-		CurrentTime -= DeltaTime;
+		CurrentMeleeTime -= DeltaTime;
 	}
+
+	if (CanSearchRengedPoint)
+	{
+		if (CurrentRangedTime <= 0.0f)
+		{
+			Points[EEnemyType::Ranged].Empty();
+			UpdateStrafeRangedPoints();
+			CurrentRangedTime = UpdateMeleeInterval;
+		}
+		CurrentRangedTime -= DeltaTime;
+	}
+	
 }
 
 FVector AEQS_Manager::GetPoint(EEnemyType EnemyType)
 {
-	if (Points[EEnemyType::Melee].IsEmpty() || Points[EEnemyType::Ranged].IsEmpty())
-	{
-		UpdateStrafePoints();
-	}
-	
 	FVector SelectedPoint = FVector::ZeroVector;
 	
 	TArray<FVector> PossiblePoints;
-
-	if (!Points.Contains(EnemyType))return SelectedPoint;
 	
-	if (EnemyType == EEnemyType::Melee)
-	{
-		if (Points[EEnemyType::Melee].IsEmpty())return SelectedPoint;
+	switch (EnemyType) {
+	case EEnemyType::Melee:
+		
+		if (Points[EEnemyType::Melee].IsEmpty()) 
+			UpdateStrafeMeleePoints();
+		
 		PossiblePoints = Points[EEnemyType::Melee];
-	}
-	else if (EnemyType == EEnemyType::Ranged)
-	{
-		if (Points[EEnemyType::Ranged].IsEmpty())return SelectedPoint;
+		CanSearchMeleePoint = true;
+		
+		break;
+	case EEnemyType::Ranged:
+		
+		if(Points[EEnemyType::Ranged].IsEmpty())
+			UpdateStrafeRangedPoints();
+		
 		PossiblePoints = Points[EEnemyType::Ranged];
+		CanSearchRengedPoint = true;
+		break;
 	}
 
 	if (PossiblePoints.Num() > 0)
@@ -228,7 +250,7 @@ FVector AEQS_Manager::GetPoint(EEnemyType EnemyType)
 		Points[EnemyType].RemoveAt(index);
 	}
 
-	// Debug: verifica se un punto è stato trovato
+	
 	if (SelectedPoint == FVector::ZeroVector)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("No valid points found for enemy type %d"), (int32)EnemyType);

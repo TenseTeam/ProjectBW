@@ -2,12 +2,17 @@
 
 #pragma once
 
+
+
 #include "CoreMinimal.h"
 #include "AI/Interfaces/AITargetInterface.h"
 #include "AI/NPC/NPCBaseStateEnemy/NPCBaseStateEnemy.h"
 #include "Components/TeamComponent/EnemyAttackRequestManager.h"
 #include "Features/Gameplay/ResourceAttributeSystem/Components/ResourceAttributeManager.h"
 #include "EnemyBase.generated.h"
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(
+	FDeadEnemy);
 
 UCLASS()
 class PROJECTBW_API AEnemyBase : public ANPCBaseStateEnemy, public IAITargetInterface
@@ -17,7 +22,13 @@ class PROJECTBW_API AEnemyBase : public ANPCBaseStateEnemy, public IAITargetInte
 public:
 	
 	AEnemyBase();
-	
+
+	UPROPERTY(BlueprintAssignable)
+	FDeadEnemy OnDeadEnemy;
+
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable)
+	void OnEnemyDead();
+
 protected:
 	
 	virtual void BeginPlay() override;
@@ -27,5 +38,6 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI|AttackRequest")
 	UEnemyAttackRequestManager* EnemyAttackRequestManage;
-	
+
+
 };

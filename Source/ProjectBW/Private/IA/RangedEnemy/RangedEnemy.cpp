@@ -14,6 +14,13 @@ ARangedEnemy::ARangedEnemy()
 	EnemyType = EEnemyType::Ranged;
 }
 
+void ARangedEnemy::OnEnemyDead_Implementation()
+{
+	Super::OnEnemyDead_Implementation();
+	EQS_Manager->CanSearchRengedPoint = false;
+	//LGDebug::Log("MORTO RANGED ENEMY " + FString::FromInt(static_cast<int32>(CurrentState)), true);
+}
+
 
 void ARangedEnemy::BeginPlay()
 {
@@ -26,6 +33,7 @@ void ARangedEnemy::PostInitProperties()
 {
 	Super::PostInitProperties();
 }
+
 
 
 

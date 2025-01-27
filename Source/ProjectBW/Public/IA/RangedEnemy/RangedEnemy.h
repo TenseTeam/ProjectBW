@@ -16,12 +16,17 @@ class PROJECTBW_API ARangedEnemy : public AEnemyBase
 public:
 
 	ARangedEnemy();
-
+	
+	virtual void OnEnemyDead_Implementation() override;
+	
 protected:
 
 	virtual void BeginPlay() override;
 	
 	virtual void PostInitProperties() override;
+	
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite ,Category = "AI|Ranged")
+	bool bIsAttacking = false;
 	
 	// UPROPERTY(EditDefaultsOnly)
 	// UChildActorComponent* ChildActor;

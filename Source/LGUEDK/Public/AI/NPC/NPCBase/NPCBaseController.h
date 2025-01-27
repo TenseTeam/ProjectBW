@@ -3,13 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DetourCrowdAIController.h"
 #include "Runtime/AIModule/Classes/AIController.h"
 #include "NPCBaseController.generated.h"
 
 class ANPCBase;
 
 UCLASS()
-class LGUEDK_API ANPCBaseController : public AAIController
+class LGUEDK_API ANPCBaseController : public ADetourCrowdAIController
 {
 	GENERATED_BODY()
 

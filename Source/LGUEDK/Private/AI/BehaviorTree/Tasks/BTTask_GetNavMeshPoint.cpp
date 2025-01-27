@@ -30,7 +30,6 @@ EBTNodeResult::Type UBTTask_GetNavMeshPoint::ExecuteTask(UBehaviorTreeComponent&
 	AEQS_Manager* EQS_Manager = ControlledPawn->GetEQSManager();
 	if (!EQS_Manager)return EBTNodeResult::Failed;
 	
-	EQS_Manager->CanSearchPoint = true;
 	EEnemyType EnemyType = ControlledPawn->GetEnemyType();
 	FVector TargetLocation = EQS_Manager->GetPoint(EnemyType);
 	
