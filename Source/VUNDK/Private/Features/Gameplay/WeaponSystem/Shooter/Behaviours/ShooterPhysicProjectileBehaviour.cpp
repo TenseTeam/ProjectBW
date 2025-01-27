@@ -15,6 +15,12 @@ void UShooterPhysicProjectileBehaviour::Init(UShooter* InShooter, const FShootDa
 	Super::Init(InShooter, InShootData, InShootBarrel);
 }
 
+void UShooterPhysicProjectileBehaviour::SetProjectilesPoolName(const FName InProjectilesPoolName)
+{
+	UActorPool* Pool = UPoolsUtility::GetPool(InProjectilesPoolName);
+	ProjectilePool = IsValid(Pool) ? Pool : ProjectilePool;
+}
+
 void UShooterPhysicProjectileBehaviour::OnDeployShoot_Implementation(UShootPoint* ShootPoint, const FVector& TargetLocation, const FVector& DirectionToTarget) const
 {
 	AActor* ActorPrj = ProjectilePool->AcquireActor();

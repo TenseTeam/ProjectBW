@@ -116,7 +116,7 @@ void UActorPool::SpawnInstance()
 		UE_LOG(LogObjectPool, Error, TEXT("ActorPool AddInstance(), Invalid actor."));
 		return;
 	}
-
+	
 	IPooledActor::Execute_AssignActorPool(Actor, this);
 	PushActor(Actor);
 }
@@ -130,11 +130,7 @@ void UActorPool::PushActor(AActor* Actor)
 
 AActor* UActorPool::PopActor()
 {
-	AActor* Actor = AvailableActors.Pop();
-	
-	if (!IsValid(Actor))
-		return nullptr;
-	
+	AActor* Actor = AvailableActors.Pop(EAllowShrinking::Yes);
 	SetActorEnabled(Actor, true);
 	return Actor;
 }
