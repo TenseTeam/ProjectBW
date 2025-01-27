@@ -25,7 +25,7 @@ public:
 	// virtual void ReleaseToken() = 0; ASTRATTO = 0;
 
 	UFUNCTION(BlueprintCallable,BlueprintNativeEvent)
-	void ReleaseToken(int ReturnToken);
+	void ReleaseToken();
 	UFUNCTION(BlueprintCallable,BlueprintNativeEvent)
 	bool TryGetToken(int TokenCost);
 	UFUNCTION(BlueprintCallable,BlueprintNativeEvent)

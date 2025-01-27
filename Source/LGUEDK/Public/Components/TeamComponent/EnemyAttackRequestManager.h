@@ -24,7 +24,7 @@ public:
 	bool TryGetToken(int TokenCost);
 	
 	UFUNCTION(BlueprintCallable)
-	void ReleaseToken(int ReturnToken);
+	void ReleaseToken();
 
 	UFUNCTION()
 	void SetTeamIndex(int NewTeamIndex) {TeamIndex = NewTeamIndex;}
@@ -37,6 +37,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team")
 	int MaxTokens;
+
+	UPROPERTY()
+	int GettedTokens;
 	
 private:
 	

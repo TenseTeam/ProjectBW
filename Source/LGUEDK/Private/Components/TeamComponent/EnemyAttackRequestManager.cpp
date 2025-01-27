@@ -28,17 +28,19 @@ bool UEnemyAttackRequestManager::TryGetToken(int TokenCost)
 	}
 	
 	CurrentTokens -= TokenCost;
-	LGDebug::Log(" CurrentTokens: " + CurrentTokens, true);
-	LGDebug::Log(" TokenCost: " + TokenCost, true);
+	GettedTokens = TokenCost;
+	//LGDebug::Log(" CurrentTokens: " + CurrentTokens, true);
+	//LGDebug::Log(" TokenCost: " + TokenCost, true);
 	return true;
 }
 
-void UEnemyAttackRequestManager::ReleaseToken(int ReturnToken)
+void UEnemyAttackRequestManager::ReleaseToken()
 {
 	if (CurrentTokens >= MaxTokens)
 		return;
 
-	CurrentTokens += ReturnToken;
+	CurrentTokens += GettedTokens;
+	GettedTokens = 0;
 		
 	LGDebug::Log("TOKEN TORNATO " + CurrentTokens, true);
 }

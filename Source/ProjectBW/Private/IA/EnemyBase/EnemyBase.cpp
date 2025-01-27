@@ -23,6 +23,8 @@ void AEnemyBase::OnEnemyDead()
 	ABaseEnemyController* AIController = Cast<ABaseEnemyController>(GetController());
 	if (!AIController)return;
 
+	Execute_ReleaseToken(AttackTarget);
+	
 	AIController->SetStateAsDead();
 	AIController->GetBrainComponent()->StopLogic("Dead");
 	
