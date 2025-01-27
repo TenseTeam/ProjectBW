@@ -187,7 +187,6 @@ void UActorPool::ClearActor(AActor* Actor)
 		UE_LOG(LogObjectPool, Error, TEXT("ActorPool ClearActor(), Invalid actor."));
 		return;
 	}
-
-	Actor->SetActorTransform(FTransform::Identity);
+	
 	IPooledActor::Execute_ClearPooledActor(Actor);
 }
