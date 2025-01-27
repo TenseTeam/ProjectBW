@@ -22,21 +22,6 @@ void AWeaponBase::Init(APawn* InOwner, UObject* InPayload)
 	SetInstigator(InOwner);
 }
 
-void AWeaponBase::SetPayload(UObject* InPayload)
-{
-	Payload = InPayload;
-}
-
-void AWeaponBase::SetWeaponDamage(const float NewDamage)
-{
-	WeaponData.Damage = NewDamage;
-}
-
-UObject* AWeaponBase::GetPayload() const
-{
-	return Payload;
-}
-
 bool AWeaponBase::WeaponAttack()
 {
 	if (DeployWeaponAttack())
@@ -49,6 +34,26 @@ bool AWeaponBase::WeaponAttack()
 	OnWeaponAttackFail();
 	OnWeaponAttackFailEvent.Broadcast();
 	return false;
+}
+
+void AWeaponBase::SetPayload(UObject* InPayload)
+{
+	Payload = InPayload;
+}
+
+void AWeaponBase::SetWeaponDamage(const float NewDamage)
+{
+	WeaponData.Damage = NewDamage;
+}
+
+float AWeaponBase::GetWeaponDamage() const
+{
+	return WeaponData.Damage;
+}
+
+UObject* AWeaponBase::GetPayload() const
+{
+	return Payload;
 }
 
 FWeaponData AWeaponBase::GetWeaponData() const
@@ -68,4 +73,3 @@ void AWeaponBase::OnWeaponAttackSuccess_Implementation()
 void AWeaponBase::OnWeaponAttackFail_Implementation()
 {
 }
-
