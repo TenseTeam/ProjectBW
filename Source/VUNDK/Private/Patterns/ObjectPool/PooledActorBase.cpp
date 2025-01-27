@@ -36,5 +36,5 @@ void APooledActorBase::ClearPooledActor_Implementation()
 
 bool APooledActorBase::Check() const
 {
-	return ActorPool != nullptr;
+	return IsValid(ActorPool);
 }

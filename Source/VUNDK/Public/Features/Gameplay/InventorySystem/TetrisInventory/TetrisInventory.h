@@ -50,7 +50,7 @@ private:
 
 public:
 	UTetrisInventory();
-	
+
 	virtual bool CanContainItem(const UItemDataBase* ItemData) const override;
 
 	virtual bool IsFull() const override;
@@ -75,7 +75,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
+	
 	virtual USaveData* CreateSaveDataObject_Implementation() override;
 	
 	virtual USaveData* CreateInventorySaveData_Implementation(USaveData* SaveData, TArray<UItemBase*>& ItemsToSave) override;

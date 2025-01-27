@@ -27,8 +27,3 @@ bool UTetrisInventoriesManager::TryTransferItem(UTetrisItem* Item, UTetrisInvent
 
 	return false;
 }
-
-void UTetrisInventoriesManager::BeginPlay()
-{
-	Super::BeginPlay();
-}

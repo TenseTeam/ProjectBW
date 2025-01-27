@@ -53,6 +53,8 @@ public:
 public:
 	UQuestManager();
 
+	virtual void BeginPlay() override;
+	
 	UFUNCTION(BlueprintCallable)
 	void Init();
 
@@ -110,8 +112,6 @@ public:
 #endif
 
 protected:
-	virtual void BeginPlay() override;
-	
 	void AddQuest(UQuestData* QuestData, const FQuestEntryData QuestEntryData);
 	
 	void RemoveQuest(const UQuestData* QuestDataKey);

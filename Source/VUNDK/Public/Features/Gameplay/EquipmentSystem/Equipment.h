@@ -65,8 +65,6 @@ private:
 
 public:
 	UEquipment();
-	
-	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable)
 	bool TryEquipItemToFirstAvailableSlot(UItemBase* Item);
@@ -84,6 +82,8 @@ public:
 	void ClearEquipment();
 
 protected:
+	virtual void BeginPlay() override;
+	
 	virtual bool CanEquipItem(const UItemBase* Item, const UEquipSlotKey* TargetSlotKey, const int32 SlotIndex) const;
 	
 	UFUNCTION(BlueprintNativeEvent)

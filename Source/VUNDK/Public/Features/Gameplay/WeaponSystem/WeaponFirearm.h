@@ -35,6 +35,9 @@ private:
 public:
 	AWeaponFirearm();
 
+#if WITH_EDITOR
+	virtual void OnConstruction(const FTransform& Transform) override;
+#endif
 	virtual void Init(APawn* InOwner, UObject* InPayload = nullptr) override;
 
 	UFUNCTION(BlueprintCallable)
@@ -109,15 +112,10 @@ public:
 	bool IsAimingDownSight() const;
 	
 protected:
-	
-#if WITH_EDITOR
-	virtual void OnConstruction(const FTransform& Transform) override;
-#endif
-
 	virtual void BeginPlay() override;
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
+	
 	virtual void EnableAimDownSight();
 
 	virtual void DisableAimDownSight();

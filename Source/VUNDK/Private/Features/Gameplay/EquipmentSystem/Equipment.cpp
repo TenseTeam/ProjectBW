@@ -8,25 +8,6 @@ UEquipment::UEquipment()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UEquipment::BeginPlay()
-{
-	Super::BeginPlay();
-
-	EquipSlots = TMap<FName, TMap<int32, UItemBase*>>();
-	for (const auto& SlotLimit : SlotLimits)
-	{
-		if (SlotLimit.Key == nullptr)
-			continue;
-
-		TMap<int32, UItemBase*> IndexedItems = TMap<int32, UItemBase*>();
-
-		for (int32 i = 0; i < SlotLimit.Value; i++)
-			IndexedItems.Add(i, nullptr);
-
-		EquipSlots.Add(SlotLimit.Key->EquipSlotKey, IndexedItems);
-	}
-}
-
 bool UEquipment::TryEquipItemToFirstAvailableSlot(UItemBase* Item)
 {
 	if (!IsValid(Item) || !IsValid(Item->GetItemData()))
@@ -117,6 +98,25 @@ void UEquipment::ClearEquipment()
 
 	OnEquipmentCleared.Broadcast();
 	OnEquipChanged.Broadcast();
+}
+
+void UEquipment::BeginPlay()
+{
+	Super::BeginPlay();
+
+	EquipSlots = TMap<FName, TMap<int32, UItemBase*>>();
+	for (const auto& SlotLimit : SlotLimits)
+	{
+		if (SlotLimit.Key == nullptr)
+			continue;
+
+		TMap<int32, UItemBase*> IndexedItems = TMap<int32, UItemBase*>();
+
+		for (int32 i = 0; i < SlotLimit.Value; i++)
+			IndexedItems.Add(i, nullptr);
+
+		EquipSlots.Add(SlotLimit.Key->EquipSlotKey, IndexedItems);
+	}
 }
 
 bool UEquipment::CanEquipItem(const UItemBase* Item, const UEquipSlotKey* TargetSlotKey, const int32 SlotIndex) const
