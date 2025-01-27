@@ -25,7 +25,7 @@ private:
 	
 public:
 	UCheckpointsManager();
-
+	
 	UFUNCTION(BlueprintPure, Category = "VUNDK|Gameplay|Checkpoints")
 	static FCheckpointsSaveData CreateSaveData();
 	

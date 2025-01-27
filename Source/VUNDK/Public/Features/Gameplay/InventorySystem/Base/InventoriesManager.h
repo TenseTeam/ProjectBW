@@ -24,7 +24,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	UItemDataBase* GetItemDataFromRegistry(const FGuid& ItemDataID) const;
-	
+
 protected:
 	virtual void BeginPlay() override;
 

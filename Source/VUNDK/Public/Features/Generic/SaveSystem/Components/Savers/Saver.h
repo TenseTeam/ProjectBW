@@ -74,6 +74,10 @@ public:
 	FName GetUniqueSaveID() const;
 	
 protected:
+	virtual void BeginPlay() override;
+	
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	
 	UFUNCTION()
 	void PrepareSave(UDefaultSaveGame* SaveGame, USlotInfoItem* SlotInfoItem, UObject* Instigator);
 	
@@ -121,10 +125,6 @@ protected:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnBeginWithNewSharedSaveGameEvent(UDefaultSaveGame* SaveGame);
-
-	virtual void BeginPlay() override;
-	
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 private:
 	void CheckBeginWithLoad();

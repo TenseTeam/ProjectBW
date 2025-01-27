@@ -14,10 +14,7 @@ class VUNDK_API UShootBarrel : public USceneComponent
 
 public:
 	UShootBarrel();
-
+	
 	UFUNCTION(BlueprintPure)
 	TArray<UShootPoint*> GetShootPointsChildren() const;
-	
-protected:
-	virtual void BeginPlay() override;
 };

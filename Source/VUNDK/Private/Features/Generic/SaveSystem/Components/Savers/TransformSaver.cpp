@@ -13,6 +13,12 @@ void UTransformSaver::OnPrepareSave_Implementation(UDefaultSaveGame* SaveGameDat
 	USSUtility::GetSaveManager()->GetSaveGameInstance()->ActorTransforms.Add(GetUniqueSaveID(), GetOwnerTransform());
 }
 
+void UTransformSaver::BeginPlay()
+{
+	Super::BeginPlay();
+	SetActorLoadedTransform(SaveManager->GetSaveGameInstance());
+}
+
 void UTransformSaver::OnLoadCompletedEvent_Implementation(const FString& SlotName, const int32 UserIndex, UDefaultSaveGame* LoadedData, UObject* Instigator)
 {
 	Super::OnLoadCompletedEvent_Implementation(SlotName, UserIndex, LoadedData, Instigator);
@@ -22,12 +28,6 @@ void UTransformSaver::OnLoadCompletedEvent_Implementation(const FString& SlotNam
 FTransform UTransformSaver::GetOwnerTransform() const
 {
 	return GetOwner()->GetActorTransform();
-}
-
-void UTransformSaver::BeginPlay()
-{
-	Super::BeginPlay();
-	SetActorLoadedTransform(SaveManager->GetSaveGameInstance());
 }
 
 void UTransformSaver::SetActorLoadedTransform(UDefaultSaveGame* LoadedData) const

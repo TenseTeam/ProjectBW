@@ -1,7 +1,6 @@
 // Copyright VUNDK, Inc. All Rights Reserved.
 
 #include "Patterns/ObjectPool/PoolsManager.h"
-
 #include "Patterns/ObjectPool/Utility/PoolsUtility.h"
 
 UPoolsManager::UPoolsManager()
@@ -27,8 +26,20 @@ void UPoolsManager::BeginPlay()
 	InitPools();
 }
 
+void UPoolsManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	DestroyPools();
+}
+
 void UPoolsManager::InitPools()
 {
 	for (const auto& Pool : Pools)
 		Pool.Value->Init();
+}
+
+void UPoolsManager::DestroyPools()
+{
+	for (const auto& Pool : Pools)
+		Pool.Value->DestroyPool();
 }

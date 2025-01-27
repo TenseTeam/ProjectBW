@@ -343,9 +343,8 @@ bool ABWCharacter::IsHoldingWeapon() const
 
 bool ABWCharacter::HasInventoryEnoughAmmo() const
 {
-	return BWController->Inventory->AmmoInventory->HasAmmoOfType(HeldWeapon->FirearmData.AmmoType);
+	return BWController->Inventory->AmmoInventory->HasAmmoOfType(HeldWeapon->GetWeaponFirearmData().AmmoType);
 }
-
 
 void ABWCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)
 {

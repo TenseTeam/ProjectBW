@@ -19,8 +19,46 @@ FName USaver::GetUniqueSaveID() const
 	const FString UniqueID = OwnerName.ToString() + LevelName + MasterID.ToString();
 	const int32 Hash = GetTypeHash(UniqueID);
 	const FString Hex = FString::Printf(TEXT("%08X"), Hash);
-	
+
 	return FName(*Hex);
+}
+
+void USaver::BeginPlay()
+{
+	Super::BeginPlay();
+	SaveManager = USSUtility::GetSaveManager();
+
+	if (!Check()) return;
+
+	SaveManager->OnPrepareSave.AddDynamic(this, &USaver::PrepareSave);
+	SaveManager->OnPrepareLoad.AddDynamic(this, &USaver::PrepareLoad);
+	SaveManager->OnSaveGame.AddDynamic(this, &USaver::OnSaveCompletedEvent);
+	SaveManager->OnLoadGame.AddDynamic(this, &USaver::OnLoadCompletedEvent);
+	SaveManager->OnPrepareSharedSave.AddDynamic(this, &USaver::PrepareSharedSave);
+	SaveManager->OnPrepareSharedLoad.AddDynamic(this, &USaver::PrepareSharedLoad);
+	SaveManager->OnSharedSaveGame.AddDynamic(this, &USaver::OnSharedSaveCompletedEvent);
+	SaveManager->OnSharedLoadGame.AddDynamic(this, &USaver::OnSharedLoadCompletedEvent);
+
+	if (bDelayBeginWithLoadForNextTick)
+		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &USaver::CheckBeginWithLoad);
+	else
+		CheckBeginWithLoad();
+}
+
+void USaver::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	if (!Check()) return;
+
+	SaveManager->OnPrepareSave.RemoveDynamic(this, &USaver::PrepareSave);
+	SaveManager->OnPrepareLoad.RemoveDynamic(this, &USaver::PrepareLoad);
+	SaveManager->OnSaveGame.RemoveDynamic(this, &USaver::OnSaveCompletedEvent);
+	SaveManager->OnLoadGame.RemoveDynamic(this, &USaver::OnLoadCompletedEvent);
+	SaveManager->OnPrepareSharedSave.RemoveDynamic(this, &USaver::PrepareSharedSave);
+	SaveManager->OnPrepareSharedLoad.RemoveDynamic(this, &USaver::PrepareSharedLoad);
+	SaveManager->OnSharedSaveGame.RemoveDynamic(this, &USaver::OnSharedSaveCompletedEvent);
+	SaveManager->OnSharedLoadGame.RemoveDynamic(this, &USaver::OnSharedLoadCompletedEvent);
 }
 
 void USaver::PrepareSave(UDefaultSaveGame* SaveGame, USlotInfoItem* SlotInfoItem, UObject* Instigator)
@@ -99,44 +137,6 @@ void USaver::OnBeginWithNewSharedSaveGameEvent_Implementation(UDefaultSaveGame* 
 {
 }
 
-void USaver::BeginPlay()
-{
-	Super::BeginPlay();
-	SaveManager = USSUtility::GetSaveManager();
-	
-	if (!Check()) return;
-	
-	SaveManager->OnPrepareSave.AddDynamic(this, &USaver::PrepareSave);
-	SaveManager->OnPrepareLoad.AddDynamic(this, &USaver::PrepareLoad);
-	SaveManager->OnSaveGame.AddDynamic(this, &USaver::OnSaveCompletedEvent);
-	SaveManager->OnLoadGame.AddDynamic(this, &USaver::OnLoadCompletedEvent);
-	SaveManager->OnPrepareSharedSave.AddDynamic(this, &USaver::PrepareSharedSave);
-	SaveManager->OnPrepareSharedLoad.AddDynamic(this, &USaver::PrepareSharedLoad);
-	SaveManager->OnSharedSaveGame.AddDynamic(this, &USaver::OnSharedSaveCompletedEvent);
-	SaveManager->OnSharedLoadGame.AddDynamic(this, &USaver::OnSharedLoadCompletedEvent);
-
-	if (bDelayBeginWithLoadForNextTick)
-		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &USaver::CheckBeginWithLoad);
-	else
-		CheckBeginWithLoad();
-}
-
-void USaver::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	Super::EndPlay(EndPlayReason);
-	
-	if (!Check()) return;
-	
-	SaveManager->OnPrepareSave.RemoveDynamic(this, &USaver::PrepareSave);
-	SaveManager->OnPrepareLoad.RemoveDynamic(this, &USaver::PrepareLoad);
-	SaveManager->OnSaveGame.RemoveDynamic(this, &USaver::OnSaveCompletedEvent);
-	SaveManager->OnLoadGame.RemoveDynamic(this, &USaver::OnLoadCompletedEvent);
-	SaveManager->OnPrepareSharedSave.RemoveDynamic(this, &USaver::PrepareSharedSave);
-	SaveManager->OnPrepareSharedLoad.RemoveDynamic(this, &USaver::PrepareSharedLoad);
-	SaveManager->OnSharedSaveGame.RemoveDynamic(this, &USaver::OnSharedSaveCompletedEvent);
-	SaveManager->OnSharedLoadGame.RemoveDynamic(this, &USaver::OnSharedLoadCompletedEvent);
-}
-
 void USaver::CheckBeginWithLoad()
 {
 	if (SaveManager->HasInstanceEverLoaded())
@@ -159,7 +159,7 @@ void USaver::BeginWithLoadedSaveGame()
 		UE_LOG(LogSaveSystem, Error, TEXT("BeginWithLoadedSaveGame(), SaveGame is not valid."));
 		return;
 	}
-		
+
 	OnBeginWithLoadedSaveGameEvent(SaveGame);
 	OnBeginWithLoadedSaveGame.Broadcast(SaveGame);
 }
@@ -173,7 +173,7 @@ void USaver::BeginWithNewSaveGame()
 		UE_LOG(LogSaveSystem, Error, TEXT("BeginWithNewSaveGame(), SaveGame is not valid."));
 		return;
 	}
-	
+
 	OnBeginWithNewSaveGameEvent(SaveGame);
 	OnBeginWithNewSaveGame.Broadcast(SaveGame);
 }
@@ -187,7 +187,7 @@ void USaver::BeginWithLoadedSharedSaveGame()
 		UE_LOG(LogSaveSystem, Error, TEXT("BeginWithLoadedSharedSaveGame(), SharedSaveGame is not valid."));
 		return;
 	}
-	
+
 	OnBeginWithLoadedSharedSaveGameEvent(SaveGame);
 	OnBeginWithLoadedSharedSaveGame.Broadcast(SaveGame);
 }
@@ -201,7 +201,7 @@ void USaver::BeginWithNewSharedSaveGame()
 		UE_LOG(LogSaveSystem, Error, TEXT("BeginWithNewSharedSaveGame(), SharedSaveGame is not valid."));
 		return;
 	}
-	
+
 	OnBeginWithNewSharedSaveGameEvent(SaveGame);
 	OnBeginWithNewSharedSaveGame.Broadcast(SaveGame);
 }
