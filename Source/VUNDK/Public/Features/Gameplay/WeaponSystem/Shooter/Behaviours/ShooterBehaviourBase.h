@@ -68,7 +68,7 @@ protected:
 	TArray<UShootPoint*> ShootPoints;
 
 private:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = 0.0f, UIMin = 0.0f, AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = 0, UIMin = 0, AllowPrivateAccess = true))
 	int32 AmmoToConsumePerShot = 1;
 	UPROPERTY()
 	UShootBarrel* ShootBarrel;
@@ -126,6 +126,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetMaxSpread(const float NewMaxSpread);
+
+	UFUNCTION(BlueprintCallable)
+	void SetShootType(const EShootType NewShootType);
 
 	UFUNCTION(BlueprintCallable)
 	void SetCurrentAmmo(const int32 NewAmmo);
