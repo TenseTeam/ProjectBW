@@ -27,7 +27,7 @@ void UShooterPhysicProjectileBehaviour::OnDeployShoot_Implementation(UShootPoint
 
 	if (!IsValid(ActorPrj))
 	{
-		UE_LOG(LogShooter, Warning, TEXT("ShooterPhysicProjectileBehaviour::OnDeployShoot_Implementation(), Invalid projectile actor from pool."));
+		UE_LOG(LogShooter, Error, TEXT("ShooterPhysicProjectileBehaviour::OnDeployShoot_Implementation(), Invalid projectile actor from pool."));
 		return;
 	}
 	

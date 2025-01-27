@@ -24,7 +24,7 @@ public:
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AActor> ActorClass;
-	UPROPERTY()
+	UPROPERTY(Transient)
 	TArray<AActor*> AvailableActors;
 	
 public:

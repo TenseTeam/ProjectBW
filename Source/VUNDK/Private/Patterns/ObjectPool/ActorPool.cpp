@@ -116,7 +116,7 @@ void UActorPool::SpawnInstance()
 		UE_LOG(LogObjectPool, Error, TEXT("ActorPool AddInstance(), Invalid actor."));
 		return;
 	}
-	
+
 	IPooledActor::Execute_AssignActorPool(Actor, this);
 	PushActor(Actor);
 }
