@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(meta = (DisplayName = "Move To Target"))
 class GVUEDK_API UGHMoveToTarget : public UGHMovementModeBase
 {
 	GENERATED_BODY()
@@ -29,7 +29,7 @@ public:
 	virtual float GetTotalHookDistance() const override { return TotalHookDistance; }
 
 private:
-	void PerformHooking(float DeltaTime);
+	void PerformMotion(float DeltaTime);
 	void OrientRotationToMovement(float DeltaTime);
 	bool CalculateMotionData();
 	float GetElapsedNormalizedDistance();

@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(meta = (DisplayName = "Sphere Trace Search"))
 class GVUEDK_API UGHSphereTraceSearch : public UGHSearchModeBase
 {
 	GENERATED_BODY()
@@ -25,10 +25,12 @@ public:
 
 private:
 	bool LookForGrabPoints(TSet<IGrabPoint*>& OutGrabPoints) const;
-	IGrabPoint* GetNearestGrabPoint(TSet<IGrabPoint*>& ValidGrabPoints) const;
+	IGrabPoint* GetMostRelevantGrabPoint(TSet<IGrabPoint*>& ValidGrabPoints) const;
 	bool PerformSphereTrace(TArray<FHitResult>& HitResults) const;
 
 private:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TEnumAsByte<ECollisionChannel> GrabPointsChannel;
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true", ClampMin = "1.0"))
 	float MaxDistance;
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true", ClampMin = "0.0"))

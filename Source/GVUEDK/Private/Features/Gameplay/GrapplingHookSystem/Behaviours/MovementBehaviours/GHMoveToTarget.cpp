@@ -77,13 +77,13 @@ bool UGHMoveToTarget::TickMode(float DeltaTime)
 			else return true;
 		}
 		
-		PerformHooking(DeltaTime);
+		PerformMotion(DeltaTime);
 		return true;
 	}
 	return false;
 }
 
-void UGHMoveToTarget::PerformHooking(float DeltaTime)
+void UGHMoveToTarget::PerformMotion(float DeltaTime)
 {
 	OwnerCharacter->GetCharacterMovement()->Velocity = FVector::ZeroVector;
 	OwnerCharacter->SetActorLocation(OwnerCharacter->GetActorLocation() + StartHookDirection * GetSpeed() * DeltaTime);

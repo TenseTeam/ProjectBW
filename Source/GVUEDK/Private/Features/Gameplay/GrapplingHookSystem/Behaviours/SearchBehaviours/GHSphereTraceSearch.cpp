@@ -13,6 +13,7 @@ UGHSphereTraceSearch::UGHSphereTraceSearch()
 	MaxDistance = 3000.f;
 	MinDistance = 0.f;
 	LastTargetGrabPoint = nullptr;
+	GrabPointsChannel = ECC_GameTraceChannel1;
 }
 
 void UGHSphereTraceSearch::Initialize(UGrapplingHookComponent* InGrapplingHookComponent)
@@ -27,7 +28,7 @@ bool UGHSphereTraceSearch::TickMode(float DeltaTime)
 	// check if there are any grab points in range (MaxCheckDistance)
 	if (LookForGrabPoints(InRangeGrabPoints))
 	{
-		SetTargetGrabPoint(GetNearestGrabPoint(InRangeGrabPoints));
+		SetTargetGrabPoint(GetMostRelevantGrabPoint(InRangeGrabPoints));
 		if (IsTargetAcquired())
 		{
 			if (LastTargetGrabPoint != nullptr && LastTargetGrabPoint != GetTargetGrabPoint())
@@ -90,7 +91,7 @@ bool UGHSphereTraceSearch::LookForGrabPoints(TSet<IGrabPoint*>& OutGrabPoints) c
 	return false;
 }
 
-IGrabPoint* UGHSphereTraceSearch::GetNearestGrabPoint(TSet<IGrabPoint*>& ValidGrabPoints) const
+IGrabPoint* UGHSphereTraceSearch::GetMostRelevantGrabPoint(TSet<IGrabPoint*>& ValidGrabPoints) const
 {
 	IGrabPoint* ReturnValue = nullptr;
 	float MinSquaredDistance = BIG_NUMBER;
@@ -109,7 +110,6 @@ IGrabPoint* UGHSphereTraceSearch::GetNearestGrabPoint(TSet<IGrabPoint*>& ValidGr
 bool UGHSphereTraceSearch::PerformSphereTrace(TArray<FHitResult>& HitResults) const
 {
 	const FCollisionShape CollisionShape = FCollisionShape::MakeSphere(MaxDistance);
-	constexpr ECollisionChannel GrabPointsChannel = ECC_GameTraceChannel1;
 
 	
 	const bool bHit = GetWorld()->SweepMultiByChannel(

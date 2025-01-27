@@ -21,9 +21,10 @@ public:
 
 	// Returns false if the ticking doesn't need to continue
 	virtual bool TickMode(float DeltaTime) { return false; }
+	virtual void EnterMode(){}
+	virtual void ExitMode(){}
 
 protected:
-
 	IGrabPoint* GetTargetGrabPoint() const;
 	void SetTargetGrabPoint(IGrabPoint* GrabPoint);
 	bool IsTargetAcquired() const;
