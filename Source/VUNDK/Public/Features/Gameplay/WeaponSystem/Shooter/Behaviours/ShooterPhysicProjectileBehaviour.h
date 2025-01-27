@@ -13,10 +13,12 @@ class VUNDK_API UShooterPhysicProjectileBehaviour : public UShooterBehaviourBase
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FName ProjectilesPoolName;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0.0", UIMin = "0.0"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.0", UIMin = "0.0"))
 	float ProjectileSpeed = 1000.0f;
+
+private:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	FName ProjectilesPoolName;
 
 private:
 	UPROPERTY()
@@ -26,7 +28,10 @@ public:
 	UShooterPhysicProjectileBehaviour();
 
 	virtual void Init(UShooter* InShooter, const FShootData InShootData, UShootBarrel* InShootBarrel) override;
-
+	
+	UFUNCTION(BlueprintCallable)
+	void SetProjectilesPoolName(const FName InProjectilesPoolName);
+	
 protected:
 	virtual void OnDeployShoot_Implementation(UShootPoint* ShootPoint, const FVector& TargetLocation, const FVector& DirectionToTarget) const override;
 
