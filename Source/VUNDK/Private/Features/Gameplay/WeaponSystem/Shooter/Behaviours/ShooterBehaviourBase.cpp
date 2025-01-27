@@ -93,13 +93,14 @@ void UShooterBehaviourBase::RefillAllMagazine()
 	Refill(GetMagSize());
 }
 
-void UShooterBehaviourBase::SetShootParams(const float NewDamage, const float NewFireRate, const float NewRange, const int32 NewMagSize, const int32 NewRecoilStrength)
+void UShooterBehaviourBase::SetShootParams(const float NewDamage, const float NewFireRate, const float NewRange, const int32 NewMagSize, const int32 NewRecoilStrength, const float NewSpread)
 {
 	SetDamage(NewDamage);
 	SetFireRate(NewFireRate);
 	SetMaxRange(NewRange);
 	SetMagSize(NewMagSize);
 	SetRecoilStrength(NewRecoilStrength);
+	SetMaxSpread(NewSpread);
 }
 
 void UShooterBehaviourBase::SetDamage(const float NewDamage)
@@ -128,19 +129,26 @@ void UShooterBehaviourBase::SetRecoilStrength(float NewRecoilStrength)
 	ShootData.RecoilStrength = NewRecoilStrength;
 }
 
-void UShooterBehaviourBase::SetMaxSpread(const float NewSpread)
+void UShooterBehaviourBase::SetMaxSpread(const float NewMaxSpread)
 {
-	ShootData.MaxSpread = FMath::Clamp(NewSpread, 0.f, 1.f);
+	ShootData.MaxSpreadDegree = NewMaxSpread;
 }
 
 void UShooterBehaviourBase::SetCurrentAmmo(const int32 NewAmmo)
 {
-	CurrentAmmo = FMath::Clamp(NewAmmo, 0, GetMagSize());
+	const int32 MagSize = GetMagSize();
+	CurrentAmmo = FMath::Clamp(NewAmmo, 0, MagSize);
+	OnCurrentAmmoChanged.Broadcast(CurrentAmmo, MagSize);
+}
+
+void UShooterBehaviourBase::ModifyCurrentAmmo(const int32 AmmoValue)
+{
+	SetCurrentAmmo(CurrentAmmo + AmmoValue);
 }
 
 float UShooterBehaviourBase::GetMaxRange_Implementation() const
 {
-	return ShootData.MaxRange * RangeMultiplier;
+	return ShootData.MaxRange;
 }
 
 float UShooterBehaviourBase::GetFireRate_Implementation() const
@@ -160,12 +168,12 @@ int32 UShooterBehaviourBase::GetMagSize_Implementation() const
 
 float UShooterBehaviourBase::GetRecoilStrength_Implementation() const
 {
-	return ShootData.RecoilStrength * RecoilStrengthMultiplier;
+	return ShootData.RecoilStrength;
 }
 
 float UShooterBehaviourBase::GetMaxSpread_Implementation() const
 {
-	return ShootData.MaxSpread * MaxSpreadMultiplier;
+	return ShootData.MaxSpreadDegree;
 }
 
 EShootType UShooterBehaviourBase::GetShootType() const
@@ -222,7 +230,7 @@ void UShooterBehaviourBase::ShootFromShootPoint(UShootPoint* ShootPoint) const
 	const FVector ShooterTargetLocation = GetShooterTargetLocation();
 	FVector ShootPointDirToTarget = ShooterTargetLocation - ShootPoint->GetShootPointLocation();
 	ShootPointDirToTarget.Normalize();
-	ShootPoint->SetSpread(GenerateSpread());
+	ShootPoint->GenerateSpreadDegree(GetMaxSpread());
 	OnDeployShoot(ShootPoint, ShooterTargetLocation, ShootPointDirToTarget);
 	OnShootFromShootPoint(ShootPoint, ShooterTargetLocation, ShootPointDirToTarget);
 }
@@ -406,11 +414,6 @@ bool UShooterBehaviourBase::HasEnoughAmmoToShoot() const
 	return ShootPoints.Num() > 0 && (bHasInfiniteAmmo || CurrentAmmo - GetAmmoToConsume() >= 0);
 }
 
-void UShooterBehaviourBase::ModifyCurrentAmmo(const int32 AmmoValue)
-{
-	SetCurrentAmmo(CurrentAmmo + AmmoValue);
-}
-
 void UShooterBehaviourBase::ApplyRecoilImpulse()
 {
 	if (!ShootData.bHasRecoil || !IsValid(ShootData.RecoilCurve))
@@ -432,10 +435,10 @@ void UShooterBehaviourBase::ProcessRecoilImpulseRotation(const float DeltaTime)
 {
 	if (!IsValid(Owner) || RecoilRemaining <= 0.0f)
 		return;
-	
+
 	const float NormalizedTime = FMath::Clamp(RecoilRemaining / ShootData.RecoilDuration, -1.f, 1.f);
 	const float DecayFactor = ShootData.RecoilCurve->GetVectorValue(1.0f - NormalizedTime).X;
-	const FRotator RecoilStep = ImpulseRecoil * (DecayFactor * DeltaTime * GetRecoilStrength());
+	const FRotator RecoilStep = ImpulseRecoil * (DecayFactor * DeltaTime * GetRecoilStrength() * RecoilStrengthMultiplier);
 
 	Owner->AddControllerPitchInput(-RecoilStep.Pitch);
 	Owner->AddControllerYawInput(RecoilStep.Yaw);
@@ -463,9 +466,4 @@ void UShooterBehaviourBase::ProcessCooldown(const float DeltaTime)
 void UShooterBehaviourBase::EndShootCooldown()
 {
 	bIsInCooldown = false;
-}
-
-float UShooterBehaviourBase::GenerateSpread() const
-{
-	return FMath::RandRange(0.f, GetMaxSpread());
 }

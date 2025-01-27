@@ -7,6 +7,7 @@
 #include "Features/Gameplay/WeaponSystem/WeaponFirearm.h"
 #include "BWWeaponFirearm.generated.h"
 
+class UWidgetComponent;
 DEFINE_LOG_CATEGORY_STATIC(LogBWWeapons, All, All);
 
 UCLASS()
@@ -14,17 +15,20 @@ class PROJECTBW_API ABWWeaponFirearm : public AWeaponFirearm
 {
 	GENERATED_BODY()
 
-public:
-	UPROPERTY(BlueprintReadOnly)
+private:
+	UPROPERTY()
 	UBWWeaponFirearmItem* WeaponFirearmItem;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UWidgetComponent* AmmoWidgetComponent;
 	
 public:
 	ABWWeaponFirearm();
 
-	void InitBWWeapon(APawn* InOwner, UBWWeaponFirearmItem* InWeaponItem);
+	virtual void Init(APawn* InOwner, UObject* InPayload = nullptr) override;
+
+	UFUNCTION(BlueprintPure)
+	UBWWeaponFirearmItem* GetWeaponFirearmItem() const;
 	
 protected:
-	virtual void OnReload_Implementation() override;
-	
-	virtual bool DeployWeaponAttack_Implementation() override;
+	virtual void OnCurrentAmmoChanged_Implementation(int32 CurrentAmmo, int32 MagSize) override;
 };

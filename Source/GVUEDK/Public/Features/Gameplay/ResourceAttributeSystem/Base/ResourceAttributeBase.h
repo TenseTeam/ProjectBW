@@ -53,6 +53,10 @@ public:
 	float MaxValue;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float MinValue;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ToolTip = "If true, the attribute will start with the StartingValue instead of the MaxValue"))
+	bool bUseStartingValue;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bUseStartingValue"))
+	float StartingValue;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bCanRegen"))
 	float RegenSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bCanRegen"))

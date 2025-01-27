@@ -35,6 +35,9 @@ protected:
 	USkeletalMeshComponent* WeaponMesh;
 
 private:
+	UPROPERTY()
+	UObject* Payload;
+
 #if WITH_EDITORONLY_DATA
 	UPROPERTY()
 	UArrowComponent* ArrowComponent;
@@ -42,13 +45,19 @@ private:
 
 public:
 	AWeaponBase();
-	
-	UFUNCTION(BlueprintCallable)
-	virtual void Init(APawn* InOwner);
 
+	UFUNCTION(BlueprintCallable)
+	virtual void Init(APawn* InOwner, UObject* InPayload = nullptr);
+
+	UFUNCTION(BlueprintCallable)
+	void SetPayload(UObject* InPayload);
+	
 	UFUNCTION(BlueprintCallable)
 	virtual void SetWeaponDamage(const float NewDamage);
 
+	UFUNCTION(BlueprintPure)
+	UObject* GetPayload() const;
+	
 	UFUNCTION(BlueprintCallable)
 	bool WeaponAttack();
 

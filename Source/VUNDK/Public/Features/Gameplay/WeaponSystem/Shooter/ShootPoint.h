@@ -13,7 +13,7 @@ class VUNDK_API UShootPoint : public USceneComponent
 	GENERATED_BODY()
 
 private:
-	float Spread;
+	float SpreadRad;
 #if WITH_EDITORONLY_DATA
 	UPROPERTY()
 	UArrowComponent* ArrowComponent;
@@ -23,7 +23,10 @@ public:
 	UShootPoint();
 
 	UFUNCTION(BlueprintCallable)
-	void SetSpread(const float NewSpread);
+	void SetSpreadDegree(const float NewSpreadDegree);
+
+	UFUNCTION(BlueprintCallable)
+	void GenerateSpreadDegree(const float MaxSpreadDegree);
 	
 	UFUNCTION(BlueprintPure)
 	FVector GetShootPointLocation() const;
@@ -36,6 +39,12 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	FVector GetShootPointRelativeDirection() const;
+
+	UFUNCTION(BlueprintPure)
+	FVector GetShootPointSpreadedDirection() const;
+
+	UFUNCTION(BlueprintPure)
+	FVector GetShootPointSpreadedRelativeDirection() const;
 
 protected:
 	virtual void OnRegister() override;

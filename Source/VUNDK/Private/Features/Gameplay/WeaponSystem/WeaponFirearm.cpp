@@ -9,9 +9,9 @@ AWeaponFirearm::AWeaponFirearm()
 	ShootBarrel->SetupAttachment(WeaponMesh);
 }
 
-void AWeaponFirearm::Init(APawn* InOwner)
+void AWeaponFirearm::Init(APawn* InOwner, UObject* InPayload)
 {
-	Super::Init(InOwner);
+	Super::Init(InOwner, InPayload);
 	Shooter->SetOwner(InOwner);
 }
 
@@ -41,9 +41,14 @@ void AWeaponFirearm::SetWeaponMaxRange(const float NewRange) const
 	Shooter->ShooterBehaviour->SetMaxRange(NewRange);
 }
 
-void AWeaponFirearm::SetWeaponAmmoRemaining(const int32 NewAmmoRemaining) const
+void AWeaponFirearm::SetWeaponRecoilStrength(const float NewRecoilStrength) const
 {
-	Shooter->ShooterBehaviour->SetCurrentAmmo(NewAmmoRemaining);
+	Shooter->ShooterBehaviour->SetRecoilStrength(NewRecoilStrength);
+}
+
+void AWeaponFirearm::SetCurrentAmmo(const int32 NewAmmo) const
+{
+	Shooter->ShooterBehaviour->SetCurrentAmmo(NewAmmo);
 }
 
 void AWeaponFirearm::SetWeaponShootType(const EShootType NewShootType)
@@ -54,6 +59,14 @@ void AWeaponFirearm::SetWeaponShootType(const EShootType NewShootType)
 void AWeaponFirearm::SetWeaponMaxSpread(const float NewSpread) const
 {
 	Shooter->ShooterBehaviour->SetMaxSpread(NewSpread);
+}
+
+int32 AWeaponFirearm::ReloadWithAmmo(UAmmoTypeData* AmmoData, const int32 Ammo)
+{
+	if (!IsValid(AmmoData) || AmmoData->AmmoID != FirearmData.AmmoType->AmmoID)
+		return Ammo;
+
+	return Reload(Ammo);
 }
 
 int32 AWeaponFirearm::Reload(const int32 Ammo)
@@ -69,18 +82,64 @@ void AWeaponFirearm::ReloadAllMagazine()
 	OnReload();
 }
 
+void AWeaponFirearm::SetAimDownSight(const bool bIsADSEnabled)
+{
+	if (bIsADSEnabled)
+		EnableAimDownSight();
+	else
+		DisableAimDownSight();
+
+	bIsAimingDownSight = bIsADSEnabled;
+}
+
+bool AWeaponFirearm::IsAimingDownSight() const
+{
+	return bIsAimingDownSight;
+}
+
 void AWeaponFirearm::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	if (WeaponMesh->DoesSocketExist(ShootBarrelSocketName))
-		ShootBarrel->AttachToComponent(WeaponMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, ShootBarrelSocketName);
-	
 	Shooter->Init(ShootBarrel);
 	SetWeaponDamage(WeaponData.Damage);
+	SetAimDownSightModifiers();
+	AttackBarrelToSocket();
+	Shooter->ShooterBehaviour->OnCurrentAmmoChanged.AddDynamic(this, &AWeaponFirearm::OnCurrentAmmoChanged);
+}
+
+void AWeaponFirearm::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	Shooter->ShooterBehaviour->OnCurrentAmmoChanged.RemoveDynamic(this, &AWeaponFirearm::OnCurrentAmmoChanged);
+}
+
+void AWeaponFirearm::EnableAimDownSight()
+{
+	SetWeaponMaxSpread(AdsMaxSpread);
+	SetWeaponRecoilStrength(AdsRecoilStrength);
+	OnEnableAimDownSight();
+}
+
+void AWeaponFirearm::DisableAimDownSight()
+{
+	SetWeaponMaxSpread(DefaultMaxSpread);
+	SetWeaponRecoilStrength(DefaultRecoilStrength);
+	OnDisableAimDownSight();
+}
+
+void AWeaponFirearm::OnEnableAimDownSight_Implementation()
+{
 }
 
 void AWeaponFirearm::OnReload_Implementation()
+{
+}
+
+void AWeaponFirearm::OnCurrentAmmoChanged_Implementation(int32 CurrentAmmo, int32 MagSize)
+{
+}
+
+void AWeaponFirearm::OnDisableAimDownSight_Implementation()
 {
 }
 
@@ -88,4 +147,19 @@ bool AWeaponFirearm::DeployWeaponAttack_Implementation()
 {
 	Super::DeployWeaponAttack_Implementation();
 	return Shooter->Shoot();
+}
+
+void AWeaponFirearm::SetAimDownSightModifiers()
+{
+	DefaultMaxSpread = Shooter->ShooterBehaviour->GetMaxSpread();
+	AdsMaxSpread = DefaultMaxSpread - ((DefaultMaxSpread / 100.f) * FirearmData.ADSPrecisionIncrease);
+
+	DefaultRecoilStrength = Shooter->ShooterBehaviour->GetRecoilStrength();
+	AdsRecoilStrength = DefaultRecoilStrength - ((DefaultRecoilStrength / 100.f) * FirearmData.ADSRecoilControlIncrease);
+}
+
+void AWeaponFirearm::AttackBarrelToSocket() const
+{
+	if (WeaponMesh->DoesSocketExist(ShootBarrelSocketName))
+		ShootBarrel->AttachToComponent(WeaponMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, ShootBarrelSocketName);
 }

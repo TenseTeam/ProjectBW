@@ -32,7 +32,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	UChildActorComponent* ChildActor;
 
-	UPROPERTY(EditDefaultsOnly, Category = "AI|Ranged")
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, Category = "AI|Ranged")
 	ARangedWeapon* RangedWeapon;
 
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "AI|Ranged")

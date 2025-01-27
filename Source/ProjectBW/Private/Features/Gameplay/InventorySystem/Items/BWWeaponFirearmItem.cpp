@@ -28,27 +28,27 @@ bool UBWWeaponFirearmItem::TryConsumeWeaponItemNewMagazine(const int MagSize)
 	return true;
 }
 
-void UBWWeaponFirearmItem::SetWeaponItemAmmoRemaining(const int32 NewAmmoRemaining)
+void UBWWeaponFirearmItem::SetAmmoRemaining(const int32 NewAmmoRemaining)
 {
 	AmmoRemaining = NewAmmoRemaining;
 }
 
-int32 UBWWeaponFirearmItem::GetWeaponItemAmmoRemaining() const
+int32 UBWWeaponFirearmItem::GetAmmoRemaining() const
 {
 	return AmmoRemaining;
 }
 
-float UBWWeaponFirearmItem::GetWeaponItemFireRate_Implementation()
+float UBWWeaponFirearmItem::GetFireRate_Implementation()
 {
 	return 0.0f;
 }
 
-float UBWWeaponFirearmItem::GetWeaponItemMaxRange_Implementation()
+float UBWWeaponFirearmItem::GetMaxRange_Implementation()
 {
 	return 0.0f;
 }
 
-int32 UBWWeaponFirearmItem::GetWeaponItemMagSize_Implementation()
+int32 UBWWeaponFirearmItem::GetMagSize_Implementation()
 {
 	return 0;
 }

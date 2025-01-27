@@ -25,6 +25,11 @@ void UActorPool::Init()
 	SpawnInstances(InitialSize);
 }
 
+TSubclassOf<AActor> UActorPool::GetActorClass() const
+{
+	return ActorClass;
+}
+
 AActor* UActorPool::AcquireActor()
 {
 	if (IsEmpty())
