@@ -4,11 +4,59 @@
 #include "GVUEDK/Public/Features/Gameplay/GrapplingHookSystem/Components/GrapplingHookComponent.h"
 
 #include <string>
+
+#include "Features/Gameplay/GrapplingHookSystem/Behaviours/MovementBehaviours/Base/GHMovementModeBase.h"
+#include "Features/Gameplay/GrapplingHookSystem/Behaviours/SearchBehaviours/Base/GHSearchModeBase.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Utility/FGvDebug.h"
 
+
+void UGrapplingHookComponent::ChangeMovementMode(int32 ModeIndex)
+{
+	if (ModeIndex < 0 || ModeIndex >= MovementModes.Num())
+	{
+		FGvDebug::Warning("Invalid Movement Mode Index");
+		return;
+	}
+	CurrentMovementMode = MovementModes[ModeIndex];
+}
+
+void UGrapplingHookComponent::ChangeSearchMode(int32 ModeIndex)
+{
+	if (ModeIndex < 0 || ModeIndex >= SearchModes.Num())
+	{
+		FGvDebug::Warning("Invalid Search Mode Index");
+		return;
+	}
+	CurrentSearchMode = SearchModes[ModeIndex];
+}
+
+bool UGrapplingHookComponent::InitializeModes()
+{
+	if (MovementModes.Num() == 0)
+	{
+		FGvDebug::Warning(GetOwner()->GetName() + " Grappling Hook has no movement modes");
+		return false;
+	}
+	if (SearchModes.Num() == 0)
+	{
+		FGvDebug::Warning(GetOwner()->GetName() + " Grappling Hook has no search modes");
+		return false;
+	}
+	for (const auto Element : MovementModes)
+	{
+		Element->Initialize(this);
+	}
+	for (const auto Element : SearchModes)
+	{
+		Element->Initialize(this);
+	}
+	CurrentMovementMode = MovementModes[0];
+	CurrentSearchMode = SearchModes[0];
+	return true;
+}
 
 UGrapplingHookComponent::UGrapplingHookComponent()
 {
@@ -38,6 +86,7 @@ void UGrapplingHookComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	InRangeGrabPoints = TSet<IGrabPoint*>();
+	
 	OwnerCharacter = Cast<ACharacter>(GetOwner());
 	if (!IsValid(OwnerCharacter))
 	{
@@ -45,7 +94,7 @@ void UGrapplingHookComponent::BeginPlay()
 		bInitialized = false;
 		return;
 	}
-	bInitialized = true;
+	bInitialized = InitializeModes();
 }
 
 void UGrapplingHookComponent::TickComponent(float DeltaTime, ELevelTick TickType,
@@ -56,94 +105,146 @@ void UGrapplingHookComponent::TickComponent(float DeltaTime, ELevelTick TickType
 		return;
 	}
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	if (bIsHooking)
-	{
-		if (bOrientRotationToMovement)
-		{
-			OrientRotationToMovement(DeltaTime);
-		}
-		
-		if (ElapsedTime < StartDelay)
-		{
-			ElapsedTime += DeltaTime;
-			return;
-		}
-		
-		if (!bMotionDataCalculated)
-		{
-			if (CalculateMotionData())
-			{
-				bMotionDataCalculated = true;
-				OnHookMotionStarted.Broadcast();
-			}
-			else return;
-		}
-		
-		PerformHooking(DeltaTime);
-		return;
-	}
 	
-	// check if there are any grab points in range (MaxCheckDistance)
-	if (LookForGrabPoints(InRangeGrabPoints))
+	if (CurrentMovementMode->TickMode(DeltaTime))
 	{
-		TargetGrabPoint = GetNearestGrabPoint(InRangeGrabPoints);
-		bTargetAcquired = TargetGrabPoint != nullptr;
-		if (bTargetAcquired)
-		{
-			if (LastTargetGrabPoint != nullptr && LastTargetGrabPoint != TargetGrabPoint)
-			{
-				LastTargetGrabPoint->Execute_Unhighlight(LastTargetGrabPoint->_getUObject());
-			}
-			if (LastTargetGrabPoint != TargetGrabPoint)
-				TargetGrabPoint->Execute_Highlight(TargetGrabPoint->_getUObject());
-			
-			LastTargetGrabPoint = TargetGrabPoint;
-		}
-		else
-		{
-			if (LastTargetGrabPoint != nullptr)
-			{
-				LastTargetGrabPoint->Execute_Unhighlight(LastTargetGrabPoint->_getUObject());
-				LastTargetGrabPoint = nullptr;
-			}
-		}
 		return;
 	}
-	// if there are no grab points in range, reset the target
-	if (TargetGrabPoint != nullptr)
-	{
-		TargetGrabPoint->Execute_Unhighlight(TargetGrabPoint->_getUObject());
-		LastTargetGrabPoint = nullptr;
-		TargetGrabPoint = nullptr;
-		bTargetAcquired = false;
-	}
+	CurrentSearchMode->TickMode(DeltaTime);
+	return;
+	
+	// if (bIsHooking)
+	// {
+	// 	if (bOrientRotationToMovement)
+	// 	{
+	// 		OrientRotationToMovement(DeltaTime);
+	// 	}
+	// 	
+	// 	if (ElapsedTime < StartDelay)
+	// 	{
+	// 		ElapsedTime += DeltaTime;
+	// 		return;
+	// 	}
+	// 	
+	// 	if (!bMotionDataCalculated)
+	// 	{
+	// 		if (CalculateMotionData())
+	// 		{
+	// 			bMotionDataCalculated = true;
+	// 			OnHookMotionStarted.Broadcast();
+	// 		}
+	// 		else return;
+	// 	}
+	// 	
+	// 	PerformHooking(DeltaTime);
+	// 	return;
+	// }
+	//
+	// // check if there are any grab points in range (MaxCheckDistance)
+	// if (LookForGrabPoints(InRangeGrabPoints))
+	// {
+	// 	TargetGrabPoint = GetNearestGrabPoint(InRangeGrabPoints);
+	// 	bTargetAcquired = TargetGrabPoint != nullptr;
+	// 	if (bTargetAcquired)
+	// 	{
+	// 		if (LastTargetGrabPoint != nullptr && LastTargetGrabPoint != TargetGrabPoint)
+	// 		{
+	// 			LastTargetGrabPoint->Execute_Unhighlight(LastTargetGrabPoint->_getUObject());
+	// 		}
+	// 		if (LastTargetGrabPoint != TargetGrabPoint)
+	// 			TargetGrabPoint->Execute_Highlight(TargetGrabPoint->_getUObject());
+	// 		
+	// 		LastTargetGrabPoint = TargetGrabPoint;
+	// 	}
+	// 	else
+	// 	{
+	// 		if (LastTargetGrabPoint != nullptr)
+	// 		{
+	// 			LastTargetGrabPoint->Execute_Unhighlight(LastTargetGrabPoint->_getUObject());
+	// 			LastTargetGrabPoint = nullptr;
+	// 		}
+	// 	}
+	// 	return;
+	// }
+	// // if there are no grab points in range, reset the target
+	// if (TargetGrabPoint != nullptr)
+	// {
+	// 	TargetGrabPoint->Execute_Unhighlight(TargetGrabPoint->_getUObject());
+	// 	LastTargetGrabPoint = nullptr;
+	// 	TargetGrabPoint = nullptr;
+	// 	bTargetAcquired = false;
+	// }
+}
+
+float UGrapplingHookComponent::GetMaxDistance() const
+{
+	return CurrentSearchMode->GetMaxDistance();
+}
+
+float UGrapplingHookComponent::GetMinDistance() const
+{	
+	return CurrentSearchMode->GetMinDistance();
+}
+
+float UGrapplingHookComponent::GetTotalHookDistance() const
+{	
+	return CurrentMovementMode->GetTotalHookDistance();
+}
+
+float UGrapplingHookComponent::GetElapsedTime() const
+{
+	return CurrentMovementMode->GetElapsedTime();
+}
+
+float UGrapplingHookComponent::GetStartDelay() const
+{
+	return CurrentMovementMode->GetStartDelay();
+}
+
+FVector UGrapplingHookComponent::GetStartLocation() const
+{
+	if (IsValid(CurrentMovementMode))
+		return CurrentMovementMode->GetStartLocation();
+	return FVector::ZeroVector;
+}
+
+FVector UGrapplingHookComponent::GetLandingPointLocation() const
+{
+	return CurrentMovementMode->GetLandingPointLocation();
+}
+
+FVector UGrapplingHookComponent::GetStartDirection() const
+{
+	return CurrentMovementMode->GetStartDirection();
 }
 
 void UGrapplingHookComponent::StartHooking()
 {
-	if (!bTargetAcquired || bIsHooking)
-	{
-		return;
-	}
-	ElapsedTime = 0.f;
-	bIsHooking = true;
-	if (!bApplyMomentumDuringHookThrow)
-	{
-		OwnerCharacter->GetCharacterMovement()->GravityScale = 0.f;
-		OwnerCharacter->GetCharacterMovement()->Velocity = FVector::ZeroVector;
-	}
-	TargetGrabPoint->Execute_Unhighlight(TargetGrabPoint->_getUObject());
-	OnStartHooking.Broadcast();
+	// if (!bTargetAcquired || bIsHooking)
+	// {
+	// 	return;
+	// }
+	// ElapsedTime = 0.f;
+	// bIsHooking = true;
+	// if (!bApplyMomentumDuringHookThrow)
+	// {
+	// 	OwnerCharacter->GetCharacterMovement()->GravityScale = 0.f;
+	// 	OwnerCharacter->GetCharacterMovement()->Velocity = FVector::ZeroVector;
+	// }
+	// TargetGrabPoint->Execute_Unhighlight(TargetGrabPoint->_getUObject());
+	// OnStartHooking.Broadcast();
+	CurrentMovementMode->StartHooking();
 }
 
 void UGrapplingHookComponent::StopHooking()
 {
-	TargetGrabPoint = nullptr;
-	bTargetAcquired = false;
-	bMotionDataCalculated = false;
-	bIsHooking = false;
-	OwnerCharacter->GetCharacterMovement()->GravityScale = 1.f;
-	OnStopHooking.Broadcast();
+	// TargetGrabPoint = nullptr;
+	// bTargetAcquired = false;
+	// bMotionDataCalculated = false;
+	// bIsHooking = false;
+	// OwnerCharacter->GetCharacterMovement()->GravityScale = 1.f;
+	// OnStopHooking.Broadcast();
+	CurrentMovementMode->StopHooking();
 }
 
 void UGrapplingHookComponent::PerformHooking(float DeltaTime)
@@ -270,7 +371,7 @@ bool UGrapplingHookComponent::PerformSphereTrace(TArray<FHitResult>& HitResults)
 		CollisionShape
 	);
 
-#if WITH_EDITOR
+#if !UE_BUILD_SHIPPING
 	if (bShowDebug)
 	{
 		DrawDebugSphere(

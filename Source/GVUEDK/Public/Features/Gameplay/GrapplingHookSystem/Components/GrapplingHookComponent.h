@@ -6,6 +6,8 @@
 #include "Features/Gameplay/GrapplingHookSystem/Interfaces/GrabPoint.h"
 #include "GrapplingHookComponent.generated.h"
 
+class UGHSearchModeBase;
+class UGHMovementModeBase;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartHooking);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FHookMotionStarted);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FHooking);
@@ -29,7 +31,30 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FInterruptHooking OnInterruptHooking;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
+	TArray<UGHMovementModeBase*> MovementModes;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
+	TArray<UGHSearchModeBase*> SearchModes;
+
+	UFUNCTION(BlueprintCallable)
+	void ChangeMovementMode(int32 ModeIndex);
+	UFUNCTION(BlueprintCallable)
+	void ChangeSearchMode(int32 ModeIndex);
+
+	ACharacter* GetOwnerCharacter() const { return OwnerCharacter; }
+	IGrabPoint* GetTargetGrabPoint() const { return TargetGrabPoint; }
+	void SetTargetGrabPoint(IGrabPoint* GrabPoint) { TargetGrabPoint = GrabPoint; bTargetAcquired = TargetGrabPoint != nullptr; }
+	bool IsTargetAcquired() const { return bTargetAcquired; } 
+
 private:
+	UPROPERTY()
+	UGHMovementModeBase* CurrentMovementMode;
+	UPROPERTY()
+	UGHSearchModeBase* CurrentSearchMode;
+
+	// Returns true if the modes are initialized successfully
+	bool InitializeModes();
+	
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true", ClampMin = "1.0"))
 	float MaxDistance;
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true", ClampMin = "0.0"))
@@ -71,20 +96,21 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 	
-
-	bool IsTargetAcquired() const { return bTargetAcquired; }
-	float GetMaxDistance() const { return MaxDistance; }
-	float GetMinDistance() const { return MinDistance; }
-	float GetTotalHookDistance() const { return bIsHooking ? TotalHookDistance : 0.f; }
+	
+	float GetMaxDistance() const;
+	float GetMinDistance() const;
+	float GetTotalHookDistance() const;
+	
 	UFUNCTION(BlueprintCallable)
-	float GetElapsedTime() const { return ElapsedTime; }
+	float GetElapsedTime() const;
 	UFUNCTION(BlueprintCallable)
-	float GetStartDelay() const { return StartDelay; }
+	float GetStartDelay() const;
 	UFUNCTION(BlueprintCallable)
-	FVector GetStartLocation() const { return bIsHooking ? StartHookLocation : FVector::ZeroVector; }
-	FVector GetLandingPointLocation() const { return bIsHooking ? EndHookLocation : FVector::ZeroVector; }
+	FVector GetStartLocation() const;
 	UFUNCTION(BlueprintCallable)
-	FVector GetStartDirection() const { return bIsHooking ? StartHookDirection : FVector::ZeroVector; }
+	FVector GetLandingPointLocation() const;
+	UFUNCTION(BlueprintCallable)
+	FVector GetStartDirection() const;
 	UFUNCTION(BlueprintCallable)
 	FVector GetTargetGrabPointLocation() const { return bTargetAcquired ? TargetGrabPoint->GetLocation() : FVector::ZeroVector; }
 
