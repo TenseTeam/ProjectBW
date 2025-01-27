@@ -6,6 +6,7 @@
 #include "Features/Gameplay/ResourceAttributeSystem/Components/ResourceAttributeManager.h"
 #include "Features/Gameplay/WeaponSystem/Shooter/Shooter.h"
 #include "IA/EnemyBase/EnemyBase.h"
+#include "IA/Weapons/Ranged/RangedWeapon.h"
 #include "RangedEnemy.generated.h"
 
 UCLASS()
@@ -17,7 +18,7 @@ public:
 
 	ARangedEnemy();
 	
-	virtual void OnEnemyDead_Implementation() override;
+	virtual void OnEnemyDead() override;
 	
 protected:
 
@@ -28,7 +29,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite ,Category = "AI|Ranged")
 	bool bIsAttacking = false;
 	
-	// UPROPERTY(EditDefaultsOnly)
-	// UChildActorComponent* ChildActor;
-	
+	UPROPERTY(EditDefaultsOnly)
+	UChildActorComponent* ChildActor;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI|Ranged")
+	ARangedWeapon* RangedWeapon;
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "AI|Ranged")
+	FName SwordSocketInHand;
 };

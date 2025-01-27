@@ -25,6 +25,8 @@ public:
 	virtual void SetStateAsAttacking(AActor* Actor) override;
 	
 	virtual void SetStateAsInvestigating() override;
+
+	virtual void SetStateAsDead() override;
 	
 protected:
 

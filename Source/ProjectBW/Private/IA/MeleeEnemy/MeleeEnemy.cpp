@@ -28,14 +28,6 @@ void AMeleeEnemy::PostInitProperties()
 	
 }
 
-// void AMeleeEnemy::OnDeadEvent_Implementation()
-// {
-// 	Super::OnDeadEvent_Implementation();
-// 	
-// 	EQS_Manager->CanSearchMeleePoint = false;
-// 	LGDebug::Log("MELEE ENEMY DEAD " + FString::FromInt(static_cast<int32>(CurrentState)), true);
-// }
-
 void AMeleeEnemy::EquipSword(FName SocketName)
 {
 	if (ChildActor && GetMesh())
@@ -56,9 +48,9 @@ void AMeleeEnemy::FinishedAnimation()
 
 }
 
-void AMeleeEnemy::OnEnemyDead_Implementation()
+void AMeleeEnemy::OnEnemyDead()
 {
-	Super::OnEnemyDead_Implementation();
+	Super::OnEnemyDead();
 	EQS_Manager->CanSearchMeleePoint = false;
 	//LGDebug::Log("MELEE ENEMY DEAD " + FString::FromInt(static_cast<int32>(CurrentState)), true);
 }

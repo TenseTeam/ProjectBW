@@ -19,6 +19,11 @@ ABaseEnemyController::ABaseEnemyController()
 void ABaseEnemyController::BeginPlay()
 {
 	EnemyBase = Cast<AEnemyBase>(GetControlledPawn());
+	if (!EnemyBase)
+	{
+		LGDebug::Log("EnemyBase NON INIZIALIZZATA",true);
+		return;
+	}
 	Super::BeginPlay();
 	
 }
@@ -68,6 +73,8 @@ void ABaseEnemyController::SetStateAsPassive()
 	if (EnemyBase)
 	{
 		EnemyBase->SetEnemyState(EEnemyState::Passive);
+		//LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)EEnemyState::Passive).ToString(),true);
+		
 	}
 }
 
@@ -119,6 +126,23 @@ void ABaseEnemyController::SetStateAsInvestigating()
 	}
 }
 
+void ABaseEnemyController::SetStateAsDead()
+{
+	Super::SetStateAsDead();
+	
+	if (UBlackboardComponent* BlackboardComp = GetBlackboardComponent())
+	{
+		BlackboardComp->SetValueAsEnum(TEXT("EnemyState"), uint8(EEnemyState::Dead));
+		LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)EEnemyState::Dead).ToString(),true);
+	}
+	if (EnemyBase)
+	{
+		EnemyBase->SetEnemyState(EEnemyState::Dead);
+		LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)EEnemyState::Dead).ToString(),true);
+	}
+}
+
+
 void ABaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 {
 	Super::HandleSight(Actor, Stimulus);
@@ -128,6 +152,7 @@ void ABaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 	if (Stimulus.WasSuccessfullySensed())
 	{
 		if (Stimulus.Type != UAISense::GetSenseID<UAISense_Sight>())return;
+		if (EnemyBase->GetState() == EEnemyState::Dead)return;
 		if (EnemyBase->GetState() == EEnemyState::Attacking)return;
 		
 		SightActorTeamIndex = GetTeamIndex(Actor);
@@ -147,6 +172,7 @@ void ABaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 	}
 	else
 	{
+		if (EnemyBase->GetState() == EEnemyState::Dead)return;
 		if (EnemyBase->GetState() == EEnemyState::Investigating)return;
 		if (!Actor->Implements<UAITargetInterface>()) return;
 		
@@ -206,6 +232,7 @@ void ABaseEnemyController::HandleDamage(AActor* Actor, FAIStimulus Stimulus)
 	if (Stimulus.WasSuccessfullySensed())
 	{
 		if (Stimulus.Type != UAISense::GetSenseID<UAISense_Damage>())return;
+		if (EnemyBase->GetState() == EEnemyState::Dead)return;
 		if (EnemyBase->GetState() == EEnemyState::Attacking)return;
 		SetStateAsAttacking(Actor);
 	}

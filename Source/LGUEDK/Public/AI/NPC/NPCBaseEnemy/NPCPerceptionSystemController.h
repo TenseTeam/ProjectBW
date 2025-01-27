@@ -57,14 +57,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Damage", meta = (ClampMin = "0.0", UIMin = "0.0", EditCondition = "CanTakeDamage"))
 	float DamageMaxAge = 5.0f;
-
 	
 	FTimerHandle LostSightTimerHandle;
 	
 	FTimerHandle LostHearTimerHandle;
 
 	FTimerHandle LostDamageTimerHandle;
-
 	
 	virtual void BeginPlay() override;
 	

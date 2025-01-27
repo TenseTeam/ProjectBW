@@ -26,8 +26,8 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FDeadEnemy OnDeadEnemy;
 
-	UFUNCTION(BlueprintNativeEvent,BlueprintCallable)
-	void OnEnemyDead();
+	UFUNCTION(BlueprintCallable)
+	virtual void OnEnemyDead();
 
 protected:
 	
@@ -39,5 +39,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI|AttackRequest")
 	UEnemyAttackRequestManager* EnemyAttackRequestManage;
 
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|AttackRequest")
+	int AttackCost;
 };

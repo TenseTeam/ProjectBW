@@ -18,17 +18,20 @@ public:
 	
 	ANPCBaseStateEnemyController();
 		
-	UFUNCTION(Blueprintable,BlueprintCallable, Category = "State")
-	virtual void SetStateAsPassive() {};
+	UFUNCTION(BlueprintCallable, Category = "State")
+	virtual void SetStateAsPassive() ;
 	
-	UFUNCTION(Blueprintable,BlueprintCallable, Category = "State")
-	virtual void SetStateAsPatrolling() {};
+	UFUNCTION(BlueprintCallable, Category = "State")
+	virtual void SetStateAsPatrolling() ;
 
-	UFUNCTION(Blueprintable,BlueprintCallable, Category = "State")
-	virtual void SetStateAsAttacking(AActor* Actor) {};
+	UFUNCTION(BlueprintCallable, Category = "State")
+	virtual void SetStateAsAttacking(AActor* Actor) ;
 
-	UFUNCTION(Blueprintable,BlueprintCallable, Category = "State")
-	virtual void SetStateAsInvestigating() {};
+	UFUNCTION(BlueprintCallable, Category = "State")
+	virtual void SetStateAsInvestigating() ;
+
+	UFUNCTION(BlueprintCallable, Category = "State")
+	virtual void SetStateAsDead() ;
 
 protected:
 	

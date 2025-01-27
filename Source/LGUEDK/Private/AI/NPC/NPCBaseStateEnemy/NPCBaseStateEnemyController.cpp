@@ -13,6 +13,26 @@ ANPCBaseStateEnemyController::ANPCBaseStateEnemyController()
 	
 }
 
+void ANPCBaseStateEnemyController::SetStateAsPassive()
+{
+}
+
+void ANPCBaseStateEnemyController::SetStateAsPatrolling()
+{
+}
+
+void ANPCBaseStateEnemyController::SetStateAsAttacking(AActor* Actor)
+{
+}
+
+void ANPCBaseStateEnemyController::SetStateAsInvestigating()
+{
+}
+
+void ANPCBaseStateEnemyController::SetStateAsDead()
+{
+}
+
 void ANPCBaseStateEnemyController::BeginPlay()
 {
 	Super::BeginPlay();

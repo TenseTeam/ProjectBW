@@ -5,6 +5,7 @@
 
 #include "IA/EnemyBase/ABaseEnemyController.h"
 #include "Kismet/GameplayStatics.h"
+#include "Perception/AIPerceptionComponent.h"
 #include "Utility/LGDebug.h"
 
 
@@ -16,9 +17,15 @@ AEnemyBase::AEnemyBase()
 	EnemyAttackRequestManage->SetTeamIndex(0);
 }
 
-void AEnemyBase::OnEnemyDead_Implementation()
+void AEnemyBase::OnEnemyDead()
 {
 	OnDeadEnemy.Broadcast();
+	ABaseEnemyController* AIController = Cast<ABaseEnemyController>(GetController());
+	if (!AIController)return;
+
+	AIController->SetStateAsDead();
+	AIController->GetBrainComponent()->StopLogic("Dead");
+	
 }
 
 void AEnemyBase::BeginPlay()
