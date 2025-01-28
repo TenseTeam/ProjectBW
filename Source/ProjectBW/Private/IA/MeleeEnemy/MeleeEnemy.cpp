@@ -15,10 +15,8 @@ AMeleeEnemy::AMeleeEnemy()
 
 void AMeleeEnemy::BeginPlay()
 {
-	Super::BeginPlay();
-
 	MeleeWeapon = Cast<AMeleeWeapon>(ChildActor->GetChildActor());
-	
+	Super::BeginPlay();
 }
 
 void AMeleeEnemy::PostInitProperties()

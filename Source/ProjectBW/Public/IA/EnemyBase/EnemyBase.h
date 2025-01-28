@@ -8,6 +8,7 @@
 #include "AI/Interfaces/AITargetInterface.h"
 #include "AI/NPC/NPCBaseStateEnemy/NPCBaseStateEnemy.h"
 #include "Components/TeamComponent/EnemyAttackRequestManager.h"
+#include "Features/Gameplay/ResourceAttributeSystem/HealthAttribute.h"
 #include "Features/Gameplay/ResourceAttributeSystem/Components/ResourceAttributeManager.h"
 #include "EnemyBase.generated.h"
 
@@ -30,15 +31,19 @@ public:
 	virtual void OnEnemyDead();
 
 protected:
+	UFUNCTION()
+	void OnHealthDecreased();
 	
 	virtual void BeginPlay() override;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI|Health")
 	UResourceAttributeManager* ResourceAttributeManager;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI|Health")
+	UHealthAttribute* HealthAttribute;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI|AttackRequest")
 	UEnemyAttackRequestManager* EnemyAttackRequestManage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|AttackRequest")
-	int AttackCost;
+
 };

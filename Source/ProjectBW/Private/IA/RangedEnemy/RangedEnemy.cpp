@@ -25,8 +25,8 @@ void ARangedEnemy::OnEnemyDead()
 
 void ARangedEnemy::BeginPlay()
 {
-	Super::BeginPlay();
 	RangedWeapon = Cast<ARangedWeapon>(ChildActor->GetChildActor());
+	Super::BeginPlay();
 	//LGDebug::Log(FString::FromInt(static_cast<int32>(EnemyType)), true);
 }
 

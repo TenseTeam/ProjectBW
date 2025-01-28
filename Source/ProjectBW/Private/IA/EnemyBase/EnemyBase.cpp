@@ -22,29 +22,36 @@ void AEnemyBase::OnEnemyDead()
 	OnDeadEnemy.Broadcast();
 	ABaseEnemyController* AIController = Cast<ABaseEnemyController>(GetController());
 	if (!AIController)return;
-
-	Execute_ReleaseToken(AttackTarget);
 	
 	AIController->SetStateAsDead();
 	AIController->GetBrainComponent()->StopLogic("Dead");
-	
+
+	USkeletalMeshComponent* MeshComponent = FindComponentByClass<USkeletalMeshComponent>();
+	if (MeshComponent)
+	{
+		MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		MeshComponent->SetSimulatePhysics(true);
+		MeshComponent->SetCollisionProfileName("Ragdoll");
+	}
+
+	LGDebug::Log("DEAD",true);
+}
+
+void AEnemyBase::OnHealthDecreased()
+{
+	LGDebug::Log("Health Decreased",true);
 }
 
 void AEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
-	// MyController = Cast<ABaseEnemyController>(GetAIController());
+
+	ResourceAttributeManager->TryGetAttribute("Health",reinterpret_cast<UResourceAttributeBase*&>(HealthAttribute));
+	
+	HealthAttribute->OnDecreasedAttribute.AddDynamic(this, &AEnemyBase::OnHealthDecreased);
+	HealthAttribute->OnReachedMinValue.AddDynamic(this, &AEnemyBase::OnEnemyDead);
 	
 }
-
-// void AEnemyBase::OnDeadEvent_Implementation()
-// {
-// 	OnDead.Broadcast();
-// 	ANPCBaseStateEnemyController* AIController = Cast<ANPCBaseStateEnemyController>(GetController());
-// 	if (!AIController)return;
-// 	AIController->SetStateAsPassive();
-// 	AIController->GetBrainComponent()->StopLogic("Dead");
-// }
 
 
 
