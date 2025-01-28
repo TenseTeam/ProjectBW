@@ -24,7 +24,7 @@ public:
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AActor> ActorClass;
-	UPROPERTY(Transient)
+	UPROPERTY()
 	TArray<AActor*> AvailableActors;
 	
 public:
@@ -62,7 +62,7 @@ private:
 
 	bool Check() const;
 
-	void SetActorEnabled(AActor* Actor, bool bEnabled) const;
+	void SetActorEnabled(AActor* Actor, bool bIsEnabled) const;
 
 	static void ClearActor(AActor* Actor);
 };

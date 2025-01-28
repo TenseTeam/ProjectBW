@@ -18,7 +18,9 @@ void AProjectileGrenade::Explode()
 {
 	TArray<AActor*> IgnoredActors;
 	IgnoredActors.Add(this);
-	UGameplayStatics::ApplyRadialDamage(GetWorld(), GetDamage(), GetActorLocation(), ExplosionRadius, UDamageType::StaticClass(), IgnoredActors, this, ProjectileInstigator->GetInstigatorController(), bDoFullDamage, ExplosionPreventionChannel);
+
+	AController* InstigatorController = IsValid(ProjectileInstigator) ? ProjectileInstigator->GetInstigatorController() : GetInstigatorController();
+	UGameplayStatics::ApplyRadialDamage(GetWorld(), GetDamage(), GetActorLocation(), ExplosionRadius, UDamageType::StaticClass(), IgnoredActors, this, InstigatorController, bDoFullDamage, ExplosionPreventionChannel);
 	OnExplosion();
 }
 
