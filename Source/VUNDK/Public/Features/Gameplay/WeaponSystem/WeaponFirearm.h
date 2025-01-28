@@ -13,19 +13,17 @@ class VUNDK_API AWeaponFirearm : public AWeaponBase
 {
 	GENERATED_BODY()
 
-public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FWeaponFirearmData FirearmData;
-
 protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FWeaponFirearmData WeaponFirearmData;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UShooter* Shooter;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UShootBarrel* ShootBarrel;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FName ShootBarrelSocketName = "Barrel";
+	FName ShootBarrelSocketName;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	EShootType WeaponShootType;
+	EShootType DefaultShootType;
 
 private:
 	bool bIsAimingDownSight;
@@ -37,6 +35,9 @@ private:
 public:
 	AWeaponFirearm();
 
+#if WITH_EDITOR
+	virtual void OnConstruction(const FTransform& Transform) override;
+#endif
 	virtual void Init(APawn* InOwner, UObject* InPayload = nullptr) override;
 
 	UFUNCTION(BlueprintCallable)
@@ -65,6 +66,36 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetWeaponMaxSpread(const float NewSpread) const;
 
+	UFUNCTION(BlueprintPure)
+	FWeaponFirearmData GetWeaponFirearmData() const;
+	
+	UFUNCTION(BlueprintPure)
+	float GetWeaponFireRate() const;
+
+	UFUNCTION(BlueprintPure)
+	float GetWeaponMagSize() const;
+
+	UFUNCTION(BlueprintPure)
+	float GetWeaponMaxRange() const;
+
+	UFUNCTION(BlueprintPure)
+	float GetWeaponRecoilStrength() const;
+
+	UFUNCTION(BlueprintPure)
+	int32 GetCurrentAmmo() const;
+
+	UFUNCTION(BlueprintPure)
+	int32 GetNeededAmmo() const;
+
+	UFUNCTION(BlueprintPure)
+	EShootType GetWeaponShootType() const;
+
+	UFUNCTION(BlueprintPure)
+	int32 GetWeaponMaxSpread() const;
+
+	UFUNCTION(BlueprintCallable)
+	void ResetToDefaultShootType();
+	
 	UFUNCTION(BlueprintCallable)
 	int32 ReloadWithAmmo(UAmmoTypeData* AmmoData, int32 Ammo);
 	
@@ -84,7 +115,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
+	
 	virtual void EnableAimDownSight();
 
 	virtual void DisableAimDownSight();
@@ -106,5 +137,5 @@ protected:
 private:
 	void SetAimDownSightModifiers();
 	
-	void AttackBarrelToSocket() const;
+	void AttachBarrelToSocket() const;
 };

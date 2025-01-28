@@ -16,6 +16,12 @@ AProjectileBase::AProjectileBase()
 	ProjectileMovementComponent->BounceVelocityStopSimulatingThreshold = 200.f;
 }
 
+void AProjectileBase::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	ProcessProjectileLifeSpan(DeltaSeconds);
+}
+
 void AProjectileBase::Init(AActor* InInstigator, const float InDamage, const float InRange, const float InSpeed, const FVector& InDirection)
 {
 	ProjectileInstigator = InInstigator;
@@ -71,6 +77,15 @@ void AProjectileBase::ClearPooledActor_Implementation()
 	ProjectileMovementComponent->StopMovementImmediately();
 }
 
+void AProjectileBase::OnProjectileHit_Implementation(const FHitResult& ImpactResult, const FVector& ImpactVelocity)
+{
+	ApplyProjectileDamage(ImpactResult.GetActor());
+}
+
+void AProjectileBase::OnProjectileLifeSpanEnd_Implementation()
+{
+}
+
 void AProjectileBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -81,21 +96,6 @@ void AProjectileBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 	ProjectileMovementComponent->OnProjectileBounce.RemoveDynamic(this, &AProjectileBase::OnProjectileHit);
-}
-
-void AProjectileBase::Tick(float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-	ProcessProjectileLifeSpan(DeltaSeconds);
-}
-
-void AProjectileBase::OnProjectileHit_Implementation(const FHitResult& ImpactResult, const FVector& ImpactVelocity)
-{
-	ApplyProjectileDamage(ImpactResult.GetActor());
-}
-
-void AProjectileBase::OnProjectileLifeSpanEnd_Implementation()
-{
 }
 
 void AProjectileBase::StartProjectileLifeSpan(const float InLifeSpan)

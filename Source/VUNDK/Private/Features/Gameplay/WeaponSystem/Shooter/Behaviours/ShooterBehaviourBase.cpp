@@ -134,6 +134,11 @@ void UShooterBehaviourBase::SetMaxSpread(const float NewMaxSpread)
 	ShootData.MaxSpreadDegree = NewMaxSpread;
 }
 
+void UShooterBehaviourBase::SetShootType(const EShootType NewShootType)
+{
+	ShootData.ShootType = NewShootType;
+}
+
 void UShooterBehaviourBase::SetCurrentAmmo(const int32 NewAmmo)
 {
 	const int32 MagSize = GetMagSize();

@@ -13,9 +13,11 @@ class VUNDK_API AProjectileGrenade : public AProjectileBase
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	bool bDoFullDamage = true;
+	float ExplosionRadius = 500.0f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float TimeToExplosion = 5.0f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip = "if true, damage not scaled based on distance from Origin."))
+	bool bDoFullDamage = true;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TEnumAsByte<ECollisionChannel> ExplosionPreventionChannel = ECC_Visibility;
 
@@ -24,9 +26,6 @@ public:
 
 protected:
 	virtual void InitVelocityAndLifeSpan_Implementation(float InRange, float InSpeed, const FVector& InDirection) override;
-
-	UFUNCTION(BlueprintPure)
-	float GetExplosionRadius() const;
 
 	UFUNCTION(BlueprintCallable)
 	void Explode();

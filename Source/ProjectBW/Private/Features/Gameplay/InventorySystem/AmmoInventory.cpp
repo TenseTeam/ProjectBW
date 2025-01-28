@@ -37,7 +37,7 @@ void UAmmoInventory::LoadAmmoSaveData(const TMap<FGuid, int32>& AmmoSaveData)
 void UAmmoInventory::Init()
 {
 	for (auto& AmmoStack : AmmoMaxStacks)
-		CurrentAmmo.Add(AmmoStack.Key, AmmoStack.Value.InitialSize);
+		CurrentAmmo.Add(AmmoStack.Key, FMath::Clamp(AmmoStack.Value.InitialSize, 0, AmmoStack.Value.MaxStack));
 }
 
 int32 UAmmoInventory::GetAmmoCount(const UAmmoTypeData* AmmoType, int32& OutMaxStack) const

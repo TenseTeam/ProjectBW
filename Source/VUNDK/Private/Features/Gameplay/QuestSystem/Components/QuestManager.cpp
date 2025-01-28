@@ -11,6 +11,13 @@ UQuestManager::UQuestManager(): QuestLogData(nullptr), TrackedQuest(nullptr)
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
+void UQuestManager::BeginPlay()
+{
+	Super::BeginPlay();
+	Init();
+	UQSUtility::Init(this); // Initialize the utility class here, as it needs the QuestManager reference
+}
+
 void UQuestManager::Init()
 {
 	if (!QuestLogData || QuestLogData->QuestEntries.IsEmpty())
@@ -249,13 +256,6 @@ void UQuestManager::LogAllQuests() const
 	}
 }
 #endif
-
-void UQuestManager::BeginPlay()
-{
-	Super::BeginPlay();
-	Init();
-	UQSUtility::Init(this); // Initialize the utility class here, as it needs the QuestManager reference
-}
 
 void UQuestManager::AddQuest(UQuestData* QuestData, const FQuestEntryData QuestEntryData)
 {

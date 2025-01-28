@@ -48,7 +48,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Init(APawn* InOwner, UObject* InPayload = nullptr);
-
+	
+	UFUNCTION(BlueprintCallable)
+	bool WeaponAttack();
+	
 	UFUNCTION(BlueprintCallable)
 	void SetPayload(UObject* InPayload);
 	
@@ -56,10 +59,10 @@ public:
 	virtual void SetWeaponDamage(const float NewDamage);
 
 	UFUNCTION(BlueprintPure)
+	float GetWeaponDamage() const;
+
+	UFUNCTION(BlueprintPure)
 	UObject* GetPayload() const;
-	
-	UFUNCTION(BlueprintCallable)
-	bool WeaponAttack();
 
 	UFUNCTION(BlueprintPure)
 	FWeaponData GetWeaponData() const;
