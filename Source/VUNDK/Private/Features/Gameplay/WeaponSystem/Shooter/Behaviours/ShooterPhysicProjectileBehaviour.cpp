@@ -23,6 +23,16 @@ void UShooterPhysicProjectileBehaviour::SetProjectilesPoolName(const FName InPro
 
 void UShooterPhysicProjectileBehaviour::OnDeployShoot_Implementation(UShootPoint* ShootPoint, const FVector& TargetLocation, const FVector& DirectionToTarget) const
 {
+	SpawnProjectile(ShootPoint, DirectionToTarget);
+}
+
+bool UShooterPhysicProjectileBehaviour::Check() const
+{
+	return Super::Check() && IsValid(ProjectilePool);
+}
+
+void UShooterPhysicProjectileBehaviour::SpawnProjectile(const UShootPoint* ShootPoint, const FVector& DirectionToTarget) const
+{
 	AActor* ActorPrj = ProjectilePool->AcquireActor();
 
 	if (!IsValid(ActorPrj))
@@ -34,9 +44,5 @@ void UShooterPhysicProjectileBehaviour::OnDeployShoot_Implementation(UShootPoint
 	AProjectileBase* Projectile = Cast<AProjectileBase>(ActorPrj);
 	Projectile->SetActorLocation(ShootPoint->GetShootPointLocation());
 	Projectile->Init(Shooter->GetOwner(), GetDamage(), GetMaxRange(), ProjectileSpeed, DirectionToTarget);
-}
-
-bool UShooterPhysicProjectileBehaviour::Check() const
-{
-	return Super::Check() && IsValid(ProjectilePool);
+	OnProjectileSpawned.Broadcast(Projectile);
 }

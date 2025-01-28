@@ -171,7 +171,7 @@ public:
 
 protected:
 	virtual void HandleShoot();
-
+	
 	void ShootFromShootPoint(UShootPoint* ShootPoint) const;
 
 	void ShootSuccess();
