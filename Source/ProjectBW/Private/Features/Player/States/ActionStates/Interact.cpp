@@ -1,7 +1,7 @@
 // Copyright Villains, Inc. All Rights Reserved.
 
 
-#include "Features/Player/States/Interact.h"
+#include "Features/Player/States/ActionStates/Interact.h"
 
 #include "Features/Gameplay/InteractionSystem/Components/InteractableDetectorComponent.h"
 #include "Features/Gameplay/InteractionSystem/Interfaces/Interactable.h"

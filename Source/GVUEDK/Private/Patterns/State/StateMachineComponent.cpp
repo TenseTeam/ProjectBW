@@ -73,7 +73,7 @@ void UStateMachineComponent::ChangeState(const int Index)
 		}
 		if (CurrentState == NewState)
 		{
-			FGvDebug::Warning("State already running");
+			FGvDebug::Warning("State: " + CurrentState->GetName() + " already running");
 			return;
 		}
 		if (States.Num() > Index)

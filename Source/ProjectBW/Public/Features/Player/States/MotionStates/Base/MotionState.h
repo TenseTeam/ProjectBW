@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CharacterState.h"
+#include "Features/Player/States/Base/CharacterState.h"
 #include "MotionState.generated.h"
 
 /**

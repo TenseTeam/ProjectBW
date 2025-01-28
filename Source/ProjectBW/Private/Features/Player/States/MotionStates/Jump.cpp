@@ -1,12 +1,8 @@
 // Copyright Villains, Inc. All Rights Reserved.
 
 
-#include "Features/Player/States/Jump.h"
-
-#include <ThirdParty/ShaderConductor/ShaderConductor/External/DirectXShaderCompiler/include/dxc/DXIL/DxilConstants.h>
-
-#include "Chaos/Deformable/MuscleActivationConstraints.h"
-#include "Features/Player/States/Hook.h"
+#include "Features/Player/States/MotionStates/Jump.h"
+#include "Features/Player/States/MotionStates/Hook.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Utility/FGvDebug.h"
 

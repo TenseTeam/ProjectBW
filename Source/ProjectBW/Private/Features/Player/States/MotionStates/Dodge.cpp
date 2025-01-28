@@ -1,7 +1,7 @@
 // Copyright Villains, Inc. All Rights Reserved.
 
 
-#include "Features/Player/States/Dodge.h"
+#include "Features/Player/States/MotionStates/Dodge.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Utility/FGvDebug.h"

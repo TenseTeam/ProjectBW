@@ -1,7 +1,7 @@
 // Copyright Villains, Inc. All Rights Reserved.
 
 
-#include "Features/Player/States/Walk.h"
+#include "Features/Player/States/MotionStates/Walk.h"
 
 void UWalk::Enter(AActor* Context)
 {

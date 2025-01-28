@@ -1,7 +1,7 @@
 // Copyright Villains, Inc. All Rights Reserved.
 
 
-#include "Features/Player/States/MotionIdle.h"
+#include "Features/Player/States/MotionStates/MotionIdle.h"
 
 void UMotionIdle::Enter(AActor* Context)
 {
