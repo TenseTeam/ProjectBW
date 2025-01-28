@@ -22,6 +22,8 @@ void AEnemyBase::OnEnemyDead()
 	OnDeadEnemy.Broadcast();
 	ABaseEnemyController* AIController = Cast<ABaseEnemyController>(GetController());
 	if (!AIController)return;
+
+	EnemyAttackRequestManage->ReturnAllTokens();
 	
 	AIController->SetStateAsDead();
 	AIController->GetBrainComponent()->StopLogic("Dead");
@@ -34,7 +36,7 @@ void AEnemyBase::OnEnemyDead()
 		MeshComponent->SetCollisionProfileName("Ragdoll");
 	}
 
-	LGDebug::Log("DEAD",true);
+	//LGDebug::Log("DEAD",true);
 }
 
 void AEnemyBase::OnHealthDecreased()

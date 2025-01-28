@@ -17,6 +17,9 @@ public:
 	
 	UEnemyAttackRequestManager();
 
+	UPROPERTY()
+	TMap<AActor*,int> StoredTokens;
+	
 	UFUNCTION(BlueprintPure,BlueprintCallable)
 	int GetTeamIndex() const {return TeamIndex;}
 
@@ -24,10 +27,20 @@ public:
 	bool TryGetToken(int TokenCost);
 	
 	UFUNCTION(BlueprintCallable)
-	void ReleaseToken();
+	void ReleaseToken(int TokenCost);
 
+	UFUNCTION(BlueprintCallable)
+	void StoreToken(AActor* AttackTarget, int TokenCost);
+
+	UFUNCTION(BlueprintCallable)
+	int GetCorrectAttackToken(AActor* AttackTarget);
+
+	UFUNCTION(BlueprintCallable)
+	void ReturnAllTokens();
+	
 	UFUNCTION()
 	void SetTeamIndex(int NewTeamIndex) {TeamIndex = NewTeamIndex;}
+
 	
 protected:
 	virtual void BeginPlay() override;
@@ -37,13 +50,11 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team")
 	int MaxTokens;
-
-	UPROPERTY()
-	int GettedTokens;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team")
+	int CurrentTokens;
 private:
 	
-	UPROPERTY()
-	int CurrentTokens;
+
 
 };

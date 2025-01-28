@@ -188,7 +188,7 @@ void ABaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 			SightMaxAge,
 			false
 		);
-		LGDebug::Log("LOST SIGHT PLAYER", true);
+		//LGDebug::Log("LOST SIGHT PLAYER", true);
 		
 		// ClearFocus(EAIFocusPriority::Gameplay);
 	}		
