@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Base/GHMovementModeBase.h"
-#include "GHMoveToTarget.generated.h"
+#include "GHSelfTowardTarget.generated.h"
 
 /**
  * 
  */
-UCLASS(meta = (DisplayName = "Move To Target"))
-class GVUEDK_API UGHMoveToTarget : public UGHMovementModeBase
+UCLASS(meta = (DisplayName = "Self Toward Target"))
+class GVUEDK_API UGHSelfTowardTarget : public UGHMovementModeBase
 {
 	GENERATED_BODY()
 
 public:
-	UGHMoveToTarget();
+	UGHSelfTowardTarget();
 	
 	virtual void StartHooking() override;
 	virtual void StopHooking() override;

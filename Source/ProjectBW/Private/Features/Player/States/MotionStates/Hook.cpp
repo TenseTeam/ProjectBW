@@ -55,18 +55,18 @@ void UHook::Update(AActor* Context, float deltaTime)
 		ElapsedTime += deltaTime;
 		return;
 	}
-	
-	const float SquaredTotalDistance = PlayerGrapplingHook->GetTotalHookDistance() * PlayerGrapplingHook->GetTotalHookDistance();
-	const float SquaredElapsedDistance = FVector::DistSquared(Character->GetActorLocation(), PlayerGrapplingHook->GetStartLocation());
-	const float NormalizedElapsedDistance = SquaredElapsedDistance / SquaredTotalDistance;
-	if (NormalizedElapsedDistance < HookEndNormalizedDistance)
-	{
-		Character->HookState = EHookState::HookLoop;
-	}
-	else
-	{
-		Character->HookState = EHookState::HookEnd;
-	}
+	Character->HookState = EHookState::HookLoop;
+	// const float SquaredTotalDistance = PlayerGrapplingHook->GetTotalHookDistance() * PlayerGrapplingHook->GetTotalHookDistance();
+	// const float SquaredElapsedDistance = FVector::DistSquared(Character->GetActorLocation(), PlayerGrapplingHook->GetStartLocation());
+	// const float NormalizedElapsedDistance = SquaredElapsedDistance / SquaredTotalDistance;
+	// if (NormalizedElapsedDistance < HookEndNormalizedDistance)
+	// {
+	// 	Character->HookState = EHookState::HookLoop;
+	// }
+	// else
+	// {
+	// 	Character->HookState = EHookState::HookEnd;
+	// }
 }
 
 void UHook::Exit(AActor* Context)
@@ -84,7 +84,7 @@ void UHook::Exit(AActor* Context)
 
 void UHook::HandleInput(AActor* Context, const EInputActionType InputAction, const FInputActionValue& Value)
 {
-	if (bInitialized)
+	if (!bInitialized)
 	{
 		return;
 	}
@@ -113,7 +113,7 @@ void UHook::OnHookFinished()
 
 void UHook::OnHookStarted()
 {
-	HookEndNormalizedDistance = Character->Data->HookEndNormalizedDistance;
+	//HookEndNormalizedDistance = Character->Data->HookEndNormalizedDistance;
 	StartDelay = PlayerGrapplingHook->GetStartDelay();
 	ElapsedTime = 0;
 	Character->SetIsHooking(true);

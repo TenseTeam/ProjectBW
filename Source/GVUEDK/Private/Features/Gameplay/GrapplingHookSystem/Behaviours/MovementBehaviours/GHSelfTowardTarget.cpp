@@ -1,13 +1,13 @@
 // Copyright Villains, Inc. All Rights Reserved.
 
 
-#include "Features/Gameplay/GrapplingHookSystem/Behaviours/MovementBehaviours/GHMoveToTarget.h"
+#include "Features/Gameplay/GrapplingHookSystem/Behaviours/MovementBehaviours/GHSelfTowardTarget.h"
 
 #include "Features/Gameplay/GrapplingHookSystem/Components/GrapplingHookComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-UGHMoveToTarget::UGHMoveToTarget()
+UGHSelfTowardTarget::UGHSelfTowardTarget()
 {
 	bIsHooking = false;
 	bMotionDataCalculated = false;
@@ -23,7 +23,7 @@ UGHMoveToTarget::UGHMoveToTarget()
 	SpeedCurve = nullptr;
 }
 
-void UGHMoveToTarget::StartHooking()
+void UGHSelfTowardTarget::StartHooking()
 {
 	Super::StartHooking();
 	if (!IsTargetAcquired() || bIsHooking)
@@ -41,7 +41,7 @@ void UGHMoveToTarget::StartHooking()
 	GrapplingHookComponent->OnStartHooking.Broadcast();
 }
 
-void UGHMoveToTarget::StopHooking()
+void UGHSelfTowardTarget::StopHooking()
 {
 	Super::StopHooking();
 	GrapplingHookComponent->SetTargetGrabPoint(nullptr);
@@ -51,7 +51,7 @@ void UGHMoveToTarget::StopHooking()
 	GrapplingHookComponent->OnStopHooking.Broadcast();
 }
 
-bool UGHMoveToTarget::TickMode(float DeltaTime)
+bool UGHSelfTowardTarget::TickMode(float DeltaTime)
 {
 	Super::TickMode(DeltaTime);
 	if (bIsHooking)
@@ -83,7 +83,7 @@ bool UGHMoveToTarget::TickMode(float DeltaTime)
 	return false;
 }
 
-void UGHMoveToTarget::PerformMotion(float DeltaTime)
+void UGHSelfTowardTarget::PerformMotion(float DeltaTime)
 {
 	OwnerCharacter->GetCharacterMovement()->Velocity = FVector::ZeroVector;
 	OwnerCharacter->SetActorLocation(OwnerCharacter->GetActorLocation() + StartHookDirection * GetSpeed() * DeltaTime);
@@ -95,7 +95,7 @@ void UGHMoveToTarget::PerformMotion(float DeltaTime)
 	}
 }
 
-void UGHMoveToTarget::OrientRotationToMovement(float DeltaTime)
+void UGHSelfTowardTarget::OrientRotationToMovement(float DeltaTime)
 {
 	FRotator TargetRotation = (GetTargetGrabPoint()->GetLandingPoint() - OwnerCharacter->GetActorLocation()).Rotation();
 	TargetRotation.Pitch = 0.f;
@@ -104,7 +104,7 @@ void UGHMoveToTarget::OrientRotationToMovement(float DeltaTime)
 	OwnerCharacter->SetActorRotation(NewRotation);
 }
 
-bool UGHMoveToTarget::CalculateMotionData()
+bool UGHSelfTowardTarget::CalculateMotionData()
 {
 	// check if there are any obstacles between the player and the target grab point
 	TArray<FHitResult> HitResults;
@@ -126,12 +126,12 @@ bool UGHMoveToTarget::CalculateMotionData()
 	return true;
 }
 
-float UGHMoveToTarget::GetElapsedNormalizedDistance()
+float UGHSelfTowardTarget::GetElapsedNormalizedDistance()
 {
 	return FVector::DistSquared(OwnerCharacter->GetActorLocation(), StartHookLocation) / (TotalHookDistance * TotalHookDistance);
 }
 
-float UGHMoveToTarget::GetSpeed()
+float UGHSelfTowardTarget::GetSpeed()
 {
 	if (!IsValid(SpeedCurve))
 	{
