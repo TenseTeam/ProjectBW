@@ -8,7 +8,8 @@
 #include "Utility/LGDebug.h"
 
 
-ANPCBaseStateEnemyController::ANPCBaseStateEnemyController()
+ANPCBaseStateEnemyController::ANPCBaseStateEnemyController(const FObjectInitializer& ObjectInitializer)
+	:Super(ObjectInitializer)
 {
 	
 }

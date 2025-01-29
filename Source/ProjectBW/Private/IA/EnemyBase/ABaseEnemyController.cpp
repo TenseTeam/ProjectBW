@@ -11,7 +11,7 @@
 #include "Components/HealtComponent/HealthBaseComponent.h"
 
 
-ABaseEnemyController::ABaseEnemyController()
+ABaseEnemyController::ABaseEnemyController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	EnemyBase = nullptr;
 }

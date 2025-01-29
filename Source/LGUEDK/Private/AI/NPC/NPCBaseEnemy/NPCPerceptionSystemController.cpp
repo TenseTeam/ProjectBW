@@ -15,7 +15,8 @@
 #include "Utility/LGDebug.h"
 
 
-ANPCPerceptionSystemController::ANPCPerceptionSystemController()
+ANPCPerceptionSystemController::ANPCPerceptionSystemController(const FObjectInitializer& ObjectInitializer)
+	:Super(ObjectInitializer)
 {
 	CanSee = true;
 	CanHear = true;

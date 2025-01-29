@@ -10,13 +10,13 @@
 class ANPCBase;
 
 UCLASS()
-class LGUEDK_API ANPCBaseController : public ADetourCrowdAIController
+class LGUEDK_API ANPCBaseController : public AAIController
 {
 	GENERATED_BODY()
 
 public:
 	
-	 ANPCBaseController();
+	 ANPCBaseController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	UFUNCTION(Blueprintable,BlueprintCallable)
 	ANPCBase* GetControlledPawn() const {return ControlledPawn;}

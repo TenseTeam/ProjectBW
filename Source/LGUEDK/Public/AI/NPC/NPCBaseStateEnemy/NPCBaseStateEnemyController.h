@@ -16,7 +16,7 @@ class LGUEDK_API ANPCBaseStateEnemyController : public ANPCPerceptionSystemContr
 
 public:
 	
-	ANPCBaseStateEnemyController();
+	ANPCBaseStateEnemyController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 		
 	UFUNCTION(BlueprintCallable, Category = "State")
 	virtual void SetStateAsPassive() ;

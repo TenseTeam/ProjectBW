@@ -16,7 +16,7 @@ class PROJECTBW_API ABaseEnemyController : public ANPCBaseStateEnemyController
 
 public:
 
-	ABaseEnemyController();
+	ABaseEnemyController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void SetStateAsPassive() override;
 

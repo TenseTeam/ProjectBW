@@ -21,7 +21,7 @@ class LGUEDK_API ANPCPerceptionSystemController : public ANPCBaseController
 
 public:
 	
-	ANPCPerceptionSystemController();
+	ANPCPerceptionSystemController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 	
