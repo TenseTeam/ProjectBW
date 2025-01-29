@@ -89,11 +89,7 @@ void UBTService_UpdatePlayerDistance::TickNode(UBehaviorTreeComponent& OwnerComp
 	CachedBlackboardComp->SetValueAsVector(PawnPositionKey.SelectedKeyName, PawnPosition);
 	CachedBlackboardComp->SetValueAsFloat(DistanceFromPlayerKey.SelectedKeyName, Distance);
 	
-
-	if (Distance > 2000)
-	{
-		LGDebug::Log("Player is too far", true);
-	}
+	
 	
 	//LGDebug::Log("player position " + CachedAttackTarget->GetActorLocation().ToString(), true);
 	//LGDebug::Log("player position " + CachedSelf->GetName(), true);

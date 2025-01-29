@@ -10,6 +10,8 @@
 ANPCBaseController::ANPCBaseController()
 {
 	ControlledPawn = nullptr;
+	
+	
 }
 
 void ANPCBaseController::OnPossess(APawn* InPawn)
@@ -33,4 +35,7 @@ void ANPCBaseController::BeginPlay()
 {
 	Super::BeginPlay();
 	InitializeBlackboardValues();
+
+	
+	
 }

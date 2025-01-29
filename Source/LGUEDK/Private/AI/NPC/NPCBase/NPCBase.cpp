@@ -8,6 +8,7 @@
 ANPCBase::ANPCBase()
 {
 	Controller = nullptr;
+	
 }
 
 UBehaviorTree* ANPCBase::GetBehaviorTree() const
