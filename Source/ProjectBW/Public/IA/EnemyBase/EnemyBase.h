@@ -12,8 +12,22 @@
 #include "Features/Gameplay/ResourceAttributeSystem/Components/ResourceAttributeManager.h"
 #include "EnemyBase.generated.h"
 
+
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(
-	FDeadEnemy);
+	FStatePassive);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(
+	FStatePatrolling);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(
+	FStateInvestigating);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
+	FStateAttacking , AActor*, Target);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(
+	FStateDead);
 
 UCLASS()
 class PROJECTBW_API AEnemyBase : public ANPCBaseStateEnemy, public IAITargetInterface
@@ -23,12 +37,38 @@ class PROJECTBW_API AEnemyBase : public ANPCBaseStateEnemy, public IAITargetInte
 public:
 	
 	AEnemyBase();
+	
+	UPROPERTY(BlueprintAssignable)
+	FStatePassive OnStatePassive;
 
 	UPROPERTY(BlueprintAssignable)
-	FDeadEnemy OnDeadEnemy;
+	FStatePatrolling OnStatePatrolling;
+
+	UPROPERTY(BlueprintAssignable)
+	FStateInvestigating OnStateInvestigating;
+
+	UPROPERTY(BlueprintAssignable)
+	FStateAttacking OnStateAttacking;
+
+	UPROPERTY(BlueprintAssignable)
+	FStateDead OnStateDead;
 
 	UFUNCTION(BlueprintCallable)
+	virtual void OnEnemyPassive();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void OnEnemyPatrolling();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void OnEnemyInvestigating();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void OnEnemyAttack(AActor* Target);
+	
+	UFUNCTION(BlueprintCallable)
 	virtual void OnEnemyDead();
+
+	
 
 protected:
 	UFUNCTION()

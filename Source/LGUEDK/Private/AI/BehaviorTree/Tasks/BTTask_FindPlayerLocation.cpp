@@ -39,7 +39,8 @@ EBTNodeResult::Type UBTTask_FindPlayerLocation::ExecuteTask(UBehaviorTreeCompone
 					OwnerComp.GetBlackboardComponent()->SetValueAsVector("TargetLocation",location.Location);
 					FinishLatentTask(OwnerComp,EBTNodeResult::Succeeded);
 					return EBTNodeResult::Succeeded;
-				}	
+				}
+				
 			}
 			
 		}

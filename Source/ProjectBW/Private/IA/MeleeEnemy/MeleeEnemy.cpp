@@ -53,3 +53,9 @@ void AMeleeEnemy::OnEnemyDead()
 	//LGDebug::Log("MELEE ENEMY DEAD " + FString::FromInt(static_cast<int32>(CurrentState)), true);
 }
 
+void AMeleeEnemy::OnEnemyPatrolling()
+{
+	Super::OnEnemyPatrolling();
+	EQS_Manager->CanSearchMeleePoint = false;
+}
+

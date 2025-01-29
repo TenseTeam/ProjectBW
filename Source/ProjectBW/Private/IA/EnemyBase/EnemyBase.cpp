@@ -17,9 +17,35 @@ AEnemyBase::AEnemyBase()
 	EnemyAttackRequestManage->SetTeamIndex(0);
 }
 
+void AEnemyBase::OnEnemyPassive()
+{
+	OnStatePassive.Broadcast();
+	SetEnemyState(EEnemyState::Passive);
+}
+
+void AEnemyBase::OnEnemyPatrolling()
+{
+	OnStatePatrolling.Broadcast();
+	SetEnemyState(EEnemyState::Patrolling);
+}
+
+void AEnemyBase::OnEnemyInvestigating()
+{
+	OnStateInvestigating.Broadcast();
+	SetEnemyState(EEnemyState::Investigating);
+}
+
+void AEnemyBase::OnEnemyAttack(AActor* Target)
+{
+	OnStateAttacking.Broadcast(Target);
+	SetEnemyState(EEnemyState::Attacking);
+	SetAttackTarget(Target);
+}
+
 void AEnemyBase::OnEnemyDead()
 {
-	OnDeadEnemy.Broadcast();
+	OnStateDead.Broadcast();
+	
 	ABaseEnemyController* AIController = Cast<ABaseEnemyController>(GetController());
 	if (!AIController)return;
 

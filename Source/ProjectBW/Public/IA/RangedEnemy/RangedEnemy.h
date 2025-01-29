@@ -19,6 +19,8 @@ public:
 	ARangedEnemy();
 	
 	virtual void OnEnemyDead() override;
+
+	virtual void OnEnemyPatrolling() override;
 	
 protected:
 

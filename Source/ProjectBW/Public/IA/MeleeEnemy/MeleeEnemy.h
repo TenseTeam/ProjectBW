@@ -36,6 +36,8 @@ public:
 	void FinishedAnimation();
 
 	virtual void OnEnemyDead() override;
+
+	virtual void OnEnemyPatrolling() override;
 	
 protected:
 	

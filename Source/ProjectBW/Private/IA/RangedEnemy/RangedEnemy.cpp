@@ -22,6 +22,12 @@ void ARangedEnemy::OnEnemyDead()
 	//LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)EEnemyState::Dead).ToString(),true);
 }
 
+void ARangedEnemy::OnEnemyPatrolling()
+{
+	Super::OnEnemyPatrolling();
+	EQS_Manager->CanSearchRengedPoint = false;
+}
+
 
 void ARangedEnemy::BeginPlay()
 {

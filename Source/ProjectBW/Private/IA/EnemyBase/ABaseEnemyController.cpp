@@ -72,7 +72,7 @@ void ABaseEnemyController::SetStateAsPassive()
 
 	if (EnemyBase)
 	{
-		EnemyBase->SetEnemyState(EEnemyState::Passive);
+		EnemyBase->OnEnemyPassive();
 		//LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)EEnemyState::Passive).ToString(),true);
 		
 	}
@@ -90,7 +90,7 @@ void ABaseEnemyController::SetStateAsPatrolling()
 
 	if (EnemyBase)
 	{
-		EnemyBase->SetEnemyState(EEnemyState::Patrolling);
+		EnemyBase->OnEnemyPatrolling();
 	}
 }
 
@@ -106,8 +106,7 @@ void ABaseEnemyController::SetStateAsAttacking(AActor* Actor)
 	
 	if (EnemyBase)
 	{
-		EnemyBase->SetEnemyState(EEnemyState::Attacking);
-		EnemyBase->SetAttackTarget(Actor);
+		EnemyBase->OnEnemyAttack(Actor);
 	}
 	
 }
@@ -122,7 +121,7 @@ void ABaseEnemyController::SetStateAsInvestigating()
 
 	if (EnemyBase)
 	{
-		EnemyBase->SetEnemyState(EEnemyState::Investigating);
+		EnemyBase->OnEnemyInvestigating();
 	}
 }
 
@@ -152,8 +151,6 @@ void ABaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 	if (Stimulus.WasSuccessfullySensed())
 	{
 		if (Stimulus.Type != UAISense::GetSenseID<UAISense_Sight>())return;
-		if (EnemyBase->GetState() == EEnemyState::Dead)return;
-		if (EnemyBase->GetState() == EEnemyState::Attacking)return;
 		
 		SightActorTeamIndex = GetTeamIndex(Actor);
 		MyIndex = GetTeamIndex(EnemyBase);
@@ -165,7 +162,9 @@ void ABaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 		}
 
 		if (SightActorTeamIndex == MyIndex)return;
-			
+		if (EnemyBase->GetState() == EEnemyState::Dead)return;
+		if (EnemyBase->GetState() == EEnemyState::Attacking)return;
+		
 		SetStateAsAttacking(Actor);
 		LGDebug::Log("SEE PLAYER ",true);
 		
@@ -243,6 +242,7 @@ void ABaseEnemyController::OnLostSight()
 {
 	Super::OnLostSight();
 	SetStateAsPatrolling();
+	
 	LGDebug::Log("LOST SIGHT PLAYER", true);
 }
 

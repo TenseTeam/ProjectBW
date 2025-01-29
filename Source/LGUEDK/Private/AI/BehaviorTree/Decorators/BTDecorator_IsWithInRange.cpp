@@ -35,7 +35,7 @@ bool UBTDecorator_IsWithInRange::CalculateRawConditionValue(UBehaviorTreeCompone
 	// LGDebug::Log("MaxRange: " + FString::SanitizeFloat(MaxRange), true);
 	// LGDebug::Log("MinRange: " + FString::SanitizeFloat(MinRange), true);
 	
-	if (DistanceFromPlayer <= MaxRange && DistanceFromPlayer >= MinRange)
+	if (DistanceFromPlayer > MaxRange)
 	{
 		return true; 
 	}
