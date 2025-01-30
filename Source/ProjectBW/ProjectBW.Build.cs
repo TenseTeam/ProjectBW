@@ -17,6 +17,7 @@ public class ProjectBW : ModuleRules
 			"EnhancedInput",
 			"AIModule",
 			"GameplayTasks",
+			"GameplayTags",
 			"UMG",
 			"VUNDK",
 			"GVUEDK",
