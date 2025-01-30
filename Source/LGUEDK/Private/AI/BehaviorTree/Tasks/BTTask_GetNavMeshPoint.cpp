@@ -29,9 +29,42 @@ EBTNodeResult::Type UBTTask_GetNavMeshPoint::ExecuteTask(UBehaviorTreeComponent&
 	
 	AEQS_Manager* EQS_Manager = ControlledPawn->GetEQSManager();
 	if (!EQS_Manager)return EBTNodeResult::Failed;
+
 	
 	EEnemyType EnemyType = ControlledPawn->GetEnemyType();
-	FVector TargetLocation = EQS_Manager->GetPoint(EnemyType);
+	
+	FVector ForwardVector = ControlledPawn->GetActorForwardVector();
+	FVector PawnLocation = ControlledPawn->GetActorLocation();
+
+	FVector TargetLocation;
+	bool bFoundValidPoint = false;
+
+	int MaxAttempts = 10; 
+	int AttemptCount = 0;
+
+	while (!bFoundValidPoint && AttemptCount < MaxAttempts)
+	{
+		AttemptCount++;
+		FVector TestPoint = EQS_Manager->GetPoint(EnemyType); 
+
+		FVector DirectionToPoint = (TestPoint - PawnLocation).GetSafeNormal();
+		float DotProduct = FVector::DotProduct(ForwardVector, DirectionToPoint);
+		
+		if (DotProduct <= 0)
+		{
+			TargetLocation = TestPoint;
+			bFoundValidPoint = true;
+		}
+	}
+	
+	if (!bFoundValidPoint)
+	{
+		FVector TestPoint = EQS_Manager->GetPoint(EnemyType);
+		TargetLocation = TestPoint;
+		UE_LOG(LogTemp, Warning, TEXT("Nessun punto valido trovato dopo %d tentativi"), MaxAttempts);
+	}
+	
+	DrawDebugSphere(GetWorld(), TargetLocation, 50.0f, 12, FColor::Red, false, 2.0f);
 	
 	OwnerComp.GetBlackboardComponent()->SetValueAsVector(TargetLocationKey.SelectedKeyName,TargetLocation);
 

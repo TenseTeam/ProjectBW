@@ -24,6 +24,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(
 	FStateInvestigating);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
+	FStateChasing , AActor*, Target);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
 	FStateAttacking , AActor*, Target);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(
@@ -48,6 +51,9 @@ public:
 	FStateInvestigating OnStateInvestigating;
 
 	UPROPERTY(BlueprintAssignable)
+	FStateAttacking OnStateChasing;
+	
+	UPROPERTY(BlueprintAssignable)
 	FStateAttacking OnStateAttacking;
 
 	UPROPERTY(BlueprintAssignable)
@@ -63,6 +69,9 @@ public:
 	virtual void OnEnemyInvestigating();
 
 	UFUNCTION(BlueprintCallable)
+	virtual void OnEnemyChasing(AActor* Target);
+
+	UFUNCTION(BlueprintCallable)
 	virtual void OnEnemyAttack(AActor* Target);
 	
 	UFUNCTION(BlueprintCallable)
@@ -71,7 +80,8 @@ public:
 	
 
 protected:
-	UFUNCTION()
+	
+	UFUNCTION(Blueprintable,BlueprintNativeEvent)
 	void OnHealthDecreased();
 	
 	virtual void BeginPlay() override;

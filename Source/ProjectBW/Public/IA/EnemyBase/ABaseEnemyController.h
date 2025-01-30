@@ -22,6 +22,8 @@ public:
 
 	virtual void SetStateAsPatrolling() override;
 
+	virtual void SetStateAsChasing(AActor* Actor) override;
+
 	virtual void SetStateAsAttacking(AActor* Actor) override;
 	
 	virtual void SetStateAsInvestigating() override;

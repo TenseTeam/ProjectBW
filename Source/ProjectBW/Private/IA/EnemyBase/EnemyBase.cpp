@@ -35,6 +35,13 @@ void AEnemyBase::OnEnemyInvestigating()
 	SetEnemyState(EEnemyState::Investigating);
 }
 
+void AEnemyBase::OnEnemyChasing(AActor* Target)
+{
+	OnStateChasing.Broadcast(Target);
+	SetEnemyState(EEnemyState::Chasing);
+	SetAttackTarget(Target);
+}
+
 void AEnemyBase::OnEnemyAttack(AActor* Target)
 {
 	OnStateAttacking.Broadcast(Target);
@@ -65,7 +72,7 @@ void AEnemyBase::OnEnemyDead()
 	//LGDebug::Log("DEAD",true);
 }
 
-void AEnemyBase::OnHealthDecreased()
+void AEnemyBase::OnHealthDecreased_Implementation()
 {
 	LGDebug::Log("Health Decreased",true);
 }

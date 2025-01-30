@@ -96,6 +96,22 @@ void ABaseEnemyController::SetStateAsPatrolling()
 	}
 }
 
+void ABaseEnemyController::SetStateAsChasing(AActor* Actor)
+{
+	Super::SetStateAsChasing(Actor);
+	if (UBlackboardComponent* BlackboardComp = GetBlackboardComponent())
+	{
+		BlackboardComp->SetValueAsEnum(TEXT("EnemyState"), uint8(EEnemyState::Chasing));
+		BlackboardComp->SetValueAsObject(TEXT("AttackTarget"),Actor);
+		//LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)EEnemyState::Attacking).ToString(),true);
+	}
+	
+	if (EnemyBase)
+	{
+		EnemyBase->OnEnemyChasing(Actor);
+	}
+}
+
 void ABaseEnemyController::SetStateAsAttacking(AActor* Actor)
 {
 	Super::SetStateAsAttacking(Actor);

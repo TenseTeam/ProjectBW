@@ -22,6 +22,10 @@ void ANPCBaseStateEnemyController::SetStateAsPatrolling()
 {
 }
 
+void ANPCBaseStateEnemyController::SetStateAsChasing(AActor* Actor)
+{
+}
+
 void ANPCBaseStateEnemyController::SetStateAsAttacking(AActor* Actor)
 {
 }

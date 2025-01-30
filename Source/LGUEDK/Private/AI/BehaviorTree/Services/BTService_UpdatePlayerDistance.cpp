@@ -6,6 +6,7 @@
 #include <string>
 
 #include "AIController.h"
+#include "AI/NPC/NPCBaseStateEnemy/NPCBaseStateEnemyController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Utility/LGDebug.h"
 
@@ -89,7 +90,16 @@ void UBTService_UpdatePlayerDistance::TickNode(UBehaviorTreeComponent& OwnerComp
 	CachedBlackboardComp->SetValueAsVector(PawnPositionKey.SelectedKeyName, PawnPosition);
 	CachedBlackboardComp->SetValueAsFloat(DistanceFromPlayerKey.SelectedKeyName, Distance);
 	
-	
+	if(Distance>2000)
+	{
+		ANPCBaseStateEnemyController* AIController = Cast<ANPCBaseStateEnemyController>(CachedSelf->GetInstigatorController());
+		if (AIController)
+		{
+			AIController->SetStateAsChasing(CachedAttackTarget);
+			LGDebug::Log("Chasing", true);
+		}
+	}
+		
 	
 	//LGDebug::Log("player position " + CachedAttackTarget->GetActorLocation().ToString(), true);
 	//LGDebug::Log("player position " + CachedSelf->GetName(), true);

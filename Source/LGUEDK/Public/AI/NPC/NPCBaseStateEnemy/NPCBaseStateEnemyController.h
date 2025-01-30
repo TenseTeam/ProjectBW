@@ -25,6 +25,9 @@ public:
 	virtual void SetStateAsPatrolling() ;
 
 	UFUNCTION(BlueprintCallable, Category = "State")
+	virtual void SetStateAsChasing(AActor* Actor) ;
+	
+	UFUNCTION(BlueprintCallable, Category = "State")
 	virtual void SetStateAsAttacking(AActor* Actor) ;
 
 	UFUNCTION(BlueprintCallable, Category = "State")
