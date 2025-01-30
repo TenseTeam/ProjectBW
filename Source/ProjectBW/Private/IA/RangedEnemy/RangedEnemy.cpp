@@ -25,6 +25,7 @@ void ARangedEnemy::OnEnemyDead()
 void ARangedEnemy::OnEnemyPatrolling()
 {
 	Super::OnEnemyPatrolling();
+	if (EQS_Manager == nullptr)return;
 	EQS_Manager->CanSearchRengedPoint = false;
 }
 

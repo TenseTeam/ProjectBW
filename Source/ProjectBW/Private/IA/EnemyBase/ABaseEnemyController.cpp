@@ -5,6 +5,7 @@
 
 #include <string>
 
+#include "DelayAction.h"
 #include "AI/Interfaces/AITargetInterface.h"
 #include "AI/NPC/NPCBaseStateEnemy/NPCBaseStateEnemy.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -26,6 +27,7 @@ void ABaseEnemyController::BeginPlay()
 	}
 	Super::BeginPlay();
 	
+	SetStateAsPatrolling();
 }
 
 void ABaseEnemyController::OnPossess(APawn* InPawn)

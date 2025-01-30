@@ -56,6 +56,7 @@ void AMeleeEnemy::OnEnemyDead()
 void AMeleeEnemy::OnEnemyPatrolling()
 {
 	Super::OnEnemyPatrolling();
+	if (EQS_Manager == nullptr)return;
 	EQS_Manager->CanSearchMeleePoint = false;
 }
 

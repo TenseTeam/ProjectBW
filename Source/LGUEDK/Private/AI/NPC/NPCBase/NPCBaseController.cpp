@@ -47,10 +47,8 @@ void ANPCBaseController::BeginPlay()
 		{
 			EnemyCrowdFollowing->Initialize();
 			EnemyCrowdFollowing->SetCrowdAvoidanceQuality(ECrowdAvoidanceQuality::High);
-			EnemyCrowdFollowing->SetCrowdCollisionQueryRange(5000.0f);
-			EnemyCrowdFollowing->SetCrowdSeparationWeight(2000.0f);
-			EnemyCrowdFollowing->SetCrowdSeparation(true);
-			EnemyCrowdFollowing->SetCrowdAnticipateTurns(true);
+			EnemyCrowdFollowing->SetCrowdCollisionQueryRange(1000.0f);
+			EnemyCrowdFollowing->SetCrowdSeparationWeight(.5f);
 			EnemyCrowdFollowing->UpdateCrowdAgentParams();
 			
 			LGDebug::Log("aic controller inizializzata",true);
