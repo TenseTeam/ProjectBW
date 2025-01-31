@@ -77,7 +77,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void OnEnemyDead();
 
-	
 
 protected:
 	
@@ -94,6 +93,5 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI|AttackRequest")
 	UEnemyAttackRequestManager* EnemyAttackRequestManage;
-
 
 };

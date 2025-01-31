@@ -9,6 +9,7 @@
 #include "AI/NPC/NPCBaseStateEnemy/NPCBaseStateEnemy.h"
 #include "AI/NPC/NPCBaseStateEnemy/NPCBaseStateEnemyController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 UBTTask_GetNavMeshPoint::UBTTask_GetNavMeshPoint(FObjectInitializer const& ObjectInitializer)
 {
@@ -52,8 +53,11 @@ EBTNodeResult::Type UBTTask_GetNavMeshPoint::ExecuteTask(UBehaviorTreeComponent&
 		
 		if (DotProduct <= 0)
 		{
-			TargetLocation = TestPoint;
-			bFoundValidPoint = true;
+			if (IsPointFree(TestPoint, 250.0f, ControlledPawn)) 
+			{
+				TargetLocation = TestPoint;
+				bFoundValidPoint = true;
+			}
 		}
 	}
 	
@@ -64,10 +68,36 @@ EBTNodeResult::Type UBTTask_GetNavMeshPoint::ExecuteTask(UBehaviorTreeComponent&
 		UE_LOG(LogTemp, Warning, TEXT("Nessun punto valido trovato dopo %d tentativi"), MaxAttempts);
 	}
 	
-	DrawDebugSphere(GetWorld(), TargetLocation, 50.0f, 12, FColor::Red, false, 2.0f);
+	//DrawDebugSphere(GetWorld(), TargetLocation, 50.0f, 12, FColor::Red, false, 2.0f);
 	
 	OwnerComp.GetBlackboardComponent()->SetValueAsVector(TargetLocationKey.SelectedKeyName,TargetLocation);
 
 	FinishLatentTask(OwnerComp,EBTNodeResult::Succeeded);
 	return EBTNodeResult::Succeeded;
+}
+
+
+bool UBTTask_GetNavMeshPoint::IsPointFree(FVector Point, float Radius, AActor* IgnoreActor)
+{
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(IgnoreActor); 
+	QueryParams.AddIgnoredActor(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)); 
+
+	TArray<FHitResult> HitResults;
+	bool bHit = GetWorld()->SweepMultiByChannel(
+		HitResults, 
+		Point, 
+		Point + FVector(0, 0, 10), 
+		FQuat::Identity, 
+		ECC_Pawn, 
+		FCollisionShape::MakeSphere(Radius), 
+		QueryParams
+	);
+
+	bool bPointIsFree = !bHit || HitResults.Num() == 1; 
+
+	FColor SphereColor = bPointIsFree ? FColor::Green : FColor::Red;
+	DrawDebugSphere(GetWorld(), Point, Radius, 12, SphereColor, false, 2.0f);
+
+	return bPointIsFree;
 }

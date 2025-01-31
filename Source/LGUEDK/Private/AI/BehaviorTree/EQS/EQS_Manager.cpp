@@ -40,7 +40,7 @@ void AEQS_Manager::UpdateStrafeMeleePoints()
 	TArray<FVector> MeleePoints;
 	FNavLocation NavLocation;
 	float GridRadius = MaxRadius;
-	float StepSize = 300;
+	float StepSize = 150;
 	int32 GridSize = FMath::CeilToInt(GridRadius / StepSize);
 
 	// for (int32 i = 0; i < NumberOfPoints; i++)
@@ -84,7 +84,7 @@ void AEQS_Manager::UpdateStrafeMeleePoints()
 			12,                // Numero di segmenti
 			FColor::Red,     // Colore della sfera
 			false,             // Persistente nel tempo
-			2.0f               // Durata della sfera
+			UpdateMeleeInterval            // Durata della sfera
 		);
 	}
 	
@@ -146,7 +146,7 @@ void AEQS_Manager::UpdateStrafeRangedPoints()
 			12,                // Numero di segmenti
 			FColor::Green,     // Colore della sfera
 			false,             // Persistente nel tempo
-			2.0f               // Durata della sfera
+			UpdateRangedInterval               // Durata della sfera
 		);
 	}
 	
@@ -225,7 +225,7 @@ FVector AEQS_Manager::GetPoint(EEnemyType EnemyType)
 	switch (EnemyType) {
 	case EEnemyType::Melee:
 		
-		if (Points[EEnemyType::Melee].IsEmpty()) 
+		if (Points[EEnemyType::Melee].Num() <= 0) 
 			UpdateStrafeMeleePoints();
 		
 		PossiblePoints = Points[EEnemyType::Melee];
@@ -234,7 +234,7 @@ FVector AEQS_Manager::GetPoint(EEnemyType EnemyType)
 		break;
 	case EEnemyType::Ranged:
 		
-		if(Points[EEnemyType::Ranged].IsEmpty())
+		if(Points[EEnemyType::Ranged].Num() <= 0)
 			UpdateStrafeRangedPoints();
 		
 		PossiblePoints = Points[EEnemyType::Ranged];

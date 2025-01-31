@@ -22,4 +22,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
 	FBlackboardKeySelector TargetLocationKey;
+
+	bool IsPointFree(FVector Point, float Radius, AActor* IgnoreActor);
 };
