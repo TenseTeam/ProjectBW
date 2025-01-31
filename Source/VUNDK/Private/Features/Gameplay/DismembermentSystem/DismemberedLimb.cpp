@@ -1,7 +1,11 @@
 // Copyright VUNDK, Inc. All Rights Reserved.
 
 #include "Features/Gameplay/DismembermentSystem/DismemberedLimb.h"
+#include "Components/BoxComponent.h"
+#include "Components/SphereComponent.h"
 #include "Features/Gameplay/DismembermentSystem/Dismemberer.h"
+#include "PhysicsEngine/PhysicsAsset.h"
+#include "PhysicsEngine/SkeletalBodySetup.h"
 
 ADismemberedLimb::ADismemberedLimb()
 {
@@ -17,28 +21,13 @@ void ADismemberedLimb::Init(UDismemberer* InDismemberer, const FName BoneName)
 	Dismemberer = InDismemberer;
 	TargetSkelatalMeshComponent = Dismemberer->GetSkeletalMeshComponent();
 	TargetBoneName = BoneName;
-
 	PoseableMesh->SetSkinnedAssetAndUpdate(TargetSkelatalMeshComponent->GetSkeletalMeshAsset());
 
 	IsolateLimb();
 	SetLimbActorLocationAndRotation();
 
-	CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	CapsuleComponent->SetCollisionProfileName(TEXT("Ragdoll"));
-	CapsuleComponent->SetSimulatePhysics(true);
-
-	const FTransform Trans = TargetSkelatalMeshComponent->GetBoneTransform(TargetBoneName, ERelativeTransformSpace::RTS_Component);
-
-
-	// FBodyInstance* BodyInstance = TargetSkelatalMeshComponent->GetBodyInstance(BoneName);
-	// BodyInstance->BodySetup->AggGeom.GetBox(0).GetCenter();
-	// TODO: Add collisions for each type of bone
-
-	const FString Str = Trans.ToHumanReadableString();
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Bone Transform: %s"), *Str));
-
-	// PoseableMesh->SetBoneScaleByName()
-	// const FTransform Trans = PoseableMesh->GetBoneTransformByName(TargetBoneName, EBoneSpaces::Type::WorldSpace);
+	UShapeComponent* ShapeComponent = CreateCollisions();
+	PoseableMesh->AttachToComponent(ShapeComponent, FAttachmentTransformRules::KeepRelativeTransform);
 }
 
 TArray<FName> ADismemberedLimb::GetLimbBoneNames() const
@@ -80,6 +69,77 @@ void ADismemberedLimb::SetLimbActorLocationAndRotation()
 FName ADismemberedLimb::GetRootBoneName() const
 {
 	return PoseableMesh->GetBoneName(0);
+}
+
+UShapeComponent* ADismemberedLimb::CreateCollisions()
+{
+	UShapeComponent* AttachComponent = CapsuleComponent;
+	UPhysicsAsset* PhysicsAsset = TargetSkelatalMeshComponent->GetPhysicsAsset();
+
+	if (!IsValid(PhysicsAsset))
+		return AttachComponent;
+
+	for (const USkeletalBodySetup* BodySetup : PhysicsAsset->SkeletalBodySetups)
+	{
+		if (!GetLimbBoneNames().Contains(BodySetup->BoneName))
+			continue;
+
+		const FTransform BoneTransform = TargetSkelatalMeshComponent->GetBoneTransform(BodySetup->BoneName);
+		
+		for (const FKSphereElem& SphereElem : BodySetup->AggGeom.SphereElems)
+		{
+			USphereComponent* SphereCollision = NewObject<USphereComponent>(this);
+			SphereCollision->AttachToComponent(AttachComponent, FAttachmentTransformRules::KeepRelativeTransform);
+		
+			SphereCollision->SetSphereRadius(SphereElem.Radius);
+			// SphereCollision->SetRelativeTransform(SphereElem.GetTransform() * BoneTransform.Inverse());
+			
+			SphereCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+			SphereCollision->SetCollisionProfileName(TEXT("Ragdoll"));
+			SphereCollision->SetHiddenInGame(false);
+			SphereCollision->SetSimulatePhysics(true);
+			SphereCollision->RegisterComponent();
+		
+			AttachComponent = SphereCollision;
+		}
+		
+		for (const FKSphylElem& SphylElem : BodySetup->AggGeom.SphylElems)
+		{
+			UCapsuleComponent* CapsuleCollision = NewObject<UCapsuleComponent>(this);
+			CapsuleCollision->AttachToComponent(AttachComponent, FAttachmentTransformRules::KeepRelativeTransform);
+		
+			CapsuleCollision->SetCapsuleSize(SphylElem.Radius, SphylElem.Length);
+			// CapsuleCollision->SetRelativeTransform(SphylElem.GetTransform() * BoneTransform.Inverse());
+		
+			CapsuleCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+			CapsuleCollision->SetCollisionProfileName(TEXT("Ragdoll"));
+			CapsuleCollision->SetHiddenInGame(false);
+			CapsuleCollision->SetSimulatePhysics(true);
+			CapsuleCollision->RegisterComponent();
+		
+			AttachComponent = CapsuleComponent;
+		}
+		
+		for (const FKSphylElem& SphylElem : BodySetup->AggGeom.SphylElems)
+		{
+			UBoxComponent* BoxCollision = NewObject<UBoxComponent>(this);
+			BoxCollision->AttachToComponent(AttachComponent, FAttachmentTransformRules::KeepRelativeTransform);
+		
+			BoxCollision->SetBoxExtent(FVector(SphylElem.Radius, SphylElem.Radius, SphylElem.Length));
+			// BoxCollision->SetRelativeTransform(SphylElem.GetTransform() * BoneTransform.Inverse());
+			//
+			BoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+			BoxCollision->SetCollisionProfileName(TEXT("Ragdoll"));
+			BoxCollision->SetHiddenInGame(false);
+			BoxCollision->SetSimulatePhysics(true);
+			BoxCollision->RegisterComponent();
+		
+			AttachComponent = BoxCollision;
+		}
+	}
+
+
+	return AttachComponent;
 }
 
 bool ADismemberedLimb::Check() const

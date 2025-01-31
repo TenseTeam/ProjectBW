@@ -43,5 +43,7 @@ private:
 	
 	FName GetRootBoneName() const;
 
+	UShapeComponent* CreateCollisions();
+	
 	bool Check() const;
 };
