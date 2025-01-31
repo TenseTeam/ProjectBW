@@ -21,7 +21,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FSlateBrush AmmoIcon;
 
-	UAmmoTypeData() : AmmoID(FGuid::NewGuid())
+	UAmmoTypeData(): AmmoID(FGuid::NewGuid())
 	{
 	}
 };

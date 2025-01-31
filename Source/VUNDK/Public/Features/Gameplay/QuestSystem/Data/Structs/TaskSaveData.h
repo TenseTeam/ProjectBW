@@ -15,5 +15,8 @@ struct FTaskSaveData
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int32 CurrentAchieveCount;
 
-	FTaskSaveData() = default;
+	FTaskSaveData(): bIsAchieved(false),
+	                 CurrentAchieveCount(0)
+	{
+	}
 };

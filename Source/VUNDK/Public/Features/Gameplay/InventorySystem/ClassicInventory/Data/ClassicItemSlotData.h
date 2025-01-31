@@ -16,6 +16,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int32 SlotQuantity;
 
+ 	FClassicItemSlotData(): StackSize(1),
+	                        SlotQuantity(0)
+	{
+	}
+	
 	bool IsMaxStacked() const
 	{
 		return SlotQuantity >= StackSize;
