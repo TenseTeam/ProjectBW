@@ -205,6 +205,13 @@ protected:
 	UFUNCTION(BlueprintNativeEvent)
 	void OnShootFail(const EShootFailReason FailReason);
 
+	/**
+	 * Additional condition to check before shooting.
+	 * @return True if the condition is met, false otherwise.
+	 */
+	UFUNCTION(BlueprintNativeEvent)
+	bool OnShootCondition(UShootBarrel* OutShootBarrel) const;
+
 	UFUNCTION(BlueprintNativeEvent)
 	void OnRefill();
 

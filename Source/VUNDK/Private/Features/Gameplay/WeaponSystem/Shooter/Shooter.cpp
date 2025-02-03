@@ -29,6 +29,11 @@ bool UShooter::Shoot() const
 	return ShooterBehaviour->Shoot();
 }
 
+void UShooter::ResetCooldown() const
+{
+	ShooterBehaviour->ResetCooldown();
+}
+
 void UShooter::ResetRecoil() const
 {
 	ShooterBehaviour->ResetRecoil();

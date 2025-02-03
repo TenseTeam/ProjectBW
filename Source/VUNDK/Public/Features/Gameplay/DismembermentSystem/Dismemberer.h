@@ -34,7 +34,7 @@ public:
 	USkeletalMeshComponent* GetSkeletalMeshComponent() const;
 
 	TArray<FName> GetDismemberedBones() const;
-	
+
 protected:
 	virtual void BeginPlay() override;
 

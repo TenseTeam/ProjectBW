@@ -37,6 +37,9 @@ public:
 	bool Shoot() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
+	void ResetCooldown() const;
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure = false)
 	void ResetRecoil() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
