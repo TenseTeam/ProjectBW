@@ -169,16 +169,18 @@ void ABaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 	if (Stimulus.WasSuccessfullySensed())
 	{
 		if (Stimulus.Type != UAISense::GetSenseID<UAISense_Sight>())return;
+		if (Actor->Implements<UAITargetInterface>() == false)return;
+		
 		
 		SightActorTeamIndex = GetTeamIndex(Actor);
 		MyIndex = GetTeamIndex(EnemyBase);
-			
+		
 		if (GetWorld()->GetTimerManager().IsTimerActive(LostSightTimerHandle) && SightActorTeamIndex != MyIndex)
 		{
 			GetWorld()->GetTimerManager().ClearTimer(LostSightTimerHandle);
 			//LGDebug::Log("TIMER PERSO ANNULLATO", true);
 		}
-
+		
 		if (SightActorTeamIndex == MyIndex)return;
 		if (EnemyBase->GetState() == EEnemyState::Dead)return;
 		if (EnemyBase->GetState() == EEnemyState::Attacking)return;
@@ -189,14 +191,22 @@ void ABaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 	}
 	else
 	{
-		if (EnemyBase->GetState() == EEnemyState::Dead)return;
-		if (EnemyBase->GetState() == EEnemyState::Investigating)return;
-		if (!Actor->Implements<UAITargetInterface>()) return;
+		if (Actor->Implements<UAITargetInterface>() == false)return;
 		
 		SightActorTeamIndex = GetTeamIndex(Actor);
 		MyIndex = GetTeamIndex(EnemyBase);
 		
 		if (SightActorTeamIndex == MyIndex)return;
+		
+		if (EnemyBase->GetState() == EEnemyState::Attacking)
+		{
+			SetStateAsChasing(Actor);
+			return;
+		}
+		
+		if (EnemyBase->GetState() == EEnemyState::Dead)return;
+		if (EnemyBase->GetState() == EEnemyState::Investigating)return;
+		if (!Actor->Implements<UAITargetInterface>()) return;
 		
 		GetWorld()->GetTimerManager().SetTimer(
 			LostSightTimerHandle,
@@ -217,6 +227,7 @@ void ABaseEnemyController::HandleHear(AActor* Actor, FAIStimulus Stimulus)
 	Super::HandleHear(Actor, Stimulus);
 	if (Stimulus.WasSuccessfullySensed())
 	{
+		if (Actor->Implements<UAITargetInterface>() == false)return;
 		if (Stimulus.Type != UAISense::GetSenseID<UAISense_Hearing>())return;
 		if (EnemyBase->GetState() == EEnemyState::Attacking)return;
 
@@ -249,6 +260,7 @@ void ABaseEnemyController::HandleDamage(AActor* Actor, FAIStimulus Stimulus)
 	if (Stimulus.WasSuccessfullySensed())
 	{
 		if (Stimulus.Type != UAISense::GetSenseID<UAISense_Damage>())return;
+		if (Actor->Implements<UAITargetInterface>() == false)return;
 		if (EnemyBase->GetState() == EEnemyState::Dead)return;
 		if (EnemyBase->GetState() == EEnemyState::Attacking)return;
 		SetStateAsAttacking(Actor);

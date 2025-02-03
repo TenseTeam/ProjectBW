@@ -76,9 +76,6 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	virtual void OnEnemyDead();
-
-	UFUNCTION(BlueprintCallable)
-	void ReturnAttackToken();
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool GetCanAttack(){return bCanAttack;} 

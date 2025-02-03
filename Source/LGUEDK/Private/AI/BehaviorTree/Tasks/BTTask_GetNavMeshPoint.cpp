@@ -32,8 +32,19 @@ EBTNodeResult::Type UBTTask_GetNavMeshPoint::ExecuteTask(UBehaviorTreeComponent&
 
 	
 	EEnemyType EnemyType = ControlledPawn->GetEnemyType();
+	float Margin;
 	
-	FVector ForwardVector = ControlledPawn->GetActorForwardVector();
+	switch (EnemyType) {
+	case EEnemyType::Melee:
+		Margin =  0.3f;
+		break;
+	case EEnemyType::Ranged:
+		Margin = 0;
+		break;
+    default:
+    	Margin =   0;
+	}
+	
 	FVector PawnLocation = ControlledPawn->GetActorLocation();
 	
 	FVector TargetLocation;
@@ -58,7 +69,7 @@ EBTNodeResult::Type UBTTask_GetNavMeshPoint::ExecuteTask(UBehaviorTreeComponent&
 		
 		float DotProduct = FVector::DotProduct(DirectionControlledPawnPlayer, DirectionToPoint);
 		
-		if (DotProduct >= 0.3f)
+		if (DotProduct >= Margin)
 		{
 			if (IsPointFree(TestPoint, 200.0f, ControlledPawn)) 
 			{
