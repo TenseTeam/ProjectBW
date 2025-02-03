@@ -62,7 +62,7 @@ private:
 
 	bool Check() const;
 
-	void SetActorEnabled(AActor* Actor, bool bEnabled) const;
+	void SetActorEnabled(AActor* Actor, bool bIsEnabled) const;
 
 	static void ClearActor(AActor* Actor);
 };

@@ -19,7 +19,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip = "if true, damage not scaled based on distance from Origin."))
 	bool bDoFullDamage = true;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TEnumAsByte<ECollisionChannel> ExplosionPreventionChannel = ECC_Visibility;
+	TEnumAsByte<ECollisionChannel> ExplosionChannel = ECC_Visibility;
 
 public:
 	AProjectileGrenade();

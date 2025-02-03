@@ -1,0 +1,35 @@
+// Copyright Villains, Inc. All Rights Reserved.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "UObject/Object.h"
+#include "GrapplingHookModeBase.generated.h"
+
+class IGrabPoint;
+class UGrapplingHookComponent;
+/**
+ * 
+ */
+UCLASS(Blueprintable, BlueprintType, Abstract, EditInlineNew)
+class GVUEDK_API UGrapplingHookModeBase : public UObject
+{
+	GENERATED_BODY()
+
+public:
+	virtual void Initialize(UGrapplingHookComponent* InGrapplingHookComponent);
+
+	// Returns false if the ticking doesn't need to continue
+	virtual bool TickMode(float DeltaTime) { return false; }
+	virtual void EnterMode(){}
+	virtual void ExitMode(){}
+
+protected:
+	IGrabPoint* GetTargetGrabPoint() const;
+	void SetTargetGrabPoint(IGrabPoint* GrabPoint);
+	bool IsTargetAcquired() const;
+	UPROPERTY()
+	UGrapplingHookComponent* GrapplingHookComponent;
+	UPROPERTY()
+	ACharacter* OwnerCharacter;
+};

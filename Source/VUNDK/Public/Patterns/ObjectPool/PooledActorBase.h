@@ -12,13 +12,13 @@ class VUNDK_API APooledActorBase : public AActor, public IPooledActor
 {
 	GENERATED_BODY()
 
-public:
-	APooledActorBase();
-
 private:
 	UPROPERTY()
 	UActorPool* ActorPool;
 
+public:
+	APooledActorBase();
+	
 protected:
 	virtual void AssignActorPool_Implementation(UActorPool* InActorPool) override;
 

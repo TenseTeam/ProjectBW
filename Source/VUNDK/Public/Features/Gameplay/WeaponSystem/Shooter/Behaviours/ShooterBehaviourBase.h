@@ -97,6 +97,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
 	virtual bool Shoot() override;
 
+	UFUNCTION(BlueprintCallable)
+	void ResetCooldown();
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
 	void ResetRecoil();
 
@@ -171,7 +174,7 @@ public:
 
 protected:
 	virtual void HandleShoot();
-
+	
 	void ShootFromShootPoint(UShootPoint* ShootPoint) const;
 
 	void ShootSuccess();
@@ -242,6 +245,4 @@ private:
 	void ProcessCooldown(float DeltaTime);
 
 	void EndShootCooldown();
-
-	float GenerateSpread() const;
 };

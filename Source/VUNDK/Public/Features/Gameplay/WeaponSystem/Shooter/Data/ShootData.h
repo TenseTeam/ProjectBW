@@ -34,4 +34,15 @@ struct VUNDK_API FShootData
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition = "bHasRecoil", EditConditionHides,
 		ToolTip = "The Y and Z axes define recoil strength per shot (horizontal = shots, vertical = strength), while the X axis controls recoil decay over time."))
 	UCurveVector* RecoilCurve;
+
+	FShootData(): Damage(0),
+	              FireRate(0),
+	              ShootType(),
+	              MaxSpreadDegree(0),
+	              MaxRange(0),
+	              MagSize(0),
+	              bHasRecoil(false),
+	              RecoilCurve(nullptr)
+	{
+	}
 };

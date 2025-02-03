@@ -16,4 +16,9 @@ public:
 	FName WeaponName;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float Damage;
+
+	FWeaponData(): WeaponName(NAME_None),
+	               Damage(0.0f)
+	{
+	}
 };

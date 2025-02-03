@@ -116,7 +116,7 @@ void UActorPool::SpawnInstance()
 		UE_LOG(LogObjectPool, Error, TEXT("ActorPool AddInstance(), Invalid actor."));
 		return;
 	}
-	
+
 	IPooledActor::Execute_AssignActorPool(Actor, this);
 	PushActor(Actor);
 }
@@ -150,7 +150,7 @@ bool UActorPool::Check() const
 	return IsValid(ActorClass);
 }
 
-void UActorPool::SetActorEnabled(AActor* Actor, const bool bEnabled) const
+void UActorPool::SetActorEnabled(AActor* Actor, const bool bIsEnabled) const
 {
 	if (!IsValid(Actor))
 	{
@@ -158,17 +158,18 @@ void UActorPool::SetActorEnabled(AActor* Actor, const bool bEnabled) const
 		return;
 	}
 
-	Actor->SetActorHiddenInGame(!bEnabled);
-	Actor->SetActorEnableCollision(bEnabled);
-	Actor->SetActorTickEnabled(bEnabled);
-
-	if (bEnabled)
+	Actor->SetActorHiddenInGame(!bIsEnabled);
+	Actor->SetActorEnableCollision(bIsEnabled);
+	Actor->SetActorTickEnabled(bIsEnabled);
+	bIsEnabled ? Actor->RegisterAllComponents() : Actor->UnregisterAllComponents();
+	
+	if (bIsEnabled)
 		IPooledActor::Execute_OnPooledActorBeginPlay(Actor);
 	else
 		IPooledActor::Execute_OnPooledActorEndPlay(Actor);
 
 #if WITH_EDITOR
-	const FString ActorEnabled = ActorClass->GetName().Append(bEnabled ? TEXT("_Enabled") : TEXT("_Disabled"));
+	const FString ActorEnabled = ActorClass->GetName().Append(bIsEnabled ? TEXT("_Enabled") : TEXT("_Disabled"));
 	Actor->SetActorLabel(ActorEnabled, false);
 	const FString FolderPathString = "Pools/" + GetFName().ToString();
 	const FName FolderPathName = FName(*FolderPathString);
@@ -183,6 +184,7 @@ void UActorPool::ClearActor(AActor* Actor)
 		UE_LOG(LogObjectPool, Error, TEXT("ActorPool ClearActor(), Invalid actor."));
 		return;
 	}
-	
+
+	Actor->SetActorLocationAndRotation(FVector::ZeroVector, FRotator::ZeroRotator);
 	IPooledActor::Execute_ClearPooledActor(Actor);
 }

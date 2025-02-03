@@ -24,4 +24,8 @@ struct FSaveManagerData
 	FAutoSaveData AutoSaveData;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bIsAutoSaveEnabled;
+
+	FSaveManagerData(): bIsAutoSaveEnabled(false)
+	{
+	}
 };

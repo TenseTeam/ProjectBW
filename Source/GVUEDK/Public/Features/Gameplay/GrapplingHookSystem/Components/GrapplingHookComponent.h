@@ -6,6 +6,8 @@
 #include "Features/Gameplay/GrapplingHookSystem/Interfaces/GrabPoint.h"
 #include "GrapplingHookComponent.generated.h"
 
+class UGHSearchModeBase;
+class UGHMovementModeBase;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartHooking);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FHookMotionStarted);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FHooking);
@@ -29,40 +31,21 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FInterruptHooking OnInterruptHooking;
 
-private:
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true", ClampMin = "1.0"))
-	float MaxDistance;
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true", ClampMin = "0.0"))
-	float MinDistance;
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
-	UCurveFloat* SpeedCurve;
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true", ToolTip = "Used only if no SpeedCurve provided"))
-	float LinearSpeed;
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true", ClampMin = "0.0"))
-	float StartDelay;
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
-	bool bOrientRotationToMovement;
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
-	bool bApplyMomentumDuringHookThrow;
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
-	bool bShowDebug;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
+	TArray<UGHMovementModeBase*> MovementModes;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
+	TArray<UGHSearchModeBase*> SearchModes;
 
+private:
+	UPROPERTY()
+	UGHMovementModeBase* CurrentMovementMode;
+	UPROPERTY()
+	UGHSearchModeBase* CurrentSearchMode;
 	UPROPERTY()
 	ACharacter* OwnerCharacter;
 	
-	TSet<IGrabPoint*> InRangeGrabPoints;
 	IGrabPoint* TargetGrabPoint;
-	IGrabPoint* LastTargetGrabPoint;
-
-	FVector StartHookLocation;
-	FVector EndHookLocation;
-	FVector StartHookDirection;
-	float TotalHookDistance;
-	float ElapsedTime;
-	
 	bool bTargetAcquired;
-	bool bIsHooking;
-	bool bMotionDataCalculated;
 	bool bInitialized;
 
 public:
@@ -70,42 +53,44 @@ public:
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
-	
-
-	bool IsTargetAcquired() const { return bTargetAcquired; }
-	float GetMaxDistance() const { return MaxDistance; }
-	float GetMinDistance() const { return MinDistance; }
-	float GetTotalHookDistance() const { return bIsHooking ? TotalHookDistance : 0.f; }
-	UFUNCTION(BlueprintCallable)
-	float GetElapsedTime() const { return ElapsedTime; }
-	UFUNCTION(BlueprintCallable)
-	float GetStartDelay() const { return StartDelay; }
-	UFUNCTION(BlueprintCallable)
-	FVector GetStartLocation() const { return bIsHooking ? StartHookLocation : FVector::ZeroVector; }
-	FVector GetLandingPointLocation() const { return bIsHooking ? EndHookLocation : FVector::ZeroVector; }
-	UFUNCTION(BlueprintCallable)
-	FVector GetStartDirection() const { return bIsHooking ? StartHookDirection : FVector::ZeroVector; }
-	UFUNCTION(BlueprintCallable)
-	FVector GetTargetGrabPointLocation() const { return bTargetAcquired ? TargetGrabPoint->GetLocation() : FVector::ZeroVector; }
 
 	UFUNCTION(BlueprintCallable)
 	void StartHooking();
 	UFUNCTION(BlueprintCallable)
 	void StopHooking();
+	
+	UFUNCTION(BlueprintCallable)
+	float GetMaxDistance() const;
+	UFUNCTION(BlueprintCallable)
+	float GetMinDistance() const;
+	UFUNCTION(BlueprintCallable)
+	float GetTotalHookDistance() const;
+	UFUNCTION(BlueprintCallable)
+	float GetElapsedTime() const;
+	UFUNCTION(BlueprintCallable)
+	float GetStartDelay() const;
+	UFUNCTION(BlueprintCallable)
+	FVector GetStartLocation() const;
+	UFUNCTION(BlueprintCallable)
+	FVector GetLandingPointLocation() const;
+	UFUNCTION(BlueprintCallable)
+	FVector GetStartDirection() const;
+	UFUNCTION(BlueprintCallable)
+	FVector GetTargetGrabPointLocation() const { return bTargetAcquired ? TargetGrabPoint->GetLocation() : FVector::ZeroVector; }
+	UFUNCTION(BlueprintCallable)
+	void ChangeMovementMode(int32 ModeIndex);
+	UFUNCTION(BlueprintCallable)
+	void ChangeSearchMode(int32 ModeIndex);
 
-protected:
-	virtual void PerformHooking(float DeltaTime);
-	virtual float GetSpeed() const;
-	virtual FVector GetDirection() const;
+	ACharacter* GetOwnerCharacter() const { return OwnerCharacter; }
+	IGrabPoint* GetTargetGrabPoint() const { return TargetGrabPoint; }
+	void SetTargetGrabPoint(IGrabPoint* GrabPoint) { TargetGrabPoint = GrabPoint; bTargetAcquired = TargetGrabPoint != nullptr; }
+	bool IsTargetAcquired() const { return bTargetAcquired; }
 
 private:
-	bool LookForGrabPoints(TSet<IGrabPoint*>& OutGrabPoints) const;
-	IGrabPoint* GetNearestGrabPoint(TSet<IGrabPoint*>& ValidGrabPoints) const;
-	float GetElapsedNormalizedDistance() const;
-	void OrientRotationToMovement(float DeltaTime) const;
-	// Returns true if the motion data is calculated successfully
-	bool CalculateMotionData();
-	bool PerformSphereTrace(TArray<FHitResult>& HitResults) const;
+	// Returns true if the modes are initialized successfully
+	bool InitializeModes();
+	
 	
 };
 

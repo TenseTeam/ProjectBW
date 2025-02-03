@@ -23,20 +23,26 @@ void UShooterPhysicProjectileBehaviour::SetProjectilesPoolName(const FName InPro
 
 void UShooterPhysicProjectileBehaviour::OnDeployShoot_Implementation(UShootPoint* ShootPoint, const FVector& TargetLocation, const FVector& DirectionToTarget) const
 {
+	SpawnProjectile(ShootPoint, DirectionToTarget);
+}
+
+bool UShooterPhysicProjectileBehaviour::Check() const
+{
+	return Super::Check() && IsValid(ProjectilePool);
+}
+
+void UShooterPhysicProjectileBehaviour::SpawnProjectile(const UShootPoint* ShootPoint, const FVector& DirectionToTarget) const
+{
 	AActor* ActorPrj = ProjectilePool->AcquireActor();
 
 	if (!IsValid(ActorPrj))
 	{
-		UE_LOG(LogShooter, Warning, TEXT("ShooterPhysicProjectileBehaviour::OnDeployShoot_Implementation(), Invalid projectile actor from pool."));
+		UE_LOG(LogShooter, Error, TEXT("ShooterPhysicProjectileBehaviour::OnDeployShoot_Implementation(), Invalid projectile actor from pool."));
 		return;
 	}
 	
 	AProjectileBase* Projectile = Cast<AProjectileBase>(ActorPrj);
 	Projectile->SetActorLocation(ShootPoint->GetShootPointLocation());
 	Projectile->Init(Shooter->GetOwner(), GetDamage(), GetMaxRange(), ProjectileSpeed, DirectionToTarget);
-}
-
-bool UShooterPhysicProjectileBehaviour::Check() const
-{
-	return Super::Check() && IsValid(ProjectilePool);
+	OnProjectileSpawned.Broadcast(Projectile);
 }
