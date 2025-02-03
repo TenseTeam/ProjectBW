@@ -23,6 +23,11 @@ void AWeaponFirearm::Init(APawn* InOwner, UObject* InPayload)
 	Shooter->SetOwner(InOwner);
 }
 
+void AWeaponFirearm::ResetCooldown() const
+{
+	Shooter->ResetCooldown();
+}
+
 void AWeaponFirearm::ResetRecoil() const
 {
 	Shooter->ResetRecoil();

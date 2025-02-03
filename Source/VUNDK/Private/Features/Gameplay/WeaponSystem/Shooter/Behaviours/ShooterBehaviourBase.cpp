@@ -70,6 +70,12 @@ bool UShooterBehaviourBase::Shoot()
 		return false;
 	}
 
+	if (!OnShootCondition(ShootBarrel))
+	{
+		ShootFail(EShootFailReason::Condition);
+		return false;
+	}
+
 	HandleShoot();
 	ShootSuccess();
 	return true;
@@ -77,8 +83,8 @@ bool UShooterBehaviourBase::Shoot()
 
 void UShooterBehaviourBase::ResetCooldown()
 {
-    CooldownRemaining = 0.0f;
-    bIsInCooldown = false;
+	CooldownRemaining = 0.0f;
+	bIsInCooldown = false;
 }
 
 void UShooterBehaviourBase::ResetRecoil()
@@ -317,6 +323,11 @@ FVector UShooterBehaviourBase::GetShooterTargetLocation_Implementation() const
 
 void UShooterBehaviourBase::OnShootSuccess_Implementation(const UShootBarrel* OutShootBarrel)
 {
+}
+
+bool UShooterBehaviourBase::OnShootCondition_Implementation(UShootBarrel* OutShootBarrel) const
+{
+	return true;
 }
 
 bool UShooterBehaviourBase::TryGetCameraPoints(FVector& OutStartPoint, FVector& OutEndPoint, FVector& OutHitPoint, FRotator& OutRotation, const FVector StartPointOffset) const

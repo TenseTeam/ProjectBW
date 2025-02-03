@@ -7,5 +7,6 @@ enum class EShootFailReason : uint8
 {
 	Error UMETA(DisplayName = "Error"),
 	CoolDown UMETA(DisplayName = "CoolDown"),
-	NoAmmo UMETA(DisplayName = "NoAmmo")
+	NoAmmo UMETA(DisplayName = "NoAmmo"),
+	Condition UMETA(DisplayName = "Condition")
 };
