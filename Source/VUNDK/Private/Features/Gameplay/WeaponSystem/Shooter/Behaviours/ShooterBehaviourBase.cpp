@@ -75,6 +75,12 @@ bool UShooterBehaviourBase::Shoot()
 	return true;
 }
 
+void UShooterBehaviourBase::ResetCooldown()
+{
+    CooldownRemaining = 0.0f;
+    bIsInCooldown = false;
+}
+
 void UShooterBehaviourBase::ResetRecoil()
 {
 	ShotsFired = 0;
@@ -470,5 +476,5 @@ void UShooterBehaviourBase::ProcessCooldown(const float DeltaTime)
 
 void UShooterBehaviourBase::EndShootCooldown()
 {
-	bIsInCooldown = false;
+	ResetCooldown();
 }
