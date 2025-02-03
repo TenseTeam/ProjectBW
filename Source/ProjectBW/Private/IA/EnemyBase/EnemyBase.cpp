@@ -15,6 +15,7 @@ AEnemyBase::AEnemyBase()
 	ResourceAttributeManager = CreateDefaultSubobject<UResourceAttributeManager>(TEXT("ResourceAttributeManager"));
 	EnemyAttackRequestManage = CreateDefaultSubobject<UEnemyAttackRequestManager>(TEXT("EnemyAttackRequestManager"));
 	EnemyAttackRequestManage->SetTeamIndex(0);
+	bCanAttack = true;
 }
 
 void AEnemyBase::OnEnemyPassive()
@@ -27,12 +28,22 @@ void AEnemyBase::OnEnemyPatrolling()
 {
 	OnStatePatrolling.Broadcast();
 	SetEnemyState(EEnemyState::Patrolling);
+	
+	if (AttackTarget)
+	{
+		ReturnAttackToken();
+	}
 }
 
 void AEnemyBase::OnEnemyInvestigating()
 {
 	OnStateInvestigating.Broadcast();
 	SetEnemyState(EEnemyState::Investigating);
+	
+	if (AttackTarget)
+	{
+		ReturnAttackToken();
+	}
 }
 
 void AEnemyBase::OnEnemyChasing(AActor* Target)
@@ -40,6 +51,7 @@ void AEnemyBase::OnEnemyChasing(AActor* Target)
 	OnStateChasing.Broadcast(Target);
 	SetEnemyState(EEnemyState::Chasing);
 	SetAttackTarget(Target);
+	ReturnAttackToken();
 }
 
 void AEnemyBase::OnEnemyAttack(AActor* Target)
@@ -47,6 +59,7 @@ void AEnemyBase::OnEnemyAttack(AActor* Target)
 	OnStateAttacking.Broadcast(Target);
 	SetEnemyState(EEnemyState::Attacking);
 	SetAttackTarget(Target);
+	ReturnAttackToken();
 }
 
 void AEnemyBase::OnEnemyDead()
@@ -70,6 +83,13 @@ void AEnemyBase::OnEnemyDead()
 	}
 
 	//LGDebug::Log("DEAD",true);
+}
+
+void AEnemyBase::ReturnAttackToken()
+{
+	int releaseToken = EnemyAttackRequestManage->GetCorrectAttackToken(AttackTarget);
+	Execute_ReleaseToken(AttackTarget,releaseToken);
+	LGDebug::Log("HO RILASCIATO I TOKEN ",true);
 }
 
 void AEnemyBase::OnHealthDecreased_Implementation()

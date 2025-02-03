@@ -57,7 +57,7 @@ void UBTService_UpdatePlayerDistance::OnBecomeRelevant(UBehaviorTreeComponent& O
 	
 	CachedBlackboardComp->SetValueAsVector(AttackTargetPositionKey.SelectedKeyName, CachedAttackTarget->GetActorLocation());
 	CachedBlackboardComp->SetValueAsVector(PawnPositionKey.SelectedKeyName, CachedSelf->GetActorLocation());
-	
+
 }
 
 void UBTService_UpdatePlayerDistance::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
@@ -86,19 +86,10 @@ void UBTService_UpdatePlayerDistance::TickNode(UBehaviorTreeComponent& OwnerComp
 	FVector PawnPosition = CachedSelf->GetActorLocation();
 	float Distance = FVector::Distance(AttackTargetPosition, PawnPosition);
 	
+	
 	CachedBlackboardComp->SetValueAsVector(AttackTargetPositionKey.SelectedKeyName, AttackTargetPosition);
 	CachedBlackboardComp->SetValueAsVector(PawnPositionKey.SelectedKeyName, PawnPosition);
 	CachedBlackboardComp->SetValueAsFloat(DistanceFromPlayerKey.SelectedKeyName, Distance);
-	
-	if(Distance>2000)
-	{
-		ANPCBaseStateEnemyController* AIController = Cast<ANPCBaseStateEnemyController>(CachedSelf->GetInstigatorController());
-		if (AIController)
-		{
-			AIController->SetStateAsChasing(CachedAttackTarget);
-			LGDebug::Log("Chasing", true);
-		}
-	}
 		
 	
 	//LGDebug::Log("player position " + CachedAttackTarget->GetActorLocation().ToString(), true);

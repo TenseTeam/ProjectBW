@@ -40,7 +40,7 @@ void UEnemyAttackRequestManager::ReleaseToken(int TokenCost)
 	
 	CurrentTokens += TokenCost;
 		
-	LGDebug::Log("TOKEN TORNATO " + CurrentTokens, true);
+	//LGDebug::Log("TOKEN TORNATO " + CurrentTokens, true);
 }
 
 void UEnemyAttackRequestManager::StoreToken(AActor* AttackTarget, int TokenCost)
@@ -54,21 +54,20 @@ void UEnemyAttackRequestManager::StoreToken(AActor* AttackTarget, int TokenCost)
 	StoredTokens.Add(AttackTarget);
 	StoredTokens[AttackTarget] = TokenCost;
 	
-	LGDebug::Log("TOKEN SALVATO " + FString::FromInt(StoredTokens[AttackTarget]), true);
+	//LGDebug::Log("TOKEN SALVATO " + FString::FromInt(StoredTokens[AttackTarget]), true);
 }
 
 int UEnemyAttackRequestManager::GetCorrectAttackToken(AActor* AttackTarget)
 {
-	int Token = -1;
+	int Token = 0;
 	
 	if (!StoredTokens.Contains(AttackTarget))
 		return Token;
 	
-	
 	Token = StoredTokens[AttackTarget];
 	StoredTokens[AttackTarget] = 0;
 	
-	LGDebug::Log("TOKEN RIMOSSO " + FString::FromInt(StoredTokens[AttackTarget]), true);
+	//LGDebug::Log("TOKEN RIMOSSO " + FString::FromInt(StoredTokens[AttackTarget]), true);
 	
 	return Token;
 }
@@ -86,7 +85,7 @@ void UEnemyAttackRequestManager::ReturnAllTokens()
 
 		TargetInterface->ReleaseToken(Token.Value);
 
-		LGDebug::Log("TOKEN RIMOSSO " + FString::FromInt(Token.Value), true);
+		//LGDebug::Log("TOKEN RIMOSSO " + FString::FromInt(Token.Value), true);
 	}
 }
 

@@ -77,7 +77,15 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void OnEnemyDead();
 
+	UFUNCTION(BlueprintCallable)
+	void ReturnAttackToken();
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool GetCanAttack(){return bCanAttack;} 
 
+	UFUNCTION(BlueprintCallable)
+	void SetCanAttack(bool bValue){bCanAttack = bValue;}
+	
 protected:
 	
 	UFUNCTION(Blueprintable,BlueprintNativeEvent)
@@ -93,5 +101,11 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI|AttackRequest")
 	UEnemyAttackRequestManager* EnemyAttackRequestManage;
+
+private:
+	UPROPERTY()
+	bool bCanAttack;
+
+	
 
 };

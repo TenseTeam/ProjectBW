@@ -9,7 +9,6 @@
 #include "AI/NPC/NPCBaseStateEnemy/NPCBaseStateEnemy.h"
 #include "AI/NPC/NPCBaseStateEnemy/NPCBaseStateEnemyController.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "Kismet/GameplayStatics.h"
 
 UBTTask_GetNavMeshPoint::UBTTask_GetNavMeshPoint(FObjectInitializer const& ObjectInitializer)
 {
@@ -36,24 +35,32 @@ EBTNodeResult::Type UBTTask_GetNavMeshPoint::ExecuteTask(UBehaviorTreeComponent&
 	
 	FVector ForwardVector = ControlledPawn->GetActorForwardVector();
 	FVector PawnLocation = ControlledPawn->GetActorLocation();
-
+	
 	FVector TargetLocation;
 	bool bFoundValidPoint = false;
 
 	int MaxAttempts = 10; 
 	int AttemptCount = 0;
 
+	//calcolo direzione tra player e nemico
+	//punto direzione punto e player
+	// dot product tra direzione e punto
+
+	
 	while (!bFoundValidPoint && AttemptCount < MaxAttempts)
 	{
 		AttemptCount++;
-		FVector TestPoint = EQS_Manager->GetPoint(EnemyType); 
-
-		FVector DirectionToPoint = (TestPoint - PawnLocation).GetSafeNormal();
-		float DotProduct = FVector::DotProduct(ForwardVector, DirectionToPoint);
+		FVector TestPoint = EQS_Manager->GetPoint(EnemyType);
 		
-		if (DotProduct <= 0)
+		FVector PlayerPosition = (ControlledPawn->GetAttackTarget()->GetActorLocation());
+		FVector DirectionControlledPawnPlayer = (PawnLocation - PlayerPosition).GetSafeNormal();
+		FVector DirectionToPoint = (TestPoint - PlayerPosition).GetSafeNormal();
+		
+		float DotProduct = FVector::DotProduct(DirectionControlledPawnPlayer, DirectionToPoint);
+		
+		if (DotProduct >= 0.3f)
 		{
-			if (IsPointFree(TestPoint, 250.0f, ControlledPawn)) 
+			if (IsPointFree(TestPoint, 200.0f, ControlledPawn)) 
 			{
 				TargetLocation = TestPoint;
 				bFoundValidPoint = true;
@@ -77,11 +84,13 @@ EBTNodeResult::Type UBTTask_GetNavMeshPoint::ExecuteTask(UBehaviorTreeComponent&
 }
 
 
-bool UBTTask_GetNavMeshPoint::IsPointFree(FVector Point, float Radius, AActor* IgnoreActor)
+bool UBTTask_GetNavMeshPoint::IsPointFree(FVector Point, float Radius, ANPCBaseStateEnemy* ControlledPawn)
 {
+	AActor* AttackTarget = ControlledPawn->GetAttackTarget();
+	
 	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(IgnoreActor); 
-	QueryParams.AddIgnoredActor(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)); 
+	QueryParams.AddIgnoredActor(ControlledPawn); 
+	QueryParams.AddIgnoredActor(AttackTarget); 
 
 	TArray<FHitResult> HitResults;
 	bool bHit = GetWorld()->SweepMultiByChannel(
@@ -98,6 +107,7 @@ bool UBTTask_GetNavMeshPoint::IsPointFree(FVector Point, float Radius, AActor* I
 
 	FColor SphereColor = bPointIsFree ? FColor::Green : FColor::Red;
 	DrawDebugSphere(GetWorld(), Point, Radius, 12, SphereColor, false, 2.0f);
+	
 
 	return bPointIsFree;
 }
