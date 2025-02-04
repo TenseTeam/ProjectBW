@@ -1,26 +1,35 @@
 // Copyright VUNDK, Inc. All Rights Reserved.
 
 #include "Features/Gameplay/DismembermentSystem/DismemberedLimb.h"
+
+#include "Components/BoxComponent.h"
 #include "Features/Gameplay/DismembermentSystem/Dismemberer.h"
+#include "PhysicsEngine/PhysicsAsset.h"
+#include "PhysicsEngine/SkeletalBodySetup.h"
+#include "PhysicsEngine/SphereElem.h"
+
+class USkeletalBodySetup;
 
 ADismemberedLimb::ADismemberedLimb()
 {
 	PrimaryActorTick.bCanEverTick = false;
-	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
+	LimbRootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	PoseableMesh = CreateDefaultSubobject<UPoseableMeshComponent>(TEXT("PoseableMesh"));
-	SetRootComponent(BoxComponent);
-	PoseableMesh->SetupAttachment(BoxComponent);
+	SetRootComponent(LimbRootComponent);
 }
 
-void ADismemberedLimb::Init(UDismemberer* InDismemberer, const FName BoneName)
+void ADismemberedLimb::Init(UDismemberer* InDismemberer, const FName BoneName, const FVector Impulse)
 {
 	Dismemberer = InDismemberer;
 	TargetSkelatalMeshComponent = Dismemberer->GetSkeletalMeshComponent();
 	TargetBoneName = BoneName;
 	PoseableMesh->SetSkinnedAssetAndUpdate(TargetSkelatalMeshComponent->GetSkeletalMeshAsset());
-
+	SetActorLabel(TargetBoneName.ToString());
+	
 	IsolateLimb();
 	SetLimbActorLocationAndRotation();
+	UPrimitiveComponent* CollisionComp = CreateApproximateCollision();
+	CollisionComp->AddImpulse(Impulse, TargetBoneName);
 }
 
 TArray<FName> ADismemberedLimb::GetLimbBoneNames() const
@@ -50,10 +59,6 @@ void ADismemberedLimb::IsolateLimb()
 
 	for (const FName& BoneName : Dismemberer->GetDismemberedBones())
 		PoseableMesh->HideBoneByName(BoneName, EPhysBodyOp::PBO_Term);
-
-	// Draw poseable mesh bounds
-	// FBoxSphereBounds Bounds = PoseableMesh->CalcBounds(PoseableMesh->GetComponentTransform());
-	// DrawDebugBox(GetWorld(), Bounds.Origin, Bounds.BoxExtent, FColor::Red, false, 5.f, 0, 5.f);
 }
 
 void ADismemberedLimb::SetLimbActorLocationAndRotation()
@@ -67,77 +72,66 @@ FName ADismemberedLimb::GetRootBoneName() const
 {
 	return PoseableMesh->GetBoneName(0);
 }
-//
-// UShapeComponent* ADismemberedLimb::CreateCollisions()
-// {
-// 	// UShapeComponent* AttachComponent = CapsuleComponent;
-// 	// UPhysicsAsset* PhysicsAsset = TargetSkelatalMeshComponent->GetPhysicsAsset();
-// 	//
-// 	// if (!IsValid(PhysicsAsset))
-// 	// 	return AttachComponent;
-// 	//
-// 	// for (const USkeletalBodySetup* BodySetup : PhysicsAsset->SkeletalBodySetups)
-// 	// {
-// 	// 	if (!GetLimbBoneNames().Contains(BodySetup->BoneName))
-// 	// 		continue;
-// 	//
-// 	// 	const FTransform BoneTransform = TargetSkelatalMeshComponent->GetBoneTransform(BodySetup->BoneName);
-// 	// 	
-// 	// 	for (const FKSphereElem& SphereElem : BodySetup->AggGeom.SphereElems)
-// 	// 	{
-// 	// 		USphereComponent* SphereCollision = NewObject<USphereComponent>(this);
-// 	// 		SphereCollision->AttachToComponent(AttachComponent, FAttachmentTransformRules::KeepRelativeTransform);
-// 	// 	
-// 	// 		SphereCollision->SetSphereRadius(SphereElem.Radius);
-// 	// 		// SphereCollision->SetRelativeTransform(SphereElem.GetTransform() * BoneTransform.Inverse());
-// 	// 		
-// 	// 		SphereCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-// 	// 		SphereCollision->SetCollisionProfileName(TEXT("Ragdoll"));
-// 	// 		SphereCollision->SetHiddenInGame(false);
-// 	// 		SphereCollision->SetSimulatePhysics(true);
-// 	// 		SphereCollision->RegisterComponent();
-// 	// 	
-// 	// 		AttachComponent = SphereCollision;
-// 	// 	}
-// 	// 	
-// 	// 	for (const FKSphylElem& SphylElem : BodySetup->AggGeom.SphylElems)
-// 	// 	{
-// 	// 		UCapsuleComponent* CapsuleCollision = NewObject<UCapsuleComponent>(this);
-// 	// 		CapsuleCollision->AttachToComponent(AttachComponent, FAttachmentTransformRules::KeepRelativeTransform);
-// 	// 	
-// 	// 		CapsuleCollision->SetCapsuleSize(SphylElem.Radius, SphylElem.Length);
-// 	// 		// CapsuleCollision->SetRelativeTransform(SphylElem.GetTransform() * BoneTransform.Inverse());
-// 	// 	
-// 	// 		CapsuleCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-// 	// 		CapsuleCollision->SetCollisionProfileName(TEXT("Ragdoll"));
-// 	// 		CapsuleCollision->SetHiddenInGame(false);
-// 	// 		CapsuleCollision->SetSimulatePhysics(true);
-// 	// 		CapsuleCollision->RegisterComponent();
-// 	// 	
-// 	// 		AttachComponent = CapsuleComponent;
-// 	// 	}
-// 	// 	
-// 	// 	for (const FKSphylElem& SphylElem : BodySetup->AggGeom.SphylElems)
-// 	// 	{
-// 	// 		UBoxComponent* BoxCollision = NewObject<UBoxComponent>(this);
-// 	// 		BoxCollision->AttachToComponent(AttachComponent, FAttachmentTransformRules::KeepRelativeTransform);
-// 	// 	
-// 	// 		BoxCollision->SetBoxExtent(FVector(SphylElem.Radius, SphylElem.Radius, SphylElem.Length));
-// 	// 		// BoxCollision->SetRelativeTransform(SphylElem.GetTransform() * BoneTransform.Inverse());
-// 	// 		//
-// 	// 		BoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-// 	// 		BoxCollision->SetCollisionProfileName(TEXT("Ragdoll"));
-// 	// 		BoxCollision->SetHiddenInGame(false);
-// 	// 		BoxCollision->SetSimulatePhysics(true);
-// 	// 		BoxCollision->RegisterComponent();
-// 	// 	
-// 	// 		AttachComponent = BoxCollision;
-// 	// 	}
-// 	// }
-// 	//
-//
-// 	// return AttachComponent;
-// }
+
+UPrimitiveComponent* ADismemberedLimb::CreateApproximateCollision()
+{
+	UPhysicsAsset* PhysicsAsset = TargetSkelatalMeshComponent->GetPhysicsAsset();
+	if (!IsValid(PoseableMesh))
+		return nullptr;
+
+	UPrimitiveComponent* PrimitiveComponent = nullptr;
+	for (const USkeletalBodySetup* BodySetup : PhysicsAsset->SkeletalBodySetups)
+	{
+		if (!GetLimbBoneNames().Contains(BodySetup->BoneName))
+			continue;
+
+		if (BodySetup->AggGeom.SphereElems.Num() > 0)
+		{
+			const FKSphereElem& SphereElem = BodySetup->AggGeom.SphereElems[0];
+			UBoxComponent* BoxComponent = NewObject<UBoxComponent>(this, UBoxComponent::StaticClass());
+			BoxComponent->SetBoxExtent(FVector(SphereElem.Radius));
+			PrimitiveComponent = BoxComponent;
+			break;
+		}
+
+		if (BodySetup->AggGeom.SphylElems.Num() > 0)
+		{
+			const FKSphylElem& SphylElem = BodySetup->AggGeom.SphylElems[0];
+			UBoxComponent* BoxComponent = NewObject<UBoxComponent>(this, UBoxComponent::StaticClass());
+			BoxComponent->SetBoxExtent(FVector(SphylElem.Radius, SphylElem.Radius, SphylElem.Length));
+			PrimitiveComponent = BoxComponent;
+			break;
+		}
+
+		if (BodySetup->AggGeom.BoxElems.Num() > 0)
+		{
+			const FKBoxElem& BoxElem = BodySetup->AggGeom.BoxElems[0];
+			UBoxComponent* BoxComponent = NewObject<UBoxComponent>(this, UBoxComponent::StaticClass());
+			BoxComponent->SetBoxExtent(FVector(BoxElem.X, BoxElem.Y, BoxElem.Z));
+			PrimitiveComponent = BoxComponent;
+			break;
+		}
+	}
+
+	if (!IsValid(PrimitiveComponent))
+	{
+		// If no collision primitive was found, create a capsule component
+		UCapsuleComponent* CapsuleComponent = NewObject<UCapsuleComponent>(this, UCapsuleComponent::StaticClass());
+		CapsuleComponent->SetCapsuleSize(10.0f, 20.0f);
+		PrimitiveComponent = CapsuleComponent;
+	}
+
+	PrimitiveComponent->SetupAttachment(RootComponent);
+	PrimitiveComponent->RegisterComponent();
+	AddInstanceComponent(PrimitiveComponent);
+	PrimitiveComponent->Activate();
+	
+	PoseableMesh->AttachToComponent(PrimitiveComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	PrimitiveComponent->SetCollisionProfileName(TEXT("Ragdoll"));
+	PrimitiveComponent->SetSimulatePhysics(true);
+
+	return PrimitiveComponent;
+}
 
 bool ADismemberedLimb::Check() const
 {

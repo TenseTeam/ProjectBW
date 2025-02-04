@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/BoxComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/PoseableMeshComponent.h"
 #include "GameFramework/Actor.h"
 #include "DismemberedLimb.generated.h"
@@ -19,7 +19,7 @@ class VUNDK_API ADismemberedLimb : public AActor
 
 private:
 	UPROPERTY()
-	UBoxComponent* BoxComponent;
+	USceneComponent* LimbRootComponent;
 	UPROPERTY()
 	UPoseableMeshComponent* PoseableMesh;
 	UPROPERTY()
@@ -31,8 +31,8 @@ private:
 	
 public:
 	ADismemberedLimb();
-
-	void Init(UDismemberer* InDismemberer, const FName BoneName);
+	
+	void Init(UDismemberer* InDismemberer, const FName BoneName, const FVector Impulse);
 
 	TArray<FName> GetLimbBoneNames() const;
 	
@@ -43,5 +43,7 @@ private:
 	
 	FName GetRootBoneName() const;
 	
+	UPrimitiveComponent* CreateApproximateCollision();
+
 	bool Check() const;
 };

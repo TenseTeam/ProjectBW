@@ -28,8 +28,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Init(USkeletalMeshComponent* InSkeletalMeshComponent);
 
-	UFUNCTION(BlueprintCallable, BlueprintPure = false)
-	void DismemberLimb(const FName& BoneName);
+	UFUNCTION(BlueprintCallable)
+	void DismemberLimb(const FName& BoneName, const FVector Impulse);
+
+	UFUNCTION(BlueprintCallable)
+	void DismemberRandomLimbs(int32 LimbsCount, const FVector Impulse);
 
 	USkeletalMeshComponent* GetSkeletalMeshComponent() const;
 
@@ -39,7 +42,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	void SpawnDisemberedLimb(FName BoneName);
+	void SpawnDisemberedLimb(FName BoneName, const FVector Impulse);
 
 	bool Check() const;
 };

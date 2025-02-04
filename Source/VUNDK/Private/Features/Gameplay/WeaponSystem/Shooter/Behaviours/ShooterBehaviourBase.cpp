@@ -242,14 +242,12 @@ void UShooterBehaviourBase::HandleShoot()
 	}
 }
 
-void UShooterBehaviourBase::ShootFromShootPoint(UShootPoint* ShootPoint) const
+void UShooterBehaviourBase::DeployShoot(UShootPoint* ShootPoint) const
 {
 	const FVector ShooterTargetLocation = GetShooterTargetLocation();
-	FVector ShootPointDirToTarget = ShooterTargetLocation - ShootPoint->GetShootPointLocation();
-	ShootPointDirToTarget.Normalize();
+	const FVector ShootPointDirToTarget = (ShooterTargetLocation - ShootPoint->GetShootPointLocation()).GetSafeNormal();
 	ShootPoint->GenerateSpreadDegree(GetMaxSpread());
 	OnDeployShoot(ShootPoint, ShooterTargetLocation, ShootPointDirToTarget);
-	OnShootFromShootPoint(ShootPoint, ShooterTargetLocation, ShootPointDirToTarget);
 }
 
 void UShooterBehaviourBase::ShootSuccess()
@@ -293,10 +291,6 @@ void UShooterBehaviourBase::OnBehaviourDisabled_Implementation()
 }
 
 void UShooterBehaviourBase::OnDeployShoot_Implementation(UShootPoint* ShootPoint, const FVector& TargetLocation, const FVector& DirectionToTarget) const
-{
-}
-
-void UShooterBehaviourBase::OnShootFromShootPoint_Implementation(UShootPoint* ShootPoint, const FVector& TargetLocation, const FVector& DirectionToTarget) const
 {
 }
 
@@ -392,7 +386,7 @@ void UShooterBehaviourBase::HandleSimultaneousShoot()
 			continue;
 		}
 
-		ShootFromShootPoint(ShootPoint);
+		DeployShoot(ShootPoint);
 	}
 }
 
@@ -406,7 +400,7 @@ void UShooterBehaviourBase::HandleSequentialShoot()
 		return;
 	}
 
-	ShootFromShootPoint(ShootPoints[CurrentShootPointIndex]);
+	DeployShoot(ShootPoints[CurrentShootPointIndex]);
 }
 
 int32 UShooterBehaviourBase::NextShootPointIndex()
