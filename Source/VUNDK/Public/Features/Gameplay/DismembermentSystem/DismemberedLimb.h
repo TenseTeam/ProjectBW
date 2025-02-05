@@ -3,7 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/CapsuleComponent.h"
+#include "NiagaraDataInterfaceExport.h"
+#include "NiagaraSystem.h"
 #include "Components/PoseableMeshComponent.h"
 #include "GameFramework/Actor.h"
 #include "DismemberedLimb.generated.h"
@@ -13,7 +14,7 @@ class UDismemberer;
 constexpr float BoneScale = 0.00001f;
 
 UCLASS(NotBlueprintable, NotBlueprintType, NotPlaceable)
-class VUNDK_API ADismemberedLimb : public AActor
+class VUNDK_API ADismemberedLimb : public AActor, public INiagaraParticleCallbackHandler
 {
 	GENERATED_BODY()
 
@@ -26,17 +27,23 @@ private:
 	UDismemberer* Dismemberer;
 	UPROPERTY()
 	USkeletalMeshComponent* TargetSkelatalMeshComponent;
+	UPROPERTY()
+	UNiagaraSystem* DismemberLimbFX;
 	FName TargetBoneName;
 	TArray<FName> LimbBoneNames;
 	
 public:
 	ADismemberedLimb();
+
+	virtual void ReceiveParticleData_Implementation(const TArray<FBasicParticleData>& Data, UNiagaraSystem* NiagaraSystem, const FVector& SimulationPositionOffset) override;
 	
-	void Init(UDismemberer* InDismemberer, const FName BoneName, const FVector Impulse);
+	void Init(UDismemberer* InDismemberer, FName BoneName, FVector Impulse, UNiagaraSystem* InDismemberLimbFX);
 
 	TArray<FName> GetLimbBoneNames() const;
 	
 private:
+	void SpawnDismemberFX();
+	
 	void IsolateLimb();
 	
 	void SetLimbActorLocationAndRotation();

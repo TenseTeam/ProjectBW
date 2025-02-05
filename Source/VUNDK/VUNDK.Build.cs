@@ -14,24 +14,17 @@ public class VUNDK : ModuleRules
                 "CoreUObject",
                 "Engine",
                 "InputCore",
-                "EnhancedInput"
+                "EnhancedInput",
+                "Niagara"
             }
         );
         
-        // UI Modules
-        PublicDependencyModuleNames.AddRange(
+        PrivateDependencyModuleNames.AddRange(
             new string[]
             {
                 "Slate",
                 "SlateCore",
-                "UMG"
-            }
-        );
-        
-        // AI Modules
-        PublicDependencyModuleNames.AddRange(
-            new string[]
-            {
+                "UMG",
                 "AIModule"
             }
         );

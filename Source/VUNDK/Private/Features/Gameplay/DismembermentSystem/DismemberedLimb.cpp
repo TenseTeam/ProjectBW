@@ -1,9 +1,13 @@
 // Copyright VUNDK, Inc. All Rights Reserved.
 
 #include "Features/Gameplay/DismembermentSystem/DismemberedLimb.h"
-
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Components/BoxComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Features/Gameplay/DismembermentSystem/Dismemberer.h"
+#include "Features/Gameplay/DismembermentSystem/Utility/DismemberUtility.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "PhysicsEngine/PhysicsAsset.h"
 #include "PhysicsEngine/SkeletalBodySetup.h"
 #include "PhysicsEngine/SphereElem.h"
@@ -18,16 +22,36 @@ ADismemberedLimb::ADismemberedLimb()
 	SetRootComponent(LimbRootComponent);
 }
 
-void ADismemberedLimb::Init(UDismemberer* InDismemberer, const FName BoneName, const FVector Impulse)
+void ADismemberedLimb::ReceiveParticleData_Implementation(const TArray<FBasicParticleData>& Data, UNiagaraSystem* NiagaraSystem, const FVector& SimulationPositionOffset)
+{
+	INiagaraParticleCallbackHandler::ReceiveParticleData_Implementation(Data, NiagaraSystem, SimulationPositionOffset);
+	
+	UDismemberUtility::SpawnBloodDecal(
+		GetWorld(),
+		Dismemberer->GetRandomBloodStainDecal(),
+		Data[0].Position,
+		FVector(FMath::RandRange(Dismemberer->BloodStainMinSize, Dismemberer->BloodStainMaxSize)),
+		Dismemberer->BloodStainDuration,
+		Dismemberer->BloodStainChance
+	);
+}
+
+void ADismemberedLimb::Init(UDismemberer* InDismemberer, const FName BoneName, const FVector Impulse, UNiagaraSystem* InDismemberLimbFX)
 {
 	Dismemberer = InDismemberer;
 	TargetSkelatalMeshComponent = Dismemberer->GetSkeletalMeshComponent();
 	TargetBoneName = BoneName;
+	DismemberLimbFX = InDismemberLimbFX;
+
+	if (!Check())
+		return;
+
 	PoseableMesh->SetSkinnedAssetAndUpdate(TargetSkelatalMeshComponent->GetSkeletalMeshAsset());
 	SetActorLabel(TargetBoneName.ToString());
-	
+
 	IsolateLimb();
 	SetLimbActorLocationAndRotation();
+	SpawnDismemberFX();
 	UPrimitiveComponent* CollisionComp = CreateApproximateCollision();
 	CollisionComp->AddImpulse(Impulse, TargetBoneName);
 }
@@ -35,6 +59,15 @@ void ADismemberedLimb::Init(UDismemberer* InDismemberer, const FName BoneName, c
 TArray<FName> ADismemberedLimb::GetLimbBoneNames() const
 {
 	return LimbBoneNames;
+}
+
+void ADismemberedLimb::SpawnDismemberFX()
+{
+	const FVector BoneLocation = PoseableMesh->GetSocketLocation(TargetBoneName);
+	const FVector PivotLocation = PoseableMesh->GetSocketLocation(Dismemberer->PivotOrientationName);
+	const FVector SprayDirection = (PivotLocation - BoneLocation).GetSafeNormal();
+	UNiagaraComponent* NiagaraComponent = UDismemberUtility::SpawnDismemberFX(DismemberLimbFX, PoseableMesh, TargetBoneName, SprayDirection);
+	NiagaraComponent->SetVariableObject(Dismemberer->NiagaraCallbackName, this);
 }
 
 void ADismemberedLimb::IsolateLimb()
@@ -125,7 +158,7 @@ UPrimitiveComponent* ADismemberedLimb::CreateApproximateCollision()
 	PrimitiveComponent->RegisterComponent();
 	AddInstanceComponent(PrimitiveComponent);
 	PrimitiveComponent->Activate();
-	
+
 	PoseableMesh->AttachToComponent(PrimitiveComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	PrimitiveComponent->SetCollisionProfileName(TEXT("Ragdoll"));
 	PrimitiveComponent->SetSimulatePhysics(true);
@@ -135,5 +168,5 @@ UPrimitiveComponent* ADismemberedLimb::CreateApproximateCollision()
 
 bool ADismemberedLimb::Check() const
 {
-	return IsValid(Dismemberer) && IsValid(TargetSkelatalMeshComponent);
+	return IsValid(Dismemberer) && IsValid(TargetSkelatalMeshComponent) && IsValid(DismemberLimbFX);
 }
