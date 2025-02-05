@@ -31,12 +31,6 @@ void AEnemyBase::OnEnemyPatrolling()
 	
 }
 
-void AEnemyBase::OnEnemyInvestigating()
-{
-	OnStateInvestigating.Broadcast();
-	SetEnemyState(EEnemyState::Investigating);
-}
-
 void AEnemyBase::OnEnemyChasing(AActor* Target)
 {
 	OnStateChasing.Broadcast(Target);
@@ -78,7 +72,7 @@ void AEnemyBase::OnEnemyDead()
 
 void AEnemyBase::OnHealthDecreased_Implementation()
 {
-	LGDebug::Log("Health Decreased",true);
+	//LGDebug::Log("Health Decreased",true);
 }
 
 void AEnemyBase::BeginPlay()

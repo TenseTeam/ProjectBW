@@ -22,12 +22,12 @@ void ANPCBaseController::OnPossess(APawn* InPawn)
 	if (ANPCBase* const EnemyBase = Cast<ANPCBase>(InPawn))
 	{
 		ControlledPawn = EnemyBase;
-		if (UBehaviorTree* const tree = EnemyBase->GetBehaviorTree())
+		if (UBehaviorTree* const Tree = EnemyBase->GetBehaviorTree())
 		{
 			UBlackboardComponent* BlackboardComponent;
-			UseBlackboard(tree->BlackboardAsset,BlackboardComponent);
+			UseBlackboard(Tree->BlackboardAsset,BlackboardComponent);
 			Blackboard = BlackboardComponent;
-			RunBehaviorTree(tree);
+			RunBehaviorTree(Tree);
 			//LGDebug::Log("aic controller inizializzata",true);
 		}
 	}
@@ -38,12 +38,10 @@ void ANPCBaseController::BeginPlay()
 	Super::BeginPlay();
 	InitializeBlackboardValues();
 
-	auto PhatFollowComp = FindComponentByClass<UEnemyCrowdFollowingComponent>();
-	if (PhatFollowComp)
+	if (auto PhatFollowComp = FindComponentByClass<UEnemyCrowdFollowingComponent>())
 	{
 		SetPathFollowingComponent(PhatFollowComp);
-		UEnemyCrowdFollowingComponent* EnemyCrowdFollowing = Cast<UEnemyCrowdFollowingComponent>(PhatFollowComp);
-		if (EnemyCrowdFollowing)
+		if (UEnemyCrowdFollowingComponent* EnemyCrowdFollowing = Cast<UEnemyCrowdFollowingComponent>(PhatFollowComp))
 		{
 			EnemyCrowdFollowing->Initialize();
 			EnemyCrowdFollowing->SetCrowdAvoidanceQuality(ECrowdAvoidanceQuality::High);

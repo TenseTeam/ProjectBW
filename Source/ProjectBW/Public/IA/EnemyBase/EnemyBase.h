@@ -20,9 +20,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(
 	FStatePatrolling);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(
-	FStateInvestigating);
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
 	FStateChasing , AActor*, Target);
 
@@ -48,9 +45,6 @@ public:
 	FStatePatrolling OnStatePatrolling;
 
 	UPROPERTY(BlueprintAssignable)
-	FStateInvestigating OnStateInvestigating;
-
-	UPROPERTY(BlueprintAssignable)
 	FStateAttacking OnStateChasing;
 	
 	UPROPERTY(BlueprintAssignable)
@@ -64,9 +58,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void OnEnemyPatrolling();
-
-	UFUNCTION(BlueprintCallable)
-	virtual void OnEnemyInvestigating();
 
 	UFUNCTION(BlueprintCallable)
 	virtual void OnEnemyChasing(AActor* Target);

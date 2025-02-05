@@ -29,12 +29,12 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "State")
 	virtual void SetStateAsAttacking(AActor* Actor) ;
+	
+	UFUNCTION(BlueprintCallable, Category = "State")
+	virtual void SetStateAsInvestigating();
 
 	UFUNCTION(BlueprintCallable, Category = "State")
-	virtual void SetStateAsInvestigating() ;
-
-	UFUNCTION(BlueprintCallable, Category = "State")
-	virtual void SetStateAsDead() ;
+	virtual void SetStateAsDead();
 
 protected:
 	

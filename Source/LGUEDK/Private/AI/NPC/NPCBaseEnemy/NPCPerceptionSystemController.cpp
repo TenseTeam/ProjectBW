@@ -18,10 +18,6 @@
 ANPCPerceptionSystemController::ANPCPerceptionSystemController(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
 {
-	CanSee = true;
-	CanHear = true;
-	CanTakeDamage = true;
-	SetUpPerceptionSystem();
 	//LGDebug::Log("ANPCPerceptionSystemController COSTRUTTORE",true);
 }
 
@@ -40,6 +36,7 @@ void ANPCPerceptionSystemController::InitializeBlackboardValues()
 {
 	Super::InitializeBlackboardValues();
 }
+
 
 void ANPCPerceptionSystemController::SetUpPerceptionSystem()
 {

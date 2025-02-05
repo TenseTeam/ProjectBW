@@ -10,10 +10,15 @@
 #include "AI/NPC/NPCBaseStateEnemy/NPCBaseStateEnemy.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Components/HealtComponent/HealthBaseComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 
 ABaseEnemyController::ABaseEnemyController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	CanHear = false;
+	CanSee = true;
+	CanTakeDamage = true;
+	SetUpPerceptionSystem();
 	EnemyBase = nullptr;
 }
 
@@ -27,6 +32,7 @@ void ABaseEnemyController::BeginPlay()
 	}
 	Super::BeginPlay();
 	
+	//SetStateAsChasing(UGameplayStatics::GetPlayerCharacter(GetWorld(),0));
 	SetStateAsPatrolling();
 }
 
@@ -49,11 +55,8 @@ void ABaseEnemyController::InitializeBlackboardValues()
 	Blackboard->SetValueAsFloat(TEXT("TimeBeforeNextStep"), EnemyBase->GetTimeBeforeNextStep());
 	Blackboard->SetValueAsVector(TEXT("TargetLocation"), FVector::ZeroVector);
 	Blackboard->SetValueAsObject(TEXT("AttackTarget"), nullptr);
-	Blackboard->SetValueAsFloat(TEXT("TimeBeforeInvestigating"), EnemyBase->GetTimeBeforeInvestigating());
-	Blackboard->SetValueAsFloat(TEXT("RandomInvestigatingTimeDeviation"), EnemyBase->GetRandomInvestigatingTimeDeviation());
 	Blackboard->SetValueAsFloat(TEXT("MaxAttackRadius"), EnemyBase->GetMaxRadius());
 	Blackboard->SetValueAsFloat(TEXT("MinAttackRadius"), EnemyBase->GetMinRadius());
-	Blackboard->SetValueAsFloat(TEXT("StrafeRadius"), EnemyBase->GetStrafeRadius());
 	Blackboard->SetValueAsFloat(TEXT("JumpHeight"), EnemyBase->GetJumpHeight());
 	Blackboard->SetValueAsFloat(TEXT("JumpDistance"), EnemyBase->GetJumpDistance());
 	
@@ -119,7 +122,7 @@ void ABaseEnemyController::SetStateAsAttacking(AActor* Actor)
 	{
 		BlackboardComp->SetValueAsEnum(TEXT("EnemyState"), uint8(EEnemyState::Attacking));
 		BlackboardComp->SetValueAsObject(TEXT("AttackTarget"),Actor);
-		//LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)EEnemyState::Attacking).ToString(),true);
+		LGDebug::Log(*StaticEnum<EEnemyState>()->GetNameByValue((int64)EEnemyState::Attacking).ToString(),true);
 	}
 	
 	if (EnemyBase)
@@ -127,20 +130,6 @@ void ABaseEnemyController::SetStateAsAttacking(AActor* Actor)
 		EnemyBase->OnEnemyAttack(Actor);
 	}
 	
-}
-
-void ABaseEnemyController::SetStateAsInvestigating()
-{
-	Super::SetStateAsInvestigating();
-	if (UBlackboardComponent* BlackboardComp = GetBlackboardComponent())
-	{
-		BlackboardComp->SetValueAsEnum(TEXT("EnemyState"), uint8(EEnemyState::Investigating));
-	}
-
-	if (EnemyBase)
-	{
-		EnemyBase->OnEnemyInvestigating();
-	}
 }
 
 void ABaseEnemyController::SetStateAsDead()
@@ -169,44 +158,36 @@ void ABaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 	if (Stimulus.WasSuccessfullySensed())
 	{
 		if (Stimulus.Type != UAISense::GetSenseID<UAISense_Sight>())return;
-		if (Actor->Implements<UAITargetInterface>() == false)return;
-		
+		if (!Actor->Implements<UAITargetInterface>())return;
 		
 		SightActorTeamIndex = GetTeamIndex(Actor);
 		MyIndex = GetTeamIndex(EnemyBase);
+		if (SightActorTeamIndex == MyIndex)return;
 		
-		if (GetWorld()->GetTimerManager().IsTimerActive(LostSightTimerHandle) && SightActorTeamIndex != MyIndex)
+		if (GetWorld()->GetTimerManager().IsTimerActive(LostSightTimerHandle))
 		{
 			GetWorld()->GetTimerManager().ClearTimer(LostSightTimerHandle);
 			//LGDebug::Log("TIMER PERSO ANNULLATO", true);
 		}
-		
-		if (SightActorTeamIndex == MyIndex)return;
-		if (EnemyBase->GetState() == EEnemyState::Dead)return;
-		if (EnemyBase->GetState() == EEnemyState::Attacking)return;
+
+		if (EnemyBase->GetState() == EEnemyState::Dead) return;
+		if (EnemyBase->GetState() == EEnemyState::Chasing) return;
+		if (EnemyBase->GetState() == EEnemyState::Attacking) return;
 		
 		SetStateAsAttacking(Actor);
-		LGDebug::Log("SEE PLAYER ",true);
-		
 	}
 	else
 	{
-		if (Actor->Implements<UAITargetInterface>() == false)return;
+		if (!Actor->Implements<UAITargetInterface>()) return;
 		
 		SightActorTeamIndex = GetTeamIndex(Actor);
 		MyIndex = GetTeamIndex(EnemyBase);
 		
 		if (SightActorTeamIndex == MyIndex)return;
+
 		
-		if (EnemyBase->GetState() == EEnemyState::Attacking)
-		{
-			SetStateAsChasing(Actor);
-			return;
-		}
-		
-		if (EnemyBase->GetState() == EEnemyState::Dead)return;
-		if (EnemyBase->GetState() == EEnemyState::Investigating)return;
-		if (!Actor->Implements<UAITargetInterface>()) return;
+		if (EnemyBase->GetState() == EEnemyState::Attacking) SetStateAsChasing(Actor);
+		if (EnemyBase->GetState() == EEnemyState::Dead) return;
 		
 		GetWorld()->GetTimerManager().SetTimer(
 			LostSightTimerHandle,
@@ -222,47 +203,18 @@ void ABaseEnemyController::HandleSight(AActor* Actor, FAIStimulus Stimulus)
 	
 }
 
-void ABaseEnemyController::HandleHear(AActor* Actor, FAIStimulus Stimulus)
-{
-	Super::HandleHear(Actor, Stimulus);
-	if (Stimulus.WasSuccessfullySensed())
-	{
-		if (Actor->Implements<UAITargetInterface>() == false)return;
-		if (Stimulus.Type != UAISense::GetSenseID<UAISense_Hearing>())return;
-		if (EnemyBase->GetState() == EEnemyState::Attacking)return;
-
-		///new restart behaviour i prefer use a jolly state -> SetStateAsPassive
-		// if (ControlledPawn->GetState() == EEnemyState::Investigating)
-		// {
-		// 	if (GetAIOwner())
-		// 	{
-		// 		GetAIOwner()->StopLogic("Restarting Behavior Tree");
-		// 		GetAIOwner()->RunBehaviorTree(BehaviorTreeAsset);  
-		// 	}
-		// }
-
-		if (GetBlackboardComponent()->GetValueAsBool("HasBeenInvestigating") == false)
-		{
-			GetBlackboardComponent()->SetValueAsBool("HasBeenInvestigating",true);
-		}
-			
-		GetBlackboardComponent()->SetValueAsVector("TargetLocation",EnemyBase->RandomPosition(Stimulus.StimulusLocation));
-			
-		SetStateAsPassive();
-		SetStateAsInvestigating();
-		LGDebug::Log("HEAR PLAYER ",true);
-	}
-}
-
 void ABaseEnemyController::HandleDamage(AActor* Actor, FAIStimulus Stimulus)
 {
 	Super::HandleDamage(Actor, Stimulus);
 	if (Stimulus.WasSuccessfullySensed())
 	{
 		if (Stimulus.Type != UAISense::GetSenseID<UAISense_Damage>())return;
-		if (Actor->Implements<UAITargetInterface>() == false)return;
-		if (EnemyBase->GetState() == EEnemyState::Dead)return;
-		if (EnemyBase->GetState() == EEnemyState::Attacking)return;
+		if (!Actor->Implements<UAITargetInterface>()) return;
+		
+		if (EnemyBase->GetState() == EEnemyState::Dead) return;
+		if (EnemyBase->GetState() == EEnemyState::Chasing) return;
+		if (EnemyBase->GetState() == EEnemyState::Attacking) return;
+		
 		SetStateAsAttacking(Actor);
 	}
 }
@@ -274,14 +226,6 @@ void ABaseEnemyController::OnLostSight()
 	SetStateAsPatrolling();
 	
 	LGDebug::Log("LOST SIGHT PLAYER", true);
-}
-
-void ABaseEnemyController::OnLostHear()
-{
-	Super::OnLostHear();
-	
-	SetStateAsPatrolling();
-	LGDebug::Log(" LOST HEAR PLAYER ",true);
 }
 
 void ABaseEnemyController::OnLostDamage()

@@ -24,6 +24,7 @@ bool UBTDecorator_CanJumpToElevatedPosition::CalculateRawConditionValue(UBehavio
 	{
 		return false;
 	}
+	
 	AActor* AttackTarget = Cast<AActor>(BlackboardComp->GetValueAsObject(AttackTargetKey.SelectedKeyName));
 	UCharacterMovementComponent* MovementComponent = AttackTarget->FindComponentByClass<UCharacterMovementComponent>();
 	

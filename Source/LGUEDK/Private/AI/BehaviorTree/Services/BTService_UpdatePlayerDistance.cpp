@@ -54,7 +54,8 @@ void UBTService_UpdatePlayerDistance::OnBecomeRelevant(UBehaviorTreeComponent& O
 		LGDebug::Log("Self non trovato", true);
 		return;
 	}
-	
+
+	//LGDebug::Log("CachedAttackTarget " + CachedAttackTarget->GetName(), true);
 	CachedBlackboardComp->SetValueAsVector(AttackTargetPositionKey.SelectedKeyName, CachedAttackTarget->GetActorLocation());
 	CachedBlackboardComp->SetValueAsVector(PawnPositionKey.SelectedKeyName, CachedSelf->GetActorLocation());
 
@@ -90,7 +91,7 @@ void UBTService_UpdatePlayerDistance::TickNode(UBehaviorTreeComponent& OwnerComp
 	CachedBlackboardComp->SetValueAsVector(AttackTargetPositionKey.SelectedKeyName, AttackTargetPosition);
 	CachedBlackboardComp->SetValueAsVector(PawnPositionKey.SelectedKeyName, PawnPosition);
 	CachedBlackboardComp->SetValueAsFloat(DistanceFromPlayerKey.SelectedKeyName, Distance);
-		
+	
 	
 	//LGDebug::Log("player position " + CachedAttackTarget->GetActorLocation().ToString(), true);
 	//LGDebug::Log("player position " + CachedSelf->GetName(), true);

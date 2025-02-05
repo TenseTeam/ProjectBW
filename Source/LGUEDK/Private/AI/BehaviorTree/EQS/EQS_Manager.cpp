@@ -7,6 +7,7 @@
 #include "VectorTypes.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
+#include "Utility/LGDebug.h"
 
 
 // Sets default values
@@ -225,7 +226,7 @@ FVector AEQS_Manager::GetPoint(EEnemyType EnemyType)
 	switch (EnemyType) {
 	case EEnemyType::Melee:
 		
-		if (Points[EEnemyType::Melee].Num() <= 0) 
+		if (Points[EEnemyType::Melee].Num() <= 0)
 			UpdateStrafeMeleePoints();
 		
 		PossiblePoints = Points[EEnemyType::Melee];
