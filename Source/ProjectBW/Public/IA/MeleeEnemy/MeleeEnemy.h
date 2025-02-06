@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Features/Gameplay/GrapplingHookSystem/Interfaces/GrabPoint.h"
 #include "IA/EnemyBase/EnemyBase.h"
 #include "IA/Weapons/Melee/MeleeWeapon.h"
 #include "MeleeEnemy.generated.h"
@@ -12,7 +13,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(
 
 
 UCLASS()
-class PROJECTBW_API AMeleeEnemy : public AEnemyBase
+class PROJECTBW_API AMeleeEnemy : public AEnemyBase, public IGrabPoint
 {
 	GENERATED_BODY()
 

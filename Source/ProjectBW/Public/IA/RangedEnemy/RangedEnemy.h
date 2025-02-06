@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Features/Gameplay/GrapplingHookSystem/Interfaces/GrabPoint.h"
 #include "Features/Gameplay/ResourceAttributeSystem/Components/ResourceAttributeManager.h"
 #include "Features/Gameplay/WeaponSystem/Shooter/Shooter.h"
 #include "IA/EnemyBase/EnemyBase.h"
@@ -10,7 +11,7 @@
 #include "RangedEnemy.generated.h"
 
 UCLASS()
-class PROJECTBW_API ARangedEnemy : public AEnemyBase
+class PROJECTBW_API ARangedEnemy : public AEnemyBase, public IGrabPoint
 {
 	GENERATED_BODY()
 

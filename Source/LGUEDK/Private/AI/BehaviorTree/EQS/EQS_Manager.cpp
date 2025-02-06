@@ -75,19 +75,25 @@ void AEQS_Manager::UpdateStrafeMeleePoints()
 			}
 		}
 	}
-	
-	for (const FVector& Point : MeleePoints)
+
+#if !UE_BUILD_SHIPPING
+	if (bShowDebug)
 	{
-		DrawDebugSphere(
-			GetWorld(), 
-			Point,				// Posizione della sfera
-			50.0f,             // Raggio della sfera
-			12,                // Numero di segmenti
-			FColor::Red,     // Colore della sfera
-			false,             // Persistente nel tempo
-			UpdateMeleeInterval            // Durata della sfera
-		);
+		for (const FVector& Point : MeleePoints)
+		{
+			DrawDebugSphere(
+				GetWorld(), 
+				Point,				// Posizione della sfera
+				50.0f,             // Raggio della sfera
+				12,                // Numero di segmenti
+				FColor::Red,     // Colore della sfera
+				false,             // Persistente nel tempo
+				UpdateMeleeInterval            // Durata della sfera
+			);
+		}
 	}
+	
+#endif
 	
 	Points.Add(EEnemyType::Melee, MeleePoints);
 }
@@ -137,19 +143,25 @@ void AEQS_Manager::UpdateStrafeRangedPoints()
 			}
 		}
 	}
-	
-	for (const FVector& Point : RangedPoints)
+
+#if !UE_BUILD_SHIPPING
+	if (bShowDebug)
 	{
-		DrawDebugSphere(
-			GetWorld(), 
-			Point,				// Posizione della sfera
-			50.0f,             // Raggio della sfera
-			12,                // Numero di segmenti
-			FColor::Green,     // Colore della sfera
-			false,             // Persistente nel tempo
-			UpdateRangedInterval               // Durata della sfera
-		);
+		for (const FVector& Point : RangedPoints)
+		{
+			DrawDebugSphere(
+				GetWorld(), 
+				Point,				// Posizione della sfera
+				50.0f,             // Raggio della sfera
+				12,                // Numero di segmenti
+				FColor::Green,     // Colore della sfera
+				false,             // Persistente nel tempo
+				UpdateRangedInterval               // Durata della sfera
+			);
+		}
 	}
+#endif
+	
 	
 	Points.Add(EEnemyType::Ranged, RangedPoints);
 }

@@ -117,7 +117,7 @@ bool UBTTask_GetNavMeshPoint::IsPointFree(const FVector& Point,const float Radiu
 	const bool bPointIsFree = !bHit || HitResults.Num() == 1;
 
 	const FColor SphereColor = bPointIsFree ? FColor::Green : FColor::Red;
-	DrawDebugSphere(GetWorld(), Point, Radius, 12, SphereColor, false, 2.0f);
+	//DrawDebugSphere(GetWorld(), Point, Radius, 12, SphereColor, false, 2.0f);
 	
 
 	return bPointIsFree;

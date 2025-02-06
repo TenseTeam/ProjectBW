@@ -94,6 +94,13 @@ bool UGHSelfTowardTarget::TickMode(float DeltaTime)
 
 void UGHSelfTowardTarget::PerformMotion(float DeltaTime)
 {
+	//TODO:
+	// if (CheckObstacles())
+	// {
+	// 	StopHooking();
+	// 	return;
+	// }
+	
 	OwnerCharacter->GetCharacterMovement()->Velocity = FVector::ZeroVector;
 	OwnerCharacter->SetActorLocation(OwnerCharacter->GetActorLocation() + StartHookDirection * GetSpeed() * DeltaTime);
 	GrapplingHookComponent->OnPerformHookMotion.Broadcast();
@@ -116,18 +123,10 @@ void UGHSelfTowardTarget::OrientRotationToMovement(float DeltaTime)
 
 bool UGHSelfTowardTarget::TryCalculateMotionData()
 {
-	// check if there are any obstacles between the player and the target grab point
-	TArray<FHitResult> HitResults;
-	FCollisionQueryParams CollisionParams;
-	AActor* TargetGrabPointActor = Cast<AActor>(GetTargetGrabPoint());
-	CollisionParams.AddIgnoredActor(TargetGrabPointActor);
-	CollisionParams.AddIgnoredActor(OwnerCharacter);
-	GetWorld()->LineTraceMultiByChannel(HitResults, OwnerCharacter->GetActorLocation(), GetTargetGrabPoint()->Execute_GetLocation(TargetGrabPointActor), ECC_Visibility, CollisionParams);
-	if (HitResults.Num() > 0)
+	if (CheckObstacles()) 
 	{
 		return false;
 	}
-	
 	StartHookLocation = OwnerCharacter->GetActorLocation();
 	EndHookLocation = GetTargetGrabPoint()->Execute_GetLandingPoint(GetTargetGrabPoint()->_getUObject());
 	TotalHookDistance = FVector::Dist(StartHookLocation, EndHookLocation);
@@ -148,4 +147,18 @@ float UGHSelfTowardTarget::GetSpeed()
 	}
 	const float CurveInput = SpeedCurve->GetFloatValue(FVector::DistSquared(OwnerCharacter->GetActorLocation(), StartHookLocation) / (TotalHookDistance * TotalHookDistance)); 
 	return SpeedCurve->GetFloatValue(CurveInput);
+}
+
+bool UGHSelfTowardTarget::CheckObstacles() const 
+{
+	FHitResult HitResult;
+	FCollisionQueryParams CollisionParams;
+	AActor* TargetGrabPointActor = Cast<AActor>(GetTargetGrabPoint());
+	CollisionParams.AddIgnoredActor(TargetGrabPointActor);
+	CollisionParams.AddIgnoredActor(OwnerCharacter);
+	if (GetWorld()->LineTraceSingleByChannel(HitResult, OwnerCharacter->GetActorLocation(), GetTargetGrabPoint()->Execute_GetLocation(TargetGrabPointActor), ObstaclesTraceChannel, CollisionParams))
+	{
+		return true;
+	}
+	return false;
 }

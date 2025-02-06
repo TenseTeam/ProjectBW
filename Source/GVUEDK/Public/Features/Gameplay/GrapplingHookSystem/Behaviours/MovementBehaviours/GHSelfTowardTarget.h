@@ -35,6 +35,11 @@ private:
 	float GetElapsedNormalizedDistance();
 	float GetSpeed();
 
+	/** Check if there are any obstacles between the thrower and the target grab point
+	  * @return true if there are obstacles, false otherwise
+	*/
+	bool CheckObstacles() const;
+
 private:
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
 	UCurveFloat* SpeedCurve;
@@ -42,6 +47,8 @@ private:
 	float LinearSpeed;
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
 	bool bOrientRotationToMovement;
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	TEnumAsByte<ECollisionChannel> ObstaclesTraceChannel;
 	
 
 	FVector StartHookLocation;

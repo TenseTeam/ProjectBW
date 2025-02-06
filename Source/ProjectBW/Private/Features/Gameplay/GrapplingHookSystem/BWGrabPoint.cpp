@@ -91,14 +91,14 @@ FVector ABWGrabPoint::GetPlayerCameraLocation() const
 bool ABWGrabPoint::ObstacleInBetween(const ACharacter* Character, FHitResult& HitResult)
 {
 	// between landing point and player
-	GetWorld()->LineTraceSingleByChannel(HitResult, GetLandingPoint_Implementation(), Character->GetActorLocation(), ECC_Visibility,
+	GetWorld()->LineTraceSingleByChannel(HitResult, GetLandingPoint_Implementation(), Character->GetActorLocation(), ObstaclesTraceChannel,
 										 TraceParams);
 	if (HitResult.bBlockingHit)
 	{
 		return true;
 	}
 	// between grab point and player
-	GetWorld()->LineTraceSingleByChannel(HitResult, GetActorLocation(), Character->GetActorLocation(), ECC_Visibility,
+	GetWorld()->LineTraceSingleByChannel(HitResult, GetActorLocation(), Character->GetActorLocation(), ObstaclesTraceChannel,
                                          TraceParams);
 	if (HitResult.bBlockingHit)
 	{

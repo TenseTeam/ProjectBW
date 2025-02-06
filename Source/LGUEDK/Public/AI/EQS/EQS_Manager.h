@@ -72,6 +72,9 @@ private:
 
 	UFUNCTION(BlueprintCallable)
 	bool IsInRange(FVector& TargetPosition,FVector& CurrentPosition, const float& MinDistance, const float& MaxDistance);
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	bool bShowDebug;
 };
 
 
