@@ -24,5 +24,5 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
 	FBlackboardKeySelector TargetLocationKey;
 
-	bool IsPointFree(FVector Point, float Radius, ANPCBaseStateEnemy* ControlledPawn);
+	bool IsPointFree(const FVector& Point,const float Radius,const ANPCBaseStateEnemy* ControlledPawn) const;
 };

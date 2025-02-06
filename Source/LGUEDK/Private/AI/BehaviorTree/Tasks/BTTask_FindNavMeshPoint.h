@@ -33,13 +33,13 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
 	FBlackboardKeySelector TargetLocationKey;
 
-	FVector FindFarthestPointWithinRange(FVector PlayerLocation,const AActor* Enemy,float MinDistance, float MaxDistance);
+	FVector FindFarthestPointWithinRange(const FVector& PlayerLocation,const AActor* Enemy,const float& MinDistance,const float& MaxDistance);
 
 	bool IsHittingSomething(const FVector& Start, const FVector& End,const AActor* Enemy);
 
-	bool IsInRange(float Distance,const float MinDistance,const float MaxDistance);
+	bool IsInRange(float& Distance,const float& MinDistance,const float& MaxDistance);
 
-	FVector GetCorrectNavPoint(TArray<FNavLocation> NavPoints,float BestDistance, const FVector& PlayerLocation,FVector PlayerNavMeshLocation,const float MinDistance,const float MaxDistance,const AActor* Enemy);
+	FVector GetCorrectNavPoint(TArray<FNavLocation>& NavPoints,float& BestDistance, const FVector& PlayerLocation,FVector PlayerNavMeshLocation,const float& MinDistance,const float& MaxDistance,const AActor* Enemy);
 
-	void GetAllReachableNavPoints(UNavigationSystemV1* NavSystem, const FVector& Center,float Radius, TArray<FNavLocation>& OutNavPoints);
+	void GetAllReachableNavPoints(UNavigationSystemV1* NavSystem, const FVector& Center,const float& Radius, TArray<FNavLocation>& OutNavPoints);
 };

@@ -183,7 +183,7 @@ bool AEQS_Manager::IsHittingSomething(const FVector& Start, const FVector& End)
 	return bHit;
 }
 
-bool AEQS_Manager::IsInRange(FVector TargetPosition,FVector CurrentPosition, const float MinDistance, const float MaxDistance)
+bool AEQS_Manager::IsInRange(FVector& TargetPosition,FVector& CurrentPosition,const float& MinDistance, const float& MaxDistance)
 {
 	float Distance = FVector::Distance(TargetPosition,CurrentPosition);
 	return Distance > MinDistance && Distance < MaxDistance;
@@ -217,7 +217,7 @@ void AEQS_Manager::Tick(float DeltaTime)
 	
 }
 
-FVector AEQS_Manager::GetPoint(EEnemyType EnemyType)
+FVector AEQS_Manager::GetPoint(EEnemyType& EnemyType)
 {
 	FVector SelectedPoint = FVector::ZeroVector;
 	

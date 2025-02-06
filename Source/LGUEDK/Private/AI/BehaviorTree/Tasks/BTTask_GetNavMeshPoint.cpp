@@ -17,14 +17,14 @@ UBTTask_GetNavMeshPoint::UBTTask_GetNavMeshPoint(FObjectInitializer const& Objec
 
 EBTNodeResult::Type UBTTask_GetNavMeshPoint::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	AAIController* AIController = OwnerComp.GetAIOwner();
+	const AAIController* AIController = OwnerComp.GetAIOwner();
 	if (!AIController)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ClearEnemyFocusTask: AIController is null"));
 		return EBTNodeResult::Failed;
 	}
-	
-	ANPCBaseStateEnemy* ControlledPawn = Cast<ANPCBaseStateEnemy>(AIController->GetPawn());
+
+	const ANPCBaseStateEnemy* ControlledPawn = Cast<ANPCBaseStateEnemy>(AIController->GetPawn());
 	if (!ControlledPawn)return EBTNodeResult::Failed;
 	
 	AEQS_Manager* EQS_Manager = ControlledPawn->GetEQSManager();
@@ -44,13 +44,13 @@ EBTNodeResult::Type UBTTask_GetNavMeshPoint::ExecuteTask(UBehaviorTreeComponent&
     default:
     	Margin =   0;
 	}
-	
-	FVector PawnLocation = ControlledPawn->GetActorLocation();
+
+	const FVector PawnLocation = ControlledPawn->GetActorLocation();
 	
 	FVector TargetLocation;
 	bool bFoundValidPoint = false;
 
-	int MaxAttempts = 10; 
+	const int MaxAttempts = 10; 
 	int AttemptCount = 0;
 
 	//calcolo direzione tra player e nemico
@@ -66,8 +66,8 @@ EBTNodeResult::Type UBTTask_GetNavMeshPoint::ExecuteTask(UBehaviorTreeComponent&
 		FVector PlayerPosition = (ControlledPawn->GetAttackTarget()->GetActorLocation());
 		FVector DirectionControlledPawnPlayer = (PawnLocation - PlayerPosition).GetSafeNormal();
 		FVector DirectionToPoint = (TestPoint - PlayerPosition).GetSafeNormal();
-		
-		float DotProduct = FVector::DotProduct(DirectionControlledPawnPlayer, DirectionToPoint);
+
+		const float DotProduct = FVector::DotProduct(DirectionControlledPawnPlayer, DirectionToPoint);
 		
 		if (DotProduct >= Margin)
 		{
@@ -81,7 +81,7 @@ EBTNodeResult::Type UBTTask_GetNavMeshPoint::ExecuteTask(UBehaviorTreeComponent&
 	
 	if (!bFoundValidPoint)
 	{
-		FVector TestPoint = EQS_Manager->GetPoint(EnemyType);
+		const FVector TestPoint = EQS_Manager->GetPoint(EnemyType);
 		TargetLocation = TestPoint;
 		UE_LOG(LogTemp, Warning, TEXT("Nessun punto valido trovato dopo %d tentativi"), MaxAttempts);
 	}
@@ -95,16 +95,16 @@ EBTNodeResult::Type UBTTask_GetNavMeshPoint::ExecuteTask(UBehaviorTreeComponent&
 }
 
 
-bool UBTTask_GetNavMeshPoint::IsPointFree(FVector Point, float Radius, ANPCBaseStateEnemy* ControlledPawn)
+bool UBTTask_GetNavMeshPoint::IsPointFree(const FVector& Point,const float Radius,const ANPCBaseStateEnemy* ControlledPawn) const
 {
-	AActor* AttackTarget = ControlledPawn->GetAttackTarget();
+	const AActor* AttackTarget = ControlledPawn->GetAttackTarget();
 	
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(ControlledPawn); 
 	QueryParams.AddIgnoredActor(AttackTarget); 
 
 	TArray<FHitResult> HitResults;
-	bool bHit = GetWorld()->SweepMultiByChannel(
+	const bool bHit = GetWorld()->SweepMultiByChannel(
 		HitResults, 
 		Point, 
 		Point + FVector(0, 0, 10), 
@@ -114,9 +114,9 @@ bool UBTTask_GetNavMeshPoint::IsPointFree(FVector Point, float Radius, ANPCBaseS
 		QueryParams
 	);
 
-	bool bPointIsFree = !bHit || HitResults.Num() == 1; 
+	const bool bPointIsFree = !bHit || HitResults.Num() == 1;
 
-	FColor SphereColor = bPointIsFree ? FColor::Green : FColor::Red;
+	const FColor SphereColor = bPointIsFree ? FColor::Green : FColor::Red;
 	DrawDebugSphere(GetWorld(), Point, Radius, 12, SphereColor, false, 2.0f);
 	
 

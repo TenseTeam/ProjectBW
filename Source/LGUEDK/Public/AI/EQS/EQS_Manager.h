@@ -25,7 +25,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable)
-	FVector GetPoint(EEnemyType EnemyType);
+	FVector GetPoint(EEnemyType& EnemyType);
 
 
 protected:
@@ -71,7 +71,7 @@ private:
 	bool IsHittingSomething(const FVector& Start, const FVector& End);
 
 	UFUNCTION(BlueprintCallable)
-	bool IsInRange(FVector TargetPosition,FVector CurrentPosition, const float MinDistance, const float MaxDistance);
+	bool IsInRange(FVector& TargetPosition,FVector& CurrentPosition, const float& MinDistance, const float& MaxDistance);
 };
 
 

@@ -61,7 +61,7 @@ void ACustomNavLinkProxy::MarkAsOccupied(float OccupyDuration)
 	UE_LOG(LogTemp, Log, TEXT("Nav Link marked as occupied for %.2f seconds"), OccupyDuration);
 }
 
-FVector ACustomNavLinkProxy::FindValidDestination(const FVector& OriginalDestination,int32 MaxAttempts,bool bDebug)
+FVector ACustomNavLinkProxy::FindValidDestination(const FVector& OriginalDestination,const int32& MaxAttempts,bool& bDebug)
 {
 	FVector CurrentDestination = OriginalDestination;
 	FVector Direction = (CurrentDestination - GetActorLocation()).GetSafeNormal();
