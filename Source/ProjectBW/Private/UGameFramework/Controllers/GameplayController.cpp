@@ -5,6 +5,7 @@
 #include "EnhancedInputComponent.h"
 #include "Features/Gameplay/InventorySystem/BWInventory.h"
 #include "Features/Gameplay/RPGSystem/StatsSystem/CharacterStats/CharacterStats.h"
+#include "Input/ActionManagementSystem/Components/ActionManagerComponent.h"
 #include "Utility/FGvDebug.h"
 
 FVector AGameplayController::MoveInputValue = FVector::ZeroVector;
@@ -14,6 +15,7 @@ AGameplayController::AGameplayController()
 	Inventory = CreateDefaultSubobject<UBWInventory>("Inventory");
 	Equipment = CreateDefaultSubobject<UEquipment>("Equipment");
 	CharacterStats = CreateDefaultSubobject<UCharacterStats>("CharacterStats");
+	ActionManager = CreateDefaultSubobject<UActionManagerComponent>("ActionManager");
 }
 
 void AGameplayController::BeginPlay()
@@ -32,6 +34,7 @@ void AGameplayController::BeginPlay()
 	
 	ContextsManager->SetGameplayMappingContext();
 }
+
 
 void AGameplayController::SetupInputComponent()
 {

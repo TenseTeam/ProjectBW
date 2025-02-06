@@ -12,7 +12,7 @@ FGvDebug::~FGvDebug()
 {
 }
 
-void FGvDebug::Log(const FString& LogMsg, const bool bPrintOnScreen)
+void FGvDebug::Log(const FString& LogMsg, const bool bPrintOnScreen/*, const FLogCategoryBase& LogCategory*/)
 {
 	UE_LOG(LogTemp, Log, TEXT("%s"), *LogMsg);
 	if (bPrintOnScreen && GEngine)
@@ -21,7 +21,7 @@ void FGvDebug::Log(const FString& LogMsg, const bool bPrintOnScreen)
 	}
 }
 
-void FGvDebug::Warning(const FString& WarningMsg, const bool bPrintOnScreen)
+void FGvDebug::Warning(const FString& WarningMsg, const bool bPrintOnScreen/*, const FLogCategoryBase& LogCategory*/)
 {
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *WarningMsg);
 	if (bPrintOnScreen && GEngine)
@@ -30,7 +30,7 @@ void FGvDebug::Warning(const FString& WarningMsg, const bool bPrintOnScreen)
 	}
 }
 
-void FGvDebug::Error(const FString& ErrorMsg, const bool bPrintOnScreen)
+void FGvDebug::Error(const FString& ErrorMsg, const bool bPrintOnScreen/*, const FLogCategoryBase& LogCategory*/)
 {
 	UE_LOG(LogTemp, Error, TEXT("%s"), *ErrorMsg);
 	if (bPrintOnScreen && GEngine)

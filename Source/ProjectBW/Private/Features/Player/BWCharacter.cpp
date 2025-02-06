@@ -283,7 +283,7 @@ void ABWCharacter::SetCanDodge(bool Value)
 
 bool ABWCharacter::CanDodge() const
 {
-	return bCanDodge && !DodgerComponent->IsCoolingDown() && Stamina->GetCurrentValue() >= 30.f;
+	return bCanDodge && !DodgerComponent->IsCoolingDown() && Stamina->GetCurrentValue() >= Data->StaminaDodgeCost;
 }
 
 void ABWCharacter::SetCanHook(bool Value)
@@ -370,13 +370,13 @@ void ABWCharacter::NotifyJumpApex()
 
 void ABWCharacter::StartHooking()
 {
-	SetIsHooking(true); // perdoname madre por mi vida loca
+	SetIsHooking(true); // TODO: perdoname madre por mi vida loca 
 	OnStartHook.Broadcast();
 }
 
 void ABWCharacter::StopHooking()
 {
-	SetIsHooking(false); // perdoname madre por mi vida loca
+	SetIsHooking(false); // TODO: perdoname madre por mi vida loca
 	OnStopHook.Broadcast();
 }
 
@@ -419,7 +419,7 @@ void ABWCharacter::LostStamina()
 
 void ABWCharacter::GainedStamina()
 {
-	if (!CanRun() && Stamina->GetCurrentValue() > 30.f)
+	if (!CanRun() && Stamina->GetCurrentValue() > Data->MinStaminaToRun)
 		SetCanRun(true);
 	OnGainedStamina.Broadcast();
 }

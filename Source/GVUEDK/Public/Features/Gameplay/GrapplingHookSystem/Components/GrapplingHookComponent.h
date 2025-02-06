@@ -10,7 +10,7 @@ class UGHSearchModeBase;
 class UGHMovementModeBase;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartHooking);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FHookMotionStarted);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FHooking);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPerformHookMotion);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopHooking);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInterruptHooking);
 
@@ -25,7 +25,7 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FHookMotionStarted OnHookMotionStarted;
 	UPROPERTY(BlueprintAssignable)
-	FHooking OnHooking;
+	FPerformHookMotion OnPerformHookMotion;
 	UPROPERTY(BlueprintAssignable)
 	FStopHooking OnStopHooking;
 	UPROPERTY(BlueprintAssignable)
@@ -46,6 +46,10 @@ private:
 	
 	IGrabPoint* TargetGrabPoint;
 	bool bTargetAcquired;
+
+	FVector HookLocation;
+	bool bHookHitObstacle;
+	
 	bool bInitialized;
 
 public:
@@ -76,7 +80,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FVector GetStartDirection() const;
 	UFUNCTION(BlueprintCallable)
-	FVector GetTargetGrabPointLocation() const { return bTargetAcquired ? TargetGrabPoint->GetLocation() : FVector::ZeroVector; }
+	FVector GetTargetGrabPointLocation() const { return bTargetAcquired ? TargetGrabPoint->Execute_GetLocation(TargetGrabPoint->_getUObject()) : FVector::ZeroVector; }
+	UFUNCTION(BlueprintCallable)
+	FVector GetHookLocation() const { return HookLocation; }
+	
+	
 	UFUNCTION(BlueprintCallable)
 	void ChangeMovementMode(int32 ModeIndex);
 	UFUNCTION(BlueprintCallable)
@@ -85,7 +93,10 @@ public:
 	ACharacter* GetOwnerCharacter() const { return OwnerCharacter; }
 	IGrabPoint* GetTargetGrabPoint() const { return TargetGrabPoint; }
 	void SetTargetGrabPoint(IGrabPoint* GrabPoint) { TargetGrabPoint = GrabPoint; bTargetAcquired = TargetGrabPoint != nullptr; }
+	void SetHookLocation(const FVector& Location) { HookLocation = Location; }
+	void SetHookHitObstacle(const bool Value) { bHookHitObstacle = Value; }
 	bool IsTargetAcquired() const { return bTargetAcquired; }
+	bool HasHookHitObstacle() const { return bHookHitObstacle; }
 
 private:
 	// Returns true if the modes are initialized successfully

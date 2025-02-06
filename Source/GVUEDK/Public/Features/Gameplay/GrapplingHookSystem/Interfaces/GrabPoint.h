@@ -21,10 +21,21 @@ class GVUEDK_API IGrabPoint
 	GENERATED_BODY()
 
 public:
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	AActor* GetActor();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	FVector GetLandingPoint();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	FVector GetLocation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetLocation(const FVector& NewWorldLocation);
 	
-	virtual FVector GetLandingPoint() const = 0;
-	virtual FVector GetLocation() const = 0;
-	virtual bool CanBeGrabbed(const ACharacter* Character) const = 0;
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool CanBeGrabbed(const ACharacter* Character);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void Highlight();
