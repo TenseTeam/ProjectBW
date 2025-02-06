@@ -1,13 +1,13 @@
 // Copyright Villains, Inc. All Rights Reserved.
 
 
-#include "Features/Gameplay/GrapplingHookSystem/Behaviours/SearchBehaviours/GHSphereTraceSearch.h"
+#include "Features/Gameplay/GrapplingHookSystem/Behaviours/SearchBehaviours/GHSphereTraceOnOwner.h"
 
 #include "Features/Gameplay/GrapplingHookSystem/Components/GrapplingHookComponent.h"
 #include "GameFramework/Character.h"
 #include "Utility/FGvDebug.h"
 
-UGHSphereTraceSearch::UGHSphereTraceSearch()
+UGHSphereTraceOnOwner::UGHSphereTraceOnOwner()
 {
 	bShowDebug = false;
 	MaxDistance = 3000.f;
@@ -16,13 +16,13 @@ UGHSphereTraceSearch::UGHSphereTraceSearch()
 	GrabPointsChannel = ECC_GameTraceChannel1;
 }
 
-void UGHSphereTraceSearch::Initialize(UGrapplingHookComponent* InGrapplingHookComponent)
+void UGHSphereTraceOnOwner::Initialize(UGrapplingHookComponent* InGrapplingHookComponent)
 {
 	Super::Initialize(InGrapplingHookComponent);
 	InRangeGrabPoints = TSet<IGrabPoint*>();
 }
 
-bool UGHSphereTraceSearch::TickMode(float DeltaTime)
+bool UGHSphereTraceOnOwner::TickMode(float DeltaTime)
 {
 	Super::TickMode(DeltaTime);
 	// check if there are any grab points in range (MaxCheckDistance)
@@ -61,7 +61,20 @@ bool UGHSphereTraceSearch::TickMode(float DeltaTime)
 	return false;
 }
 
-bool UGHSphereTraceSearch::LookForGrabPoints(TSet<IGrabPoint*>& OutGrabPoints) const
+void UGHSphereTraceOnOwner::ExitMode()
+{
+	if (GetTargetGrabPoint() != nullptr)
+	{
+		GetTargetGrabPoint()->Execute_Unhighlight(GetTargetGrabPoint()->_getUObject());
+	}
+	if (LastTargetGrabPoint != nullptr)
+	{
+		LastTargetGrabPoint->Execute_Unhighlight(LastTargetGrabPoint->_getUObject());
+	}
+	Super::ExitMode();
+}
+
+bool UGHSphereTraceOnOwner::LookForGrabPoints(TSet<IGrabPoint*>& OutGrabPoints) const
 {
 	TArray<FHitResult> HitResults;
 	if (PerformSphereTrace(HitResults))
@@ -69,14 +82,15 @@ bool UGHSphereTraceSearch::LookForGrabPoints(TSet<IGrabPoint*>& OutGrabPoints) c
 		for (auto HitResult : HitResults)
 		{
 			IGrabPoint* GrabPoint = Cast<IGrabPoint>(HitResult.GetActor());
+			
 			if (GrabPoint == nullptr)
 			{
 				FGvDebug::Error(HitResult.GetActor()->GetName() + " is not a grab point, FIX: set ignore collision response", true);
 				continue;
 			}
 			// check if the grab point is in range and can be grabbed (TO DO: Check if DistSquared can be moved in CanBeGrabbed)
-			if (FVector::DistSquared(OwnerCharacter->GetActorLocation(), GrabPoint->GetLocation()) <= MaxDistance * MaxDistance
-				&& GrabPoint->CanBeGrabbed(OwnerCharacter))
+			if (FVector::DistSquared(OwnerCharacter->GetActorLocation(), GrabPoint->Execute_GetLocation(HitResult.GetActor())) <= MaxDistance * MaxDistance
+				&& GrabPoint->Execute_CanBeGrabbed(HitResult.GetActor(), OwnerCharacter))
 			{
 				OutGrabPoints.Add(GrabPoint);
 			}
@@ -91,13 +105,13 @@ bool UGHSphereTraceSearch::LookForGrabPoints(TSet<IGrabPoint*>& OutGrabPoints) c
 	return false;
 }
 
-IGrabPoint* UGHSphereTraceSearch::GetMostRelevantGrabPoint(TSet<IGrabPoint*>& ValidGrabPoints) const
+IGrabPoint* UGHSphereTraceOnOwner::GetMostRelevantGrabPoint(TSet<IGrabPoint*>& ValidGrabPoints) const
 {
 	IGrabPoint* ReturnValue = nullptr;
 	float MinSquaredDistance = BIG_NUMBER;
 	for (IGrabPoint* GrabPoint : ValidGrabPoints)
 	{
-		const float SquaredDistance = FVector::DistSquared(GrabPoint->GetLocation(), OwnerCharacter->GetActorLocation());
+		const float SquaredDistance = FVector::DistSquared(GrabPoint->Execute_GetLocation(GrabPoint->_getUObject()), OwnerCharacter->GetActorLocation());
 		if (MinSquaredDistance > SquaredDistance)
 		{
 			MinSquaredDistance = SquaredDistance;
@@ -107,7 +121,7 @@ IGrabPoint* UGHSphereTraceSearch::GetMostRelevantGrabPoint(TSet<IGrabPoint*>& Va
 	return ReturnValue;
 }
 
-bool UGHSphereTraceSearch::PerformSphereTrace(TArray<FHitResult>& HitResults) const
+bool UGHSphereTraceOnOwner::PerformSphereTrace(TArray<FHitResult>& HitResults) const
 {
 	const FCollisionShape CollisionShape = FCollisionShape::MakeSphere(MaxDistance);
 

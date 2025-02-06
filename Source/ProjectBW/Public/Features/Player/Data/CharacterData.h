@@ -32,9 +32,14 @@ public:
 	float CrouchSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Stats")
 	float SwapWeaponSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dodging", meta = (ClampMin = 0))
+	float StaminaDodgeCost;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Running")
 	float RunAcceleration;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Running")
+	float MinStaminaToRun;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Jumping")
 	UCurveFloat* AscentGravityCurve;

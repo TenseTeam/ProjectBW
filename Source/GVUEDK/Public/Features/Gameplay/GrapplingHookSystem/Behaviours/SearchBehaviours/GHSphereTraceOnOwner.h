@@ -4,21 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "Base/GHSearchModeBase.h"
-#include "GHSphereTraceSearch.generated.h"
+#include "GHSphereTraceOnOwner.generated.h"
 
 /**
  * 
  */
-UCLASS(meta = (DisplayName = "Sphere Trace Search"))
-class GVUEDK_API UGHSphereTraceSearch : public UGHSearchModeBase
+UCLASS(meta = (DisplayName = "Sphere Trace On Owner"))
+class GVUEDK_API UGHSphereTraceOnOwner : public UGHSearchModeBase
 {
 	GENERATED_BODY()
 
 public:
-	UGHSphereTraceSearch();
+	UGHSphereTraceOnOwner();
 
 	virtual void Initialize(UGrapplingHookComponent* InGrapplingHookComponent) override;
 	virtual bool TickMode(float DeltaTime) override;
+	virtual void ExitMode() override;
 	
 	virtual float GetMaxDistance() const override { return MaxDistance; }
 	virtual float GetMinDistance() const override { return MinDistance; }
@@ -35,8 +36,7 @@ private:
 	float MaxDistance;
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true", ClampMin = "0.0"))
 	float MinDistance;
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
-	bool bShowDebug;
+	
 	
 	TSet<IGrabPoint*> InRangeGrabPoints;
 	IGrabPoint* LastTargetGrabPoint;

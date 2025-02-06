@@ -34,6 +34,7 @@ void UGHSelfTowardTarget::StartHooking()
 	bIsHooking = true;
 	if (!bApplyMomentumDuringHookThrow)
 	{
+		CachedGravityScale = OwnerCharacter->GetCharacterMovement()->GravityScale;
 		OwnerCharacter->GetCharacterMovement()->GravityScale = 0.f;
 		OwnerCharacter->GetCharacterMovement()->Velocity = FVector::ZeroVector;
 	}
@@ -47,7 +48,10 @@ void UGHSelfTowardTarget::StopHooking()
 	GrapplingHookComponent->SetTargetGrabPoint(nullptr);
 	bMotionDataCalculated = false;
 	bIsHooking = false;
-	OwnerCharacter->GetCharacterMovement()->GravityScale = 1.f;
+	if (!bApplyMomentumDuringHookThrow)
+	{
+		OwnerCharacter->GetCharacterMovement()->GravityScale = CachedGravityScale;
+	}
 	GrapplingHookComponent->OnStopHooking.Broadcast();
 }
 
@@ -69,12 +73,17 @@ bool UGHSelfTowardTarget::TickMode(float DeltaTime)
 		
 		if (!bMotionDataCalculated)
 		{
-			if (CalculateMotionData())
+			if (TryCalculateMotionData())
 			{
 				bMotionDataCalculated = true;
 				GrapplingHookComponent->OnHookMotionStarted.Broadcast();
 			}
-			else return true;
+			else
+			{
+				GrapplingHookComponent->OnInterruptHooking.Broadcast();
+				StopHooking();
+				return false;
+			}
 		}
 		
 		PerformMotion(DeltaTime);
@@ -87,7 +96,7 @@ void UGHSelfTowardTarget::PerformMotion(float DeltaTime)
 {
 	OwnerCharacter->GetCharacterMovement()->Velocity = FVector::ZeroVector;
 	OwnerCharacter->SetActorLocation(OwnerCharacter->GetActorLocation() + StartHookDirection * GetSpeed() * DeltaTime);
-	GrapplingHookComponent->OnHooking.Broadcast();
+	GrapplingHookComponent->OnPerformHookMotion.Broadcast();
 	if (GetElapsedNormalizedDistance() >= 1)
 	{
 		OwnerCharacter->SetActorLocation(EndHookLocation);
@@ -97,30 +106,30 @@ void UGHSelfTowardTarget::PerformMotion(float DeltaTime)
 
 void UGHSelfTowardTarget::OrientRotationToMovement(float DeltaTime)
 {
-	FRotator TargetRotation = (GetTargetGrabPoint()->GetLandingPoint() - OwnerCharacter->GetActorLocation()).Rotation();
+	const FVector LandingPoint = GetTargetGrabPoint()->Execute_GetLandingPoint(GetTargetGrabPoint()->_getUObject());
+	FRotator TargetRotation = (LandingPoint - OwnerCharacter->GetActorLocation()).Rotation();
 	TargetRotation.Pitch = 0.f;
 	TargetRotation.Roll = 0.f;
 	const FRotator NewRotation = FMath::RInterpConstantTo(OwnerCharacter->GetActorRotation(), TargetRotation, DeltaTime, 1000.f);
 	OwnerCharacter->SetActorRotation(NewRotation);
 }
 
-bool UGHSelfTowardTarget::CalculateMotionData()
+bool UGHSelfTowardTarget::TryCalculateMotionData()
 {
 	// check if there are any obstacles between the player and the target grab point
 	TArray<FHitResult> HitResults;
 	FCollisionQueryParams CollisionParams;
+	AActor* TargetGrabPointActor = Cast<AActor>(GetTargetGrabPoint());
+	CollisionParams.AddIgnoredActor(TargetGrabPointActor);
 	CollisionParams.AddIgnoredActor(OwnerCharacter);
-	CollisionParams.AddIgnoredActor(Cast<AActor>(GetTargetGrabPoint()));
-	GetWorld()->LineTraceMultiByChannel(HitResults, OwnerCharacter->GetActorLocation(), GetTargetGrabPoint()->GetLocation(), ECC_Visibility, CollisionParams);
+	GetWorld()->LineTraceMultiByChannel(HitResults, OwnerCharacter->GetActorLocation(), GetTargetGrabPoint()->Execute_GetLocation(TargetGrabPointActor), ECC_Visibility, CollisionParams);
 	if (HitResults.Num() > 0)
 	{
-		GrapplingHookComponent->OnInterruptHooking.Broadcast();
-		StopHooking();
 		return false;
 	}
 	
 	StartHookLocation = OwnerCharacter->GetActorLocation();
-	EndHookLocation = GetTargetGrabPoint()->GetLandingPoint();
+	EndHookLocation = GetTargetGrabPoint()->Execute_GetLandingPoint(GetTargetGrabPoint()->_getUObject());
 	TotalHookDistance = FVector::Dist(StartHookLocation, EndHookLocation);
 	StartHookDirection = (EndHookLocation - StartHookLocation).GetSafeNormal();
 	return true;

@@ -17,4 +17,8 @@ class GVUEDK_API UGHSearchModeBase : public UGrapplingHookModeBase
 public:
 	virtual float GetMaxDistance() const { return 0.f; }
 	virtual float GetMinDistance() const { return 0.f; }
+
+protected:
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	bool bShowDebug;
 };

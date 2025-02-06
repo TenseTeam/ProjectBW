@@ -24,14 +24,14 @@ public:
 	virtual FVector GetStartDirection() const override { return bIsHooking ? StartHookDirection : FVector::ZeroVector; }
 	virtual FVector GetLandingPointLocation() const override { return bIsHooking ? EndHookLocation : FVector::ZeroVector; }
 	virtual FVector GetStartLocation() const override { return bIsHooking ? StartHookLocation : FVector::ZeroVector; }
-	virtual float GetElapsedTime() const override { return ElapsedTime; }
-	virtual float GetStartDelay() const override { return StartDelay; }
 	virtual float GetTotalHookDistance() const override { return TotalHookDistance; }
 
+protected:
+	virtual bool TryCalculateMotionData() override;
+	
 private:
 	void PerformMotion(float DeltaTime);
 	void OrientRotationToMovement(float DeltaTime);
-	bool CalculateMotionData();
 	float GetElapsedNormalizedDistance();
 	float GetSpeed();
 
@@ -40,20 +40,14 @@ private:
 	UCurveFloat* SpeedCurve;
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true", ToolTip = "Used only if no SpeedCurve provided"))
 	float LinearSpeed;
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true", ClampMin = "0.0"))
-	float StartDelay;
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
 	bool bOrientRotationToMovement;
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
-	bool bApplyMomentumDuringHookThrow;
+	
 
 	FVector StartHookLocation;
 	FVector EndHookLocation;
 	FVector StartHookDirection;
 	
 	float TotalHookDistance;
-	float ElapsedTime;
 	
-	bool bIsHooking;
-	bool bMotionDataCalculated;
 };
