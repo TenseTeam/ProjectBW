@@ -175,7 +175,7 @@ public:
 protected:
 	virtual void HandleShoot();
 	
-	void ShootFromShootPoint(UShootPoint* ShootPoint) const;
+	void DeployShoot(UShootPoint* ShootPoint) const;
 
 	void ShootSuccess();
 
@@ -195,10 +195,7 @@ protected:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnDeployShoot(UShootPoint* ShootPoint, const FVector& TargetLocation, const FVector& DirectionToTarget) const;
-
-	UFUNCTION(BlueprintNativeEvent)
-	void OnShootFromShootPoint(UShootPoint* ShootPoint, const FVector& TargetLocation, const FVector& DirectionToTarget) const;
-
+	
 	UFUNCTION(BlueprintNativeEvent)
 	void OnShootSuccess(const UShootBarrel* OutShootBarrel);
 
