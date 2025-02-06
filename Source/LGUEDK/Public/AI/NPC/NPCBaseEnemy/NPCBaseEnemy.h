@@ -21,8 +21,8 @@ public:
 	void SetMovementSpeed(EMovementSpeed MovementSpeed) const;
 
 	EEnemyState GetState() const { return CurrentState; }
-	void SetEnemyState(EEnemyState& NewState) { CurrentState = NewState; }
-
+	void SetEnemyState(EEnemyState NewState) { CurrentState = NewState; }
+	
 protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Movement")
