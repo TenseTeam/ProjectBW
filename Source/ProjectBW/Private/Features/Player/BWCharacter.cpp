@@ -370,13 +370,13 @@ void ABWCharacter::NotifyJumpApex()
 
 void ABWCharacter::StartHooking()
 {
-	SetIsHooking(true); // perdoname madre por mi vida loca
+	SetIsHooking(true); // TODO: perdoname madre por mi vida loca 
 	OnStartHook.Broadcast();
 }
 
 void ABWCharacter::StopHooking()
 {
-	SetIsHooking(false); // perdoname madre por mi vida loca
+	SetIsHooking(false); // TODO: perdoname madre por mi vida loca
 	OnStopHook.Broadcast();
 }
 

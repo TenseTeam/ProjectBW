@@ -19,12 +19,15 @@ UGHTargetTowardSelf::UGHTargetTowardSelf()
 	bApplyMomentumDuringHookThrow = false;
 	bMaxExtensionReached = false;
 	bShowDebug = false;
+	bOrientGrabbedActorRotationToMovement = true;
+	bCanGrabTargetOnHookReduction = false;
 	MaxHookExtension = 2000.f;
 	HookLinearSpeed = 2000.f;
 	StartDelay = 0.f;
 	ElapsedTime = 0.f;
 	HookSpeedCurve = nullptr;
 	ExtensionDirection = FVector::ZeroVector;
+	TargetGrabbedLocation = FVector::ZeroVector;
 	AimTraceChannel = ECC_Visibility;
 }
 
