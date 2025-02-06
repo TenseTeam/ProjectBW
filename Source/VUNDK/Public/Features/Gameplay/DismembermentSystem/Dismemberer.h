@@ -7,6 +7,7 @@
 #include "Components/ActorComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraDataInterfaceExport.h"
+#include "Data/BloodDecalSpawnParams.h"
 #include "Dismemberer.generated.h"
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -21,25 +22,19 @@ public:
 	TArray<FName> DismemberablaBones;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TArray<UNiagaraSystem*> DismemberFXs;
+	TArray<UNiagaraSystem*> BloodExplosionFXs;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TArray<UNiagaraSystem*> BloodSpillFXs;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<UMaterialInterface*> BloodStainsDecals;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	float BloodStainDuration = 5.f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	float BloodStainChance = 0.8f;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	float BloodStainMinSize = 10.f;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	float BloodStainMaxSize = 50.f;
+	FBloodDecalSpawnParams BloodDecalSpawnParams;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, AdvancedDisplay)
-	FName PivotOrientationName = FName("pivot");
+	FName PivotOrientationName = FName("neck_01");
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, AdvancedDisplay)
 	FName NiagaraCallbackName = FName("User.Callback");
@@ -62,17 +57,35 @@ public:
 	void DismemberLimb(const FName& BoneName, const FVector Impulse);
 
 	UFUNCTION(BlueprintCallable)
+	void DismemberLimbs(const TArray<FName>& BoneNames, const FVector Impulse);
+	
+	UFUNCTION(BlueprintCallable)
 	void DismemberRandomLimbs(int32 LimbsCount, const FVector Impulse);
+
+	UFUNCTION(BlueprintCallable)
+	void DismemberAllLimbs(const FVector Impulse);
 
 	USkeletalMeshComponent* GetSkeletalMeshComponent() const;
 
 	TArray<FName> GetDismemberedBones() const;
 
-private:
-	void SpawnDismemberFX(const FName& BoneName);
-	
-	UNiagaraSystem* GetRandomDismemberFX() const;
+protected:
+	virtual void BeginPlay() override;
 
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+	UFUNCTION()
+	void OnTakePointDamage(AActor* DamagedActor, float Damage, class AController* InstigatedBy, FVector HitLocation, class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const class UDamageType* DamageType, AActor* DamageCauser);
+	
+private:
+	void SpawnBloodExplosionFX(const FVector& HitLocation);
+	
+	void SpawnBloodSpillFX(const FName& BoneName);
+
+	UNiagaraSystem* GetRandomBloodSpillFX() const;
+	
+	UNiagaraSystem* GetRandomBloodExplosionFX() const;
+	
 	UMaterialInterface* GetRandomBloodStainDecal() const;
 	
 	void SpawnDisemberedLimb(FName BoneName, const FVector Impulse);

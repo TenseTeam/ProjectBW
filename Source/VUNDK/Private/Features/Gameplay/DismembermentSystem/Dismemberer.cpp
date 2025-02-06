@@ -2,10 +2,10 @@
 
 #include "Features/Gameplay/DismembermentSystem/Dismemberer.h"
 #include "NiagaraFunctionLibrary.h"
-#include "NiagaraComponent.h"
 #include "Features/Gameplay/DismembermentSystem/Utility/DismemberUtility.h"
 
-UDismemberer::UDismemberer(): SkeletalMeshComponent(nullptr)
+UDismemberer::UDismemberer(): BloodDecalSpawnParams(),
+                              SkeletalMeshComponent(nullptr)
 {
 	PrimaryComponentTick.bCanEverTick = false;
 }
@@ -21,9 +21,7 @@ void UDismemberer::ReceiveParticleData_Implementation(const TArray<FBasicParticl
 		GetWorld(),
 		GetRandomBloodStainDecal(),
 		Data[0].Position,
-		FVector(FMath::RandRange(BloodStainMinSize, BloodStainMaxSize)),
-		BloodStainDuration,
-		BloodStainChance
+		BloodDecalSpawnParams
 	);
 }
 
@@ -41,8 +39,18 @@ void UDismemberer::DismemberLimb(const FName& BoneName, const FVector Impulse)
 		return;
 
 	SpawnDisemberedLimb(BoneName, Impulse);
-	SpawnDismemberFX(BoneName);
+	SpawnBloodSpillFX(BoneName);
+	SpawnBloodExplosionFX(SkeletalMeshComponent->GetSocketLocation(BoneName));
 	SkeletalMeshComponent->HideBoneByName(BoneName, EPhysBodyOp::PBO_Term);
+}
+
+void UDismemberer::DismemberLimbs(const TArray<FName>& BoneNames, const FVector Impulse)
+{
+	if (!Check())
+		return;
+
+	for (const FName BoneName : BoneNames)
+		DismemberLimb(BoneName, Impulse);
 }
 
 void UDismemberer::DismemberRandomLimbs(int32 LimbsCount, const FVector Impulse)
@@ -65,6 +73,15 @@ void UDismemberer::DismemberRandomLimbs(int32 LimbsCount, const FVector Impulse)
 	}
 }
 
+void UDismemberer::DismemberAllLimbs(const FVector Impulse)
+{
+	if (!Check())
+		return;
+
+	for (const FName BoneName : DismemberablaBones)
+		DismemberLimb(BoneName, Impulse);
+}
+
 USkeletalMeshComponent* UDismemberer::GetSkeletalMeshComponent() const
 {
 	return SkeletalMeshComponent;
@@ -75,9 +92,34 @@ TArray<FName> UDismemberer::GetDismemberedBones() const
 	return DismemberedBones;
 }
 
-void UDismemberer::SpawnDismemberFX(const FName& BoneName)
+void UDismemberer::BeginPlay()
 {
-	if (DismemberFXs.Num() == 0)
+	Super::BeginPlay();
+	GetOwner()->OnTakePointDamage.AddDynamic(this, &UDismemberer::OnTakePointDamage);
+}
+
+void UDismemberer::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	GetOwner()->OnTakePointDamage.RemoveDynamic(this, &UDismemberer::OnTakePointDamage);
+}
+
+void UDismemberer::OnTakePointDamage(AActor* DamagedActor, float Damage, class AController* InstigatedBy, FVector HitLocation, class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const class UDamageType* DamageType, AActor* DamageCauser)
+{
+	if (!Check())
+		return;
+	
+	SpawnBloodExplosionFX(HitLocation);
+}
+
+void UDismemberer::SpawnBloodExplosionFX(const FVector& HitLocation)
+{
+	UDismemberUtility::SpawnBloodExplosionFX(GetWorld(), GetRandomBloodExplosionFX(), HitLocation, NiagaraCallbackName, this);
+}
+
+void UDismemberer::SpawnBloodSpillFX(const FName& BoneName)
+{
+	if (BloodSpillFXs.Num() == 0)
 		return;
 
 	const FName ParentBone = SkeletalMeshComponent->GetParentBone(BoneName);
@@ -87,13 +129,17 @@ void UDismemberer::SpawnDismemberFX(const FName& BoneName)
 	const FVector BoneLocation = SkeletalMeshComponent->GetSocketLocation(BoneName);
 	const FVector PivotLocation = SkeletalMeshComponent->GetSocketLocation(PivotOrientationName);
 	const FVector SprayDirection = (BoneLocation - PivotLocation).GetSafeNormal();
-	UNiagaraComponent* NiagaraComponent = UDismemberUtility::SpawnDismemberFX(GetRandomDismemberFX(), SkeletalMeshComponent, ParentBone, SprayDirection);
-	NiagaraComponent->SetVariableObject(NiagaraCallbackName, this);
+	UDismemberUtility::SpawnBloodSpillFX(GetWorld(), GetRandomBloodSpillFX(), SkeletalMeshComponent, ParentBone, SprayDirection, NiagaraCallbackName, this);
 }
 
-UNiagaraSystem* UDismemberer::GetRandomDismemberFX() const
+UNiagaraSystem* UDismemberer::GetRandomBloodSpillFX() const
 {
-	return DismemberFXs[FMath::RandRange(0, DismemberFXs.Num() - 1)];
+	return BloodSpillFXs[FMath::RandRange(0, BloodSpillFXs.Num() - 1)];
+}
+
+UNiagaraSystem* UDismemberer::GetRandomBloodExplosionFX() const
+{
+	return BloodExplosionFXs[FMath::RandRange(0, BloodSpillFXs.Num() - 1)];
 }
 
 UMaterialInterface* UDismemberer::GetRandomBloodStainDecal() const
@@ -107,7 +153,7 @@ void UDismemberer::SpawnDisemberedLimb(const FName BoneName, const FVector Impul
 		return;
 
 	ADismemberedLimb* DismemberedLimb = GetWorld()->SpawnActor<ADismemberedLimb>();
-	DismemberedLimb->Init(this, BoneName, Impulse, GetRandomDismemberFX());
+	DismemberedLimb->Init(this, BoneName, Impulse);
 	DismemberedBones.Append(DismemberedLimb->GetLimbBoneNames());
 }
 

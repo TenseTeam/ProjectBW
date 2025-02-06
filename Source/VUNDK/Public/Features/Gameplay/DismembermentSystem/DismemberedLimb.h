@@ -27,29 +27,33 @@ private:
 	UDismemberer* Dismemberer;
 	UPROPERTY()
 	USkeletalMeshComponent* TargetSkelatalMeshComponent;
-	UPROPERTY()
-	UNiagaraSystem* DismemberLimbFX;
 	FName TargetBoneName;
 	TArray<FName> LimbBoneNames;
-	
+
 public:
 	ADismemberedLimb();
 
 	virtual void ReceiveParticleData_Implementation(const TArray<FBasicParticleData>& Data, UNiagaraSystem* NiagaraSystem, const FVector& SimulationPositionOffset) override;
-	
-	void Init(UDismemberer* InDismemberer, FName BoneName, FVector Impulse, UNiagaraSystem* InDismemberLimbFX);
+
+	void Init(UDismemberer* InDismemberer, FName BoneName, FVector Impulse);
 
 	TArray<FName> GetLimbBoneNames() const;
-	
+
+protected:
+	UFUNCTION()
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
 private:
-	void SpawnDismemberFX();
-	
+	void SpawnBloodExplosionFX();
+
+	void SpawnBloodSpillFX();
+
 	void IsolateLimb();
-	
+
 	void SetLimbActorLocationAndRotation();
-	
+
 	FName GetRootBoneName() const;
-	
+
 	UPrimitiveComponent* CreateApproximateCollision();
 
 	bool Check() const;
