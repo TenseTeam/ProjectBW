@@ -42,13 +42,15 @@ void ADismemberedLimb::Init(UDismemberer* InDismemberer, const FName BoneName, c
 		return;
 
 	PoseableMesh->SetSkinnedAssetAndUpdate(TargetSkelatalMeshComponent->GetSkeletalMeshAsset());
-	SetActorLabel(TargetBoneName.ToString());
-
 	IsolateLimb();
 	SetLimbActorLocationAndRotation();
 	SpawnBloodSpillFX();
 	UPrimitiveComponent* CollisionComp = CreateApproximateCollision();
 	CollisionComp->AddImpulse(Impulse, TargetBoneName);
+
+#if WITH_EDITOR
+	SetActorLabel(TargetBoneName.ToString());
+#endif
 }
 
 TArray<FName> ADismemberedLimb::GetLimbBoneNames() const
