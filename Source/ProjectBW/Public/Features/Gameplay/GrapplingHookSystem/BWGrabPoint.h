@@ -19,6 +19,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* Mesh;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TEnumAsByte<ECollisionChannel> ObstaclesTraceChannel;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bShowDebug;
 	UPROPERTY()
 	UGrapplingHookComponent* PlayerGrapplingHook;
@@ -29,12 +31,12 @@ private:
 public:
 	ABWGrabPoint();
 	virtual void BeginPlay() override;
-	virtual FVector GetLocation() const override;
-	virtual FVector GetLandingPoint() const override;
-	virtual bool CanBeGrabbed(const ACharacter* Character) const override;
+	virtual FVector GetLocation_Implementation() override;
+	virtual FVector GetLandingPoint_Implementation() override;
+	virtual bool CanBeGrabbed_Implementation(const ACharacter* Character) override;
 
 private:
 	FVector GetPlayerCameraLocation() const;
-	bool ObstacleInBetween(const ACharacter* Character, FHitResult& HitResult) const;
+	bool ObstacleInBetween(const ACharacter* Character, FHitResult& HitResult);
 	void Initialize();
 };

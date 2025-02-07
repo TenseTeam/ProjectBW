@@ -16,15 +16,17 @@ class PROJECTBW_API ABaseEnemyController : public ANPCBaseStateEnemyController
 
 public:
 
-	ABaseEnemyController();
+	ABaseEnemyController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void SetStateAsPassive() override;
 
 	virtual void SetStateAsPatrolling() override;
 
+	virtual void SetStateAsChasing(AActor* Actor) override;
+
 	virtual void SetStateAsAttacking(AActor* Actor) override;
-	
-	virtual void SetStateAsInvestigating() override;
+
+	virtual void SetStateAsDead() override;
 	
 protected:
 
@@ -35,16 +37,17 @@ protected:
 	virtual void InitializeBlackboardValues() override;
 	
 	virtual void HandleSight(AActor* Actor, FAIStimulus Stimulus) override ;
-	virtual void HandleHear(AActor* Actor, FAIStimulus Stimulus) override ;
 	virtual void HandleDamage(AActor* Actor, FAIStimulus Stimulus) override ;
 	
 	virtual void OnLostSight() override ;
-	virtual void OnLostHear() override ;
 	virtual void OnLostDamage() override ;
 	
 private:
 	
 	UPROPERTY()
 	AEnemyBase* EnemyBase;
+
+	UFUNCTION()
+	int GetTeamIndex (AActor* Actor);
 
 };

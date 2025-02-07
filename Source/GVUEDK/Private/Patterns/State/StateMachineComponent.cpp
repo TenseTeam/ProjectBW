@@ -3,6 +3,7 @@
 
 #include "Patterns/State/StateMachineComponent.h"
 
+#include "NativeGameplayTags.h"
 #include "Utility/FGvDebug.h"
 
 
@@ -60,6 +61,28 @@ void UStateMachineComponent::Initialize()
 	{
 		bInitialized = false;
 	}
+
+	// TArray<FGameplayTag> TagsToRemove = TArray<FGameplayTag>();
+	// for (auto Element : StatesMap)
+	// {
+	// 	if (!IsValid(Element.Value))
+	// 	{
+	// 		FGvDebug::Warning("Invalid State with Tag: " + Element.Key.ToString());
+	// 		TagsToRemove.Emplace(Element.Key);
+	// 		continue;
+	// 	}
+	//
+	// 	Element.Value->Initialize(Context);
+	// }
+	// for (auto ToRemove : TagsToRemove)
+	// {
+	// 	StatesMap.Remove(ToRemove);
+	// }
+	// if (StatesMap.Num() > 0)
+	// {
+	// 	CurrentState = StatesMap.CreateConstIterator().Value();
+	// 	bInitialized = true;
+	// }
 }
 
 void UStateMachineComponent::ChangeState(const int Index)
@@ -73,7 +96,7 @@ void UStateMachineComponent::ChangeState(const int Index)
 		}
 		if (CurrentState == NewState)
 		{
-			FGvDebug::Warning("State already running");
+			FGvDebug::Warning("State: " + CurrentState->GetName() + " already running");
 			return;
 		}
 		if (States.Num() > Index)

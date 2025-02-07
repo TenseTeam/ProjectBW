@@ -70,9 +70,21 @@ bool UShooterBehaviourBase::Shoot()
 		return false;
 	}
 
+	if (!OnShootCondition(ShootBarrel))
+	{
+		ShootFail(EShootFailReason::Condition);
+		return false;
+	}
+
 	HandleShoot();
 	ShootSuccess();
 	return true;
+}
+
+void UShooterBehaviourBase::ResetCooldown()
+{
+	CooldownRemaining = 0.0f;
+	bIsInCooldown = false;
 }
 
 void UShooterBehaviourBase::ResetRecoil()
@@ -230,14 +242,12 @@ void UShooterBehaviourBase::HandleShoot()
 	}
 }
 
-void UShooterBehaviourBase::ShootFromShootPoint(UShootPoint* ShootPoint) const
+void UShooterBehaviourBase::DeployShoot(UShootPoint* ShootPoint) const
 {
 	const FVector ShooterTargetLocation = GetShooterTargetLocation();
-	FVector ShootPointDirToTarget = ShooterTargetLocation - ShootPoint->GetShootPointLocation();
-	ShootPointDirToTarget.Normalize();
+	const FVector ShootPointDirToTarget = (ShooterTargetLocation - ShootPoint->GetShootPointLocation()).GetSafeNormal();
 	ShootPoint->GenerateSpreadDegree(GetMaxSpread());
 	OnDeployShoot(ShootPoint, ShooterTargetLocation, ShootPointDirToTarget);
-	OnShootFromShootPoint(ShootPoint, ShooterTargetLocation, ShootPointDirToTarget);
 }
 
 void UShooterBehaviourBase::ShootSuccess()
@@ -284,10 +294,6 @@ void UShooterBehaviourBase::OnDeployShoot_Implementation(UShootPoint* ShootPoint
 {
 }
 
-void UShooterBehaviourBase::OnShootFromShootPoint_Implementation(UShootPoint* ShootPoint, const FVector& TargetLocation, const FVector& DirectionToTarget) const
-{
-}
-
 void UShooterBehaviourBase::OnInit_Implementation()
 {
 }
@@ -311,6 +317,11 @@ FVector UShooterBehaviourBase::GetShooterTargetLocation_Implementation() const
 
 void UShooterBehaviourBase::OnShootSuccess_Implementation(const UShootBarrel* OutShootBarrel)
 {
+}
+
+bool UShooterBehaviourBase::OnShootCondition_Implementation(UShootBarrel* OutShootBarrel) const
+{
+	return true;
 }
 
 bool UShooterBehaviourBase::TryGetCameraPoints(FVector& OutStartPoint, FVector& OutEndPoint, FVector& OutHitPoint, FRotator& OutRotation, const FVector StartPointOffset) const
@@ -375,7 +386,7 @@ void UShooterBehaviourBase::HandleSimultaneousShoot()
 			continue;
 		}
 
-		ShootFromShootPoint(ShootPoint);
+		DeployShoot(ShootPoint);
 	}
 }
 
@@ -389,7 +400,7 @@ void UShooterBehaviourBase::HandleSequentialShoot()
 		return;
 	}
 
-	ShootFromShootPoint(ShootPoints[CurrentShootPointIndex]);
+	DeployShoot(ShootPoints[CurrentShootPointIndex]);
 }
 
 int32 UShooterBehaviourBase::NextShootPointIndex()
@@ -470,5 +481,5 @@ void UShooterBehaviourBase::ProcessCooldown(const float DeltaTime)
 
 void UShooterBehaviourBase::EndShootCooldown()
 {
-	bIsInCooldown = false;
+	ResetCooldown();
 }

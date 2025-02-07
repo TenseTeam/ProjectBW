@@ -50,7 +50,7 @@ void UResourceAttributeBase::Initialize(AActor* InOwner, const FName InName)
 
 void UResourceAttributeBase::SetValue(const float NewValue)
 {
-	if (CurrentValue == NewValue) return;
+	//if (CurrentValue == NewValue) return;
 
 	const float ValueBeforeChange = CurrentValue;
 

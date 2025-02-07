@@ -11,18 +11,12 @@ public class ProjectBWTarget : TargetRules
 		DefaultBuildSettings = BuildSettingsVersion.V5;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_5;
 		
-		ExtraModuleNames.AddRange( new string[]
+		ExtraModuleNames.AddRange(new string[]
 		{
 			"ProjectBW",
 			"VUNDK",
 			"GVUEDK",
 			"LGUEDK"
 		} );
-		// RegisterModulesCreatedByRider();
 	}
-
-	// private void RegisterModulesCreatedByRider()
-	// {
-	// 		ExtraModuleNames.AddRange(new string[] { "LGUEDK" });
-	// }
 }

@@ -40,7 +40,10 @@ public:
 #endif
 	virtual void Init(APawn* InOwner, UObject* InPayload = nullptr) override;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintPure = false)
+	void ResetCooldown() const;
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure = false)
 	void ResetRecoil() const;
 	
 	virtual void SetWeaponDamage(const float NewDamage) override;

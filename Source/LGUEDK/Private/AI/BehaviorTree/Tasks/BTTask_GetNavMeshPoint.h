@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AI/NPC/NPCBaseStateEnemy/NPCBaseStateEnemy.h"
 #include "BehaviorTree/BTTaskNode.h"
 #include "BTTask_GetNavMeshPoint.generated.h"
 
@@ -22,4 +23,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
 	FBlackboardKeySelector TargetLocationKey;
+
+	bool IsPointFree(const FVector& Point,const float Radius,const ANPCBaseStateEnemy* ControlledPawn) const;
 };

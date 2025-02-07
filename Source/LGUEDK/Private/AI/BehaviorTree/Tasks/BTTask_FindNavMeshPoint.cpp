@@ -43,7 +43,7 @@ EBTNodeResult::Type UBTTask_FindNavMeshPoint::ExecuteTask(UBehaviorTreeComponent
     return EBTNodeResult::Succeeded;
 }
 
-FVector UBTTask_FindNavMeshPoint::FindFarthestPointWithinRange(FVector PlayerLocation,const AActor* Enemy,float MinDistance, float MaxDistance)
+FVector UBTTask_FindNavMeshPoint::FindFarthestPointWithinRange(const FVector& PlayerLocation,const AActor* Enemy,const float& MinDistance,const float& MaxDistance)
 {
     FVector BestPoint = FVector::Zero();
     TArray<FNavLocation> NavPoints;
@@ -199,12 +199,12 @@ bool UBTTask_FindNavMeshPoint::IsHittingSomething(const FVector& Start, const FV
     return bHit;
 }
 
-bool UBTTask_FindNavMeshPoint::IsInRange(float Distance, const float MinDistance, const float MaxDistance)
+bool UBTTask_FindNavMeshPoint::IsInRange(float& Distance,const float& MinDistance,const float& MaxDistance)
 {
     return Distance > MinDistance && Distance < MaxDistance;
 }
 
-FVector UBTTask_FindNavMeshPoint::GetCorrectNavPoint(TArray<FNavLocation> NavPoints,float BestDistance, const FVector& PlayerLocation, FVector PlayerNavMeshLocation,const float MinDistance, const float MaxDistance,const AActor* Enemy)
+FVector UBTTask_FindNavMeshPoint::GetCorrectNavPoint(TArray<FNavLocation>& NavPoints,float& BestDistance, const FVector& PlayerLocation,FVector PlayerNavMeshLocation,const float& MinDistance,const float& MaxDistance,const AActor* Enemy)
 {
     
     FVector BestPoint = FVector::ZeroVector;
@@ -230,7 +230,7 @@ FVector UBTTask_FindNavMeshPoint::GetCorrectNavPoint(TArray<FNavLocation> NavPoi
     return BestPoint;
 }
 
-void UBTTask_FindNavMeshPoint::GetAllReachableNavPoints(UNavigationSystemV1* NavSystem, const FVector& Center,float Radius, TArray<FNavLocation>& OutNavPoints)
+void UBTTask_FindNavMeshPoint::GetAllReachableNavPoints(UNavigationSystemV1* NavSystem, const FVector& Center,const float& Radius, TArray<FNavLocation>& OutNavPoints)
 {
     const float GridRadius = Radius + 400; 
     const float StepSize = 500;           

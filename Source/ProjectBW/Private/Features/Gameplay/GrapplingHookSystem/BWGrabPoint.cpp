@@ -33,17 +33,17 @@ void ABWGrabPoint::BeginPlay()
 	Initialize();
 }
 
-FVector ABWGrabPoint::GetLocation() const
+FVector ABWGrabPoint::GetLocation_Implementation() 
 {
 	return bInitialized ? GetActorLocation() : FVector::ZeroVector;
 }
 
-FVector ABWGrabPoint::GetLandingPoint() const
+FVector ABWGrabPoint::GetLandingPoint_Implementation()  
 {
 	return bInitialized ? GetActorTransform().TransformPosition(LandingPoint) : FVector::ZeroVector;
 }
 
-bool ABWGrabPoint::CanBeGrabbed(const ACharacter* Character) const
+bool ABWGrabPoint::CanBeGrabbed_Implementation(const ACharacter* Character) 
 {
 	if (Character == nullptr || !bInitialized)
 	{
@@ -88,17 +88,17 @@ FVector ABWGrabPoint::GetPlayerCameraLocation() const
 	return UGameplayStatics::GetPlayerCameraManager(this, 0)->GetCameraCacheView().Location;
 }
 
-bool ABWGrabPoint::ObstacleInBetween(const ACharacter* Character, FHitResult& HitResult) const
+bool ABWGrabPoint::ObstacleInBetween(const ACharacter* Character, FHitResult& HitResult)
 {
 	// between landing point and player
-	GetWorld()->LineTraceSingleByChannel(HitResult, GetLandingPoint(), Character->GetActorLocation(), ECC_Visibility,
+	GetWorld()->LineTraceSingleByChannel(HitResult, GetLandingPoint_Implementation(), Character->GetActorLocation(), ObstaclesTraceChannel,
 										 TraceParams);
 	if (HitResult.bBlockingHit)
 	{
 		return true;
 	}
 	// between grab point and player
-	GetWorld()->LineTraceSingleByChannel(HitResult, GetActorLocation(), Character->GetActorLocation(), ECC_Visibility,
+	GetWorld()->LineTraceSingleByChannel(HitResult, GetActorLocation(), Character->GetActorLocation(), ObstaclesTraceChannel,
                                          TraceParams);
 	if (HitResult.bBlockingHit)
 	{

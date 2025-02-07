@@ -97,6 +97,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
 	virtual bool Shoot() override;
 
+	UFUNCTION(BlueprintCallable)
+	void ResetCooldown();
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure = false)
 	void ResetRecoil();
 
@@ -172,7 +175,7 @@ public:
 protected:
 	virtual void HandleShoot();
 	
-	void ShootFromShootPoint(UShootPoint* ShootPoint) const;
+	void DeployShoot(UShootPoint* ShootPoint) const;
 
 	void ShootSuccess();
 
@@ -192,15 +195,19 @@ protected:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnDeployShoot(UShootPoint* ShootPoint, const FVector& TargetLocation, const FVector& DirectionToTarget) const;
-
-	UFUNCTION(BlueprintNativeEvent)
-	void OnShootFromShootPoint(UShootPoint* ShootPoint, const FVector& TargetLocation, const FVector& DirectionToTarget) const;
-
+	
 	UFUNCTION(BlueprintNativeEvent)
 	void OnShootSuccess(const UShootBarrel* OutShootBarrel);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnShootFail(const EShootFailReason FailReason);
+
+	/**
+	 * Additional condition to check before shooting.
+	 * @return True if the condition is met, false otherwise.
+	 */
+	UFUNCTION(BlueprintNativeEvent)
+	bool OnShootCondition(UShootBarrel* OutShootBarrel) const;
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnRefill();
@@ -242,6 +249,4 @@ private:
 	void ProcessCooldown(float DeltaTime);
 
 	void EndShootCooldown();
-
-	float GenerateSpread() const;
 };

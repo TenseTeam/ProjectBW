@@ -19,10 +19,10 @@ class GVUEDK_API UGrapplingHookModeBase : public UObject
 public:
 	virtual void Initialize(UGrapplingHookComponent* InGrapplingHookComponent);
 
-	// Returns false if the ticking doesn't need to continue
+	// Returns true if the tick of the GrapplingHookComponent should be stopped
 	virtual bool TickMode(float DeltaTime) { return false; }
-	virtual void EnterMode(){}
-	virtual void ExitMode(){}
+	virtual void EnterMode();
+	virtual void ExitMode();
 
 protected:
 	IGrabPoint* GetTargetGrabPoint() const;

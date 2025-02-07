@@ -11,7 +11,7 @@ USTRUCT(Blueprintable, BlueprintType)
 struct FQuestSaveData
 {
 	GENERATED_BODY()
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EQuestStatus QuestStatus;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -19,5 +19,8 @@ struct FQuestSaveData
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int32 CurrentTaskIndex;
 
-	FQuestSaveData() = default;
+	FQuestSaveData(): QuestStatus(),
+	                  CurrentTaskIndex(0)
+	{
+	}
 };

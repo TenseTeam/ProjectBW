@@ -25,7 +25,7 @@ public:
 	void MarkAsOccupied(float OccupyDuration = 1.5f);
 	
 	UFUNCTION(BlueprintCallable, Category = "Custom Nav Link")
-	FVector FindValidDestination(const FVector& OriginalDestination, int32 MaxAttempts,bool bDebug);
+	FVector FindValidDestination(const FVector& OriginalDestination,const int32& MaxAttempts,bool& bDebug);
 	
 private:
 	UPROPERTY(EditAnywhere, Category = "Custom Nav Link")

@@ -33,21 +33,29 @@ bool UBTDecorator_CanSeeTarget::CalculateRawConditionValue(UBehaviorTreeComponen
 	
 	FVector StartLocation = ControlledPawn->GetActorLocation();
 	FVector EndLocation = TargetActor->GetActorLocation();
-	FHitResult HitResult;
 	
+	FHitResult HitResult;
+	FCollisionQueryParams TraceParams;
+	TraceParams.bTraceComplex = true;
+	TraceParams.bReturnPhysicalMaterial = false; 
+	TraceParams.AddIgnoredActor(ControlledPawn); 
+	TraceParams.AddIgnoredActor(TargetActor);    
+
 	bool bHit = GetWorld()->LineTraceSingleByChannel(
 		HitResult,
 		StartLocation,
 		EndLocation,
-		TraceChannel
+		ECC_Visibility, 
+		TraceParams
 	);
-	
+
 	
 	if (bDebugLineTrace)
 	{
 		FColor LineColor = bHit ? FColor::Red : FColor::Green;
 		DrawDebugLine(GetWorld(), StartLocation, EndLocation, LineColor, false, 1.0f, 0, 2.0f);
 	}
+
 	
 	return !bHit;
 }

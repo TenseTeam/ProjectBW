@@ -14,5 +14,9 @@ struct FAmmoStackData
 	int32 MaxStack;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0", UIMin = "0", EditCondition = "MaxStack > 0"))
 	int32 InitialSize;
-};
 
+	FAmmoStackData(): MaxStack(0),
+	                  InitialSize(0)
+	{
+	}
+};

@@ -20,6 +20,10 @@ struct FRPGItemVisualDetails
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UStaticMesh* ItemMesh;
 
+    FRPGItemVisualDetails(): ItemMesh(nullptr)
+	{
+	}
+
 	bool operator==(const FRPGItemVisualDetails& Other) const
 	{
 		return Name.EqualTo(Other.Name) &&

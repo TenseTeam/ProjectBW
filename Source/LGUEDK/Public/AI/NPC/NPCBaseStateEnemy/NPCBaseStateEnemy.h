@@ -33,33 +33,36 @@ public:
 	virtual float GetTimeBeforeInvestigating() const { return TimeBeforeInvestigating; }
 	UFUNCTION()
 	virtual float GetRandomInvestigatingTimeDeviation() const { return RandomInvestigatingTimeDeviation; }
-	
 	UFUNCTION()
 	virtual float GetMinRadius() const {return MinAttackRadius; }
 	UFUNCTION()
 	virtual float GetMaxRadius() {return MaxAttackRadius; }
 	UFUNCTION()
 	virtual float GetStrafeRadius() {return MaxStrafeRadius; }
-	
 	UFUNCTION()
 	virtual float GetJumpHeight() const {return MaxJumpingHeight; }
 	UFUNCTION()
 	virtual float GetJumpDistance() const {return MinJumpingDistance; }
+
+	UFUNCTION(Blueprintable,BlueprintCallable)
+	EEnemyType GetEnemyType() const { return EnemyType; }
 	
+	UFUNCTION(Blueprintable,BlueprintCallable)
 	void SetAttackTarget(AActor* Target) { AttackTarget = Target; }
+	
 	UFUNCTION(BlueprintPure)
 	AActor* GetAttackTarget() const { return AttackTarget; }
-	
-	UPROPERTY(VisibleAnywhere, Category = "AI|EQS")
-	AEQS_Manager* EQS_Manager;
 
-	UPROPERTY(VisibleAnywhere, Category = "AI|")
-	EEnemyType EnemyType;
+	UFUNCTION(Blueprintable,BlueprintCallable)
+	AEQS_Manager* GetEQSManager() const { return EQS_Manager; }
 	
 protected:
 	
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|")
+	EEnemyType EnemyType;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Patrolling")
 	float SearchRadius = 200;
 
@@ -98,5 +101,8 @@ protected:
 	
 	UPROPERTY()
 	AActor* AttackTarget;
+
+	UPROPERTY()
+	AEQS_Manager* EQS_Manager;
 	
 };

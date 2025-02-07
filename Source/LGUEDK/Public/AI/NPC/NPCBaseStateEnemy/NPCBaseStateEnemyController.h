@@ -16,19 +16,25 @@ class LGUEDK_API ANPCBaseStateEnemyController : public ANPCPerceptionSystemContr
 
 public:
 	
-	ANPCBaseStateEnemyController();
+	ANPCBaseStateEnemyController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 		
-	UFUNCTION(BlueprintCallable)
-	virtual void SetStateAsPassive() {};
+	UFUNCTION(BlueprintCallable, Category = "State")
+	virtual void SetStateAsPassive() ;
 	
-	UFUNCTION(BlueprintCallable)
-	virtual void SetStateAsPatrolling() {};
+	UFUNCTION(BlueprintCallable, Category = "State")
+	virtual void SetStateAsPatrolling() ;
 
-	UFUNCTION(BlueprintCallable)
-	virtual void SetStateAsAttacking(AActor* Actor) {};
+	UFUNCTION(BlueprintCallable, Category = "State")
+	virtual void SetStateAsChasing(AActor* Actor) ;
+	
+	UFUNCTION(BlueprintCallable, Category = "State")
+	virtual void SetStateAsAttacking(AActor* Actor) ;
+	
+	UFUNCTION(BlueprintCallable, Category = "State")
+	virtual void SetStateAsInvestigating();
 
-	UFUNCTION(BlueprintCallable)
-	virtual void SetStateAsInvestigating() {};
+	UFUNCTION(BlueprintCallable, Category = "State")
+	virtual void SetStateAsDead();
 
 protected:
 	
@@ -45,11 +51,5 @@ protected:
 	virtual void OnLostSight() override { Super::OnLostSight(); };
 	virtual void OnLostHear() override { Super::OnLostHear(); };
 	virtual void OnLostDamage() override { Super::OnLostDamage(); };
-	
-private:
-	
-	UPROPERTY()
-	ANPCBaseStateEnemy* MyControlledPawn;
-	
 	
 };

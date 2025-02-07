@@ -2,12 +2,12 @@
 
 
 #include "LGUEDK/Public/AI/NPC/NPCBase/NPCBase.h"
-
 #include "AI/NPC/NPCBase/NPCBaseController.h"
 
 
 ANPCBase::ANPCBase()
 {
+	Controller = nullptr;
 	
 }
 
@@ -19,4 +19,5 @@ UBehaviorTree* ANPCBase::GetBehaviorTree() const
 void ANPCBase::BeginPlay()
 {
 	Super::BeginPlay();
+	//Controller = Cast<ANPCBaseController>(GetAIController());
 }

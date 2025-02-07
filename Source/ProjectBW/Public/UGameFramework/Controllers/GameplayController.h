@@ -6,7 +6,9 @@
 #include "Base/BWControllerBase.h"
 #include "EnhancedInputSubsystems.h"
 #include "Features/Player/BWCharacter.h"
+#include "Input/ActionManagementSystem/Components/ActionManagerComponent.h"
 #include "GameplayController.generated.h"
+
 
 class UCharacterStats;
 class UEquipment;
@@ -25,6 +27,8 @@ public:
 	UEquipment* Equipment;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UCharacterStats* CharacterStats;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UActionManagerComponent* ActionManager;
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Features/Gameplay/GrapplingHookSystem/Interfaces/GrabPoint.h"
 #include "IA/EnemyBase/EnemyBase.h"
 #include "IA/Weapons/Melee/MeleeWeapon.h"
 #include "MeleeEnemy.generated.h"
@@ -12,7 +13,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(
 
 
 UCLASS()
-class PROJECTBW_API AMeleeEnemy : public AEnemyBase
+class PROJECTBW_API AMeleeEnemy : public AEnemyBase, public IGrabPoint
 {
 	GENERATED_BODY()
 
@@ -23,20 +24,21 @@ public:
 	
 	AMeleeEnemy();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Blueprintable, BlueprintCallable)
 	bool GetWieldSword() const {return bWieldSword; }
 	
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Blueprintable, BlueprintCallable)
 	void SetWieldSword(bool bHasSword) { bWieldSword = bHasSword; }
-	
-	// UFUNCTION(BlueprintCallable)
-	// void PlayMontageWithNotify(UAnimMontage* MontageToPlay);
 	
 	UFUNCTION(BlueprintCallable)
 	void EquipSword(FName SocketName);
 
 	UFUNCTION(BlueprintCallable)
 	void FinishedAnimation();
+
+	virtual void OnEnemyDead() override;
+
+	virtual void OnEnemyPatrolling() override;
 	
 protected:
 	
@@ -67,6 +69,5 @@ private:
 	UPROPERTY(EditAnywhere, Category = "AI|Melee")
 	bool bWieldSword;
 	
-	//void OnMontageNotifyReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
 	
 };

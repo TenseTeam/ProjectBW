@@ -3,6 +3,7 @@
 
 #include "AI/NPC/NPCBaseStateEnemy/NPCBaseStateEnemy.h"
 
+#include "AI/NPC/NPCBaseStateEnemy/NPCBaseStateEnemyController.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -26,7 +27,7 @@ FVector ANPCBaseStateEnemy::RandomPosition(FVector Position)
 	float OffsetY = RandomRadius * FMath::Sin(RandomAngle);
 	
 	FVector RandomPoint = Position + FVector(OffsetX, OffsetY, 0.0f);
-
+	
 	return RandomPoint;
 }
 

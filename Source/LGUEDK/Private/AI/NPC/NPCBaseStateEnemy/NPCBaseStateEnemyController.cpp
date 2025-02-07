@@ -8,13 +8,38 @@
 #include "Utility/LGDebug.h"
 
 
-ANPCBaseStateEnemyController::ANPCBaseStateEnemyController()
+ANPCBaseStateEnemyController::ANPCBaseStateEnemyController(const FObjectInitializer& ObjectInitializer)
+	:Super(ObjectInitializer)
 {
-	MyControlledPawn = nullptr;
+	
+}
+
+void ANPCBaseStateEnemyController::SetStateAsPassive()
+{
+}
+
+void ANPCBaseStateEnemyController::SetStateAsPatrolling()
+{
+}
+
+void ANPCBaseStateEnemyController::SetStateAsChasing(AActor* Actor)
+{
+}
+
+void ANPCBaseStateEnemyController::SetStateAsAttacking(AActor* Actor)
+{
+}
+
+void ANPCBaseStateEnemyController::SetStateAsInvestigating()
+{
+}
+
+void ANPCBaseStateEnemyController::SetStateAsDead()
+{
 }
 
 void ANPCBaseStateEnemyController::BeginPlay()
 {
-	MyControlledPawn = Cast<ANPCBaseStateEnemy>(GetControlledPawn());
 	Super::BeginPlay();
 }
+

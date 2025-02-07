@@ -6,6 +6,7 @@
 #include <string>
 
 #include "AIController.h"
+#include "AI/NPC/NPCBaseStateEnemy/NPCBaseStateEnemyController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Utility/LGDebug.h"
 
@@ -54,6 +55,7 @@ void UBTService_UpdatePlayerDistance::OnBecomeRelevant(UBehaviorTreeComponent& O
 		return;
 	}
 
+	//LGDebug::Log("CachedAttackTarget " + CachedAttackTarget->GetName(), true);
 	CachedBlackboardComp->SetValueAsVector(AttackTargetPositionKey.SelectedKeyName, CachedAttackTarget->GetActorLocation());
 	CachedBlackboardComp->SetValueAsVector(PawnPositionKey.SelectedKeyName, CachedSelf->GetActorLocation());
 
@@ -84,6 +86,7 @@ void UBTService_UpdatePlayerDistance::TickNode(UBehaviorTreeComponent& OwnerComp
 	FVector AttackTargetPosition = CachedAttackTarget->GetActorLocation();
 	FVector PawnPosition = CachedSelf->GetActorLocation();
 	float Distance = FVector::Distance(AttackTargetPosition, PawnPosition);
+	
 	
 	CachedBlackboardComp->SetValueAsVector(AttackTargetPositionKey.SelectedKeyName, AttackTargetPosition);
 	CachedBlackboardComp->SetValueAsVector(PawnPositionKey.SelectedKeyName, PawnPosition);

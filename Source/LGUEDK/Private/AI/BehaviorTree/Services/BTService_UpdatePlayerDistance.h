@@ -42,5 +42,6 @@ private:
 	AActor* CachedSelf;
 	UPROPERTY()
 	UBlackboardComponent* CachedBlackboardComp;
+
 	
 };

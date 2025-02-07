@@ -13,18 +13,19 @@ class LGUEDK_API AEQS_Manager : public AActor
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this actor's properties
+	
 	AEQS_Manager();
-
 	
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "AI|")
-	bool CanSearchPoint;
+	bool CanSearchMeleePoint;
 
-	// Called every frame
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "AI|")
+	bool CanSearchRengedPoint;
+	
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable)
-	FVector GetPoint(EEnemyType EnemyType);
+	FVector GetPoint(EEnemyType& EnemyType);
 
 
 protected:
@@ -46,17 +47,22 @@ protected:
 	float MaxAttackRadiusRanged = 1200.0f;
 	
 	UPROPERTY(EditAnywhere, Category = "AI|EQS Parameters")
-	float UpdateInterval = 5.0f;
+	float UpdateMeleeInterval = 5.0f;
 	
-	void UpdateStrafePoints();
-
+	UPROPERTY(EditAnywhere, Category = "AI|EQS Parameters")
+	float UpdateRangedInterval = 5.0f;
+	
+	void UpdateStrafeMeleePoints();
+	void UpdateStrafeRangedPoints();
+	
 	
 private:
 
 	UPROPERTY()
 	ACharacter* AttackTarget;
 	
-	float CurrentTime = 0;
+	float CurrentMeleeTime = 0;
+	float CurrentRangedTime = 0;
 
 	UFUNCTION(BlueprintCallable)
 	void Initi();
@@ -65,7 +71,10 @@ private:
 	bool IsHittingSomething(const FVector& Start, const FVector& End);
 
 	UFUNCTION(BlueprintCallable)
-	bool IsInRange(FVector TargetPosition,FVector CurrentPosition, const float MinDistance, const float MaxDistance);
+	bool IsInRange(FVector& TargetPosition,FVector& CurrentPosition, const float& MinDistance, const float& MaxDistance);
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	bool bShowDebug;
 };
 
 

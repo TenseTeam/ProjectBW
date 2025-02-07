@@ -11,6 +11,18 @@ void UGrapplingHookModeBase::Initialize(UGrapplingHookComponent* InGrapplingHook
 	OwnerCharacter = InGrapplingHookComponent->GetOwnerCharacter();
 }
 
+void UGrapplingHookModeBase::EnterMode()
+{
+	GrapplingHookComponent->SetHookHitObstacle(false);
+	GrapplingHookComponent->SetTargetGrabPoint(nullptr);
+}
+
+void UGrapplingHookModeBase::ExitMode()
+{
+	GrapplingHookComponent->SetHookHitObstacle(false);
+	GrapplingHookComponent->SetTargetGrabPoint(nullptr);
+}
+
 IGrabPoint* UGrapplingHookModeBase::GetTargetGrabPoint() const
 {
 	return GrapplingHookComponent->GetTargetGrabPoint();
